@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="CoreType.h" />
     <ClInclude Include="TArray.h" />
+    <ClInclude Include="TSet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
