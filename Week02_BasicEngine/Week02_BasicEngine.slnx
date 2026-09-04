@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Week02_BasicEngine/Week02_BasicEngine.vcxproj" />
+</Solution>
