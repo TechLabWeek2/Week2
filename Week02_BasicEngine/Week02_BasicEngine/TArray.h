@@ -167,6 +167,17 @@ public:
 		dataNum--;
 	}
 
+	void RemoveAtSwap(int32 Index) // 특정 Index의 Item을 tail 원소와 swap으로 제거 O(1)
+	{
+		if (IsEmpty())
+		{
+			throw std::out_of_range("RemoveAtSwap() on empty data");
+		}
+		IndexCheck(Index);
+		data[Index] = data[dataNum - 1];
+		dataNum--;
+	}
+
 	int32 Find(const T Item) const // 첫번째로 찾은 Item의 Index를 반환. 없으면 -1 반환
 	{
 		for (int32 i = 0; i < dataNum; i++)
