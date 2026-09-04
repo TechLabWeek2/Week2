@@ -1,6 +1,8 @@
 #include <iostream>
 #include "CoreType.h"
 #include "TArray.h"
+#include "TSet.h"
+#include "TMap.h"
 
 #include "CoreType.h"
 #include "FString.h"

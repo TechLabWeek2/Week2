@@ -145,6 +145,9 @@
   <ItemGroup>
     <ClInclude Include="CoreType.h" />
     <ClInclude Include="FString.h" />
+    <ClInclude Include="TArray.h" />
+    <ClInclude Include="TMap.h" />
+    <ClInclude Include="TSet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

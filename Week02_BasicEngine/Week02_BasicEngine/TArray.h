@@ -178,7 +178,7 @@ public:
 		dataNum--;
 	}
 
-	int32 Find (const T Item) const // 첫번째로 찾은 Item의 Index를 반환. 없으면 -1 반환
+	int32 Find(const T Item) const // 첫번째로 찾은 Item의 Index를 반환. 없으면 -1 반환
 	{
 		for (int32 i = 0; i < dataNum; i++)
 		{
