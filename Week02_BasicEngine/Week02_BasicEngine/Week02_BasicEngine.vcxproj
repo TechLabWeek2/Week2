@@ -163,6 +163,7 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="URenderer.h" />
+    <ClInclude Include="Utils\Math.hpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ShaderW0.hlsl">

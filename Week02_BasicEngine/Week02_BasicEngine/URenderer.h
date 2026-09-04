@@ -15,6 +15,8 @@
 #include "ImGui/imgui_impl_dx11.h"
 #include "imGui/imgui_impl_win32.h"
 
+#include "../Week02_BasicEngine/Utils/Math.hpp"
+
 #include <math.h>
 struct FVertexSimple
 {
@@ -27,15 +29,8 @@ struct FVector {
     FVector(float _x = 0, float _y = 0, float _z = 0) : x(_x), y(_y), z(_z) {}
 };
 
-struct FConstants {
-    FVector Offset;
-    float Scale;
-    FVector Rotation;
-    float Pad1;
-    FVector CameraLocation;
-    float Pad2;
-    FVector CameraRotation;
-    float Pad3;
+struct alignas(16) FConstants {
+    FMatrix4x4 World;
 };
 
 class URenderer

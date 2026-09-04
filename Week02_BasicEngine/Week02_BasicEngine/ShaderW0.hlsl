@@ -13,51 +13,14 @@ struct PS_INPUT
 
 cbuffer constants : register(b0)
 {
-    float3 offset;
-    float Scale;
-    float3 rotation;
-    float Pad;
-    float3 CameraLocation;
-    float Pad2;
-    float3 CameraRotation;
-    float Pad3;
+    row_major float4x4 World;
 }
 
 PS_INPUT mainVS(VS_INPUT input)
 {
     PS_INPUT output;
-    
-    // 1. Scale 적용
-    float x = input.position.x * Scale;
-    float y = input.position.y * Scale;
-    float z = input.position.z * Scale;
-    
-    // Z축 회전
-    float cosZ = cos(rotation.z);
-    float sinZ = sin(rotation.z);
-    float rx1 = x * cosZ - y * sinZ;
-    float ry1 = x * sinZ + y * cosZ;
-    float rz1 = z;
 
-    // Y축 회전
-    float cosY = cos(rotation.y);
-    float sinY = sin(rotation.y);
-    float rx2 = rx1 * cosY + rz1 * sinY;
-    float ry2 = ry1;
-    float rz2 = -rx1 * sinY + rz1 * cosY;
-
-    // X축 회전
-    float cosX = cos(rotation.x);
-    float sinX = sin(rotation.x);
-    float finalX = rx2;
-    float finalY = ry2 * cosX - rz2 * sinX;
-    float finalZ = ry2 * sinX + rz2 * cosX;
-
-    // 3. Translation (Location) 적용
-    finalX += offset.x;
-    finalY += offset.y;
-    finalZ += offset.z;
-    
+    /*
     float FOV = 45.0f; // 시야각 (예: 1.57f 대략 90도 또는 radians(45.0f))
     float AspectRatio = 9.0f / 9.0f; // 화면 가로/세로 비율 (예: 16.0f / 9.0f)
     float NearZ = 0.1f; // 최소 클리핑 거리 (예: 0.1f)
@@ -105,6 +68,9 @@ PS_INPUT mainVS(VS_INPUT input)
     output.position.y = projY * viewZ;
     output.position.z = ((FarZ / (FarZ - NearZ)) * viewZ - (FarZ * NearZ) / (FarZ - NearZ));
     output.position.w = viewZ; // 이 W값이 핵심입니다!
+    */
+    
+    output.position = mul(input.position, World);
     
     // Pass the color to the pixel shader
     output.color = input.color;

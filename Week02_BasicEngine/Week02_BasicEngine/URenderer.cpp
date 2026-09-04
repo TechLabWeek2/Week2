@@ -3,7 +3,10 @@
 
 void URenderer::CreateConstantBuffer() {
 	D3D11_BUFFER_DESC constantbufferdesc = {};
-	constantbufferdesc.ByteWidth = sizeof(FConstants) + 0xf & 0xfffffff0; // ensure constant buffer size is multiple of 16 bytes
+
+	//Fconstants 64바이트이므로
+	constantbufferdesc.ByteWidth = sizeof(FConstants);
+
 	constantbufferdesc.Usage = D3D11_USAGE_DYNAMIC; // will be updated from CPU every frame
 	constantbufferdesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	constantbufferdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -27,14 +30,36 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 	{
 		D3D11_MAPPED_SUBRESOURCE constantbufferMSR;
 
+		FMatrix4x4 scaleMatrix =
+			FMatrix4x4::Scaling(
+				Scale,
+				Scale,
+				Scale
+			);
+
+		FMatrix4x4 rotationMatrix =
+			FMatrix4x4::Rotation(
+				Rotation.x,
+				Rotation.y,
+				Rotation.z
+			);
+
+		FMatrix4x4 translationMatrix =
+			FMatrix4x4::Translation(
+				Offset.x,
+				Offset.y,
+				Offset.z
+			);
+
+		FMatrix4x4 worldMatrix =
+			scaleMatrix *
+			rotationMatrix *
+			translationMatrix;
+
 		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
 		FConstants* constants = (FConstants*)constantbufferMSR.pData;
 		{
-			constants->Offset = Offset;
-			constants->Scale = Scale;
-			constants->Rotation = { Rotation.x * 0.01745329252f,Rotation.y * 0.01745329252f,Rotation.z * 0.01745329252f };
-			constants->CameraLocation = CameraLocation;
-			constants->CameraRotation = CameraRotation;
+			constants->World = worldMatrix;
 		}
 		DeviceContext->Unmap(ConstantBuffer, 0);
 	}
