@@ -220,10 +220,11 @@ public:
 		}
 		if (Size > dataNum)
 		{
-			for (int32 i = 0; i < Size - dataNum; i++)
+			for (int32 i = dataNum; i < Size; i++)
 			{
 				AllocateMemory();
 				data[i] = T{};
+				dataNum++;
 			}
 		}
 		else
