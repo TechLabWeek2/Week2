@@ -26,6 +26,15 @@
 
 - development 브랜치로부터 생성되며, 작업 완료 및 PR 병합 후 삭제합니다.
 
+```text
+[Example]
+main
+└── development
+    ├── feat/map
+    ├── feat/player
+    ├── feat/physics
+    └── feat/resource
+```
 
 
 ## 2. Git 커밋 컨벤션 (Conventional Commits 기반)
