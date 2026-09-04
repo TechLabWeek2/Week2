@@ -1,4 +1,6 @@
 #include <iostream>
+#include "CoreType.h"
+#include "TArray.h"
 
 #include "CoreType.h"
 #include "FString.h"
