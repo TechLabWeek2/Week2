@@ -35,11 +35,6 @@ private:
 		{
 			throw std::out_of_range("Index of out range");
 		}
-	
-	}
-	bool IsEmpty () const // data가 비어있는지 확인
-	{
-		return dataNum <= 0;
 	}
 
 public:
@@ -114,6 +109,11 @@ public:
 	int32 Max () const // data의 최대 크기를 반환
 	{
 		return dataMax;
+	}
+
+	bool IsEmpty() const // data가 비어있는지 확인
+	{
+		return dataNum <= 0;
 	}
 
 	void Add (T Item) // Item을 data에 추가
@@ -200,5 +200,34 @@ public:
 		}
 
 		RemoveAt(foundIndex);
+	}
+
+	T* Data() // data 포인터를 반환 
+	{
+		return data;
+	}
+
+	const T* Data() const // data 포인터를 반환 const 버전
+	{
+		return data;
+	}
+
+	void Resize(int32 Size) // 입력한 size로 리사이즈
+	{
+		if (Size < 0)
+		{
+			throw std::out_of_range("Resize() with negative size");
+		}
+		if (Size > dataNum)
+		{
+			for (int32 i = 0; i < Size - dataNum; i++)
+			{
+				Add(T{});
+			}
+		}
+		else
+		{
+			dataNum = Size;
+		}
 	}
 };
