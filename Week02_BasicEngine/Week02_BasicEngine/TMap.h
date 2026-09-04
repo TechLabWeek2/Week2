@@ -21,11 +21,11 @@ public:
 
 	void Add(K key, V value)
 	{
-		m[key] = value;
+		map[key] = value;
 	}
 
 	V* Find(K key)
 	{
-		V
+		
 	}
 };
