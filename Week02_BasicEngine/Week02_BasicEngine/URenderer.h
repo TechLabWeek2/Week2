@@ -24,9 +24,23 @@ struct FVertexSimple
     float r, g, b, a; // Color
 };
 
-struct FVector {
+class FVector {
+public:
     float x, y, z;
     FVector(float _x = 0, float _y = 0, float _z = 0) : x(_x), y(_y), z(_z) {}
+    void Normalize() {
+        float d = x * x + y * y + z * z;
+        if (d == 1) {
+            return;
+        }
+        if (d < (1.0E-8F)) {
+            return;
+        }
+        d = sqrt(d);
+        x = x / d;
+        y = y / d;
+        z = z / d;
+    }
 };
 
 struct alignas(16) FConstants {

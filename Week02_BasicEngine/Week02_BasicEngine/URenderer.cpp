@@ -55,11 +55,42 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 			scaleMatrix *
 			rotationMatrix *
 			translationMatrix;
+		////////////////////////////////////////////////
+		FVector ZAxis = CameraRotation;
+		ZAxis.Normalize();
+		FVector XAxis;
+		XAxis.x = ZAxis.z;
+		XAxis.y = 0;
+		XAxis.z = -ZAxis.x;
+		XAxis.Normalize();
+		FVector YAxis;
+		YAxis.x = ZAxis.y * XAxis.y - XAxis.z * ZAxis.y;
+		YAxis.y = ZAxis.z * XAxis.x - ZAxis.x * XAxis.z;
+		YAxis.z = ZAxis.x * XAxis.y - ZAxis.y * XAxis.x;
+		FMatrix4x4 M;
+		M.m[0][0] = XAxis.x;
+		M.m[0][1] = YAxis.x;
+		M.m[0][2] = ZAxis.x;
+		M.m[0][3] = 0.0f;
+		M.m[1][0] = XAxis.y;
+		M.m[1][1] = YAxis.y;
+		M.m[1][2] = ZAxis.y;
+		M.m[1][3] = 0.0f;
+		M.m[2][0] = XAxis.z;
+		M.m[2][1] = YAxis.z;
+		M.m[2][2] = ZAxis.z;
+		M.m[2][3] = 0.0f;
+		M.m[3][0] = -CameraLocation.x * XAxis.x - CameraLocation.y * XAxis.y - CameraLocation.z * XAxis.z;
+		M.m[3][1] = -CameraLocation.x * YAxis.x - CameraLocation.y * YAxis.y - CameraLocation.z * YAxis.z;
+		M.m[3][2] = -CameraLocation.x * ZAxis.x - CameraLocation.y * ZAxis.y - CameraLocation.z * ZAxis.z;
+		M.m[3][3] = 1.0f;
 
+		FMatrix4x4 viewMatrix = worldMatrix * M;
+		////////////////////////////////////////////////
 		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
 		FConstants* constants = (FConstants*)constantbufferMSR.pData;
 		{
-			constants->World = worldMatrix;
+			constants->World = viewMatrix;
 		}
 		DeviceContext->Unmap(ConstantBuffer, 0);
 	}

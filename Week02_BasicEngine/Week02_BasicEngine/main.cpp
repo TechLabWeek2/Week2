@@ -124,7 +124,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     float degree = 100;
 
     FVector CameraLocation = { 0,0,0 };
-    FVector CameraRotation = { 0,0,0 };
+    FVector CameraRotation = { 0,0,1 };
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
     {
@@ -173,22 +173,54 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //아래
             CameraLocation.z -= 0.01f;
         }
-        if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) { //우클릭 누른 상태
-            if (!isDragging) {
+        if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
+        {
+            if (!isDragging)
+            {
                 isDragging = true;
                 lastMousePos = currentMousePos;
             }
+
             float deltaX = (float)(currentMousePos.x - lastMousePos.x);
             float deltaY = (float)(currentMousePos.y - lastMousePos.y);
 
-            float sensitivity = 0.2f; // 마우스 민감도 조절
+            float sensitivity = 0.02f;
 
-            CameraRotation.y += deltaX * sensitivity;
-            CameraRotation.x += deltaY * sensitivity;
+            float angleX = deltaX * sensitivity;
+            float angleY = deltaY * sensitivity;
+
+            // 좌우 회전
+            FVector rotation;
+
+            rotation.x = CameraRotation.x * cos(angleX)
+                + CameraRotation.z * sin(angleX);
+
+            rotation.y = CameraRotation.y;
+
+            rotation.z = -CameraRotation.x * sin(angleX)
+                + CameraRotation.z * cos(angleX);
+
+            rotation.Normalize();
+
+            // 상하 회전
+            FVector rotation2;
+
+            rotation2.x = rotation.x;
+
+            rotation2.y = rotation.y * cos(angleY)
+                - rotation.z * sin(angleY);
+
+            rotation2.z = rotation.y * sin(angleY)
+                + rotation.z * cos(angleY);
+
+            rotation2.Normalize();
+
+            CameraRotation = rotation2;
 
             lastMousePos = currentMousePos;
         }
-        else {
+        else
+        {
             isDragging = false;
             lastMousePos = currentMousePos;
         }
