@@ -43,3 +43,7 @@ using UTF8CHAR = char8_t;
 // A 32-bit character type. In-memory only. 32-bit representation.
 using UTF32CHAR = char32_t;
 
+//실제로 다룰 기본 문자열은 WIDECHAR로 한다.
+//TCHAR를 다른 곳에서 기본적으로 사용하도록 하고, 기본 문자열 타입을 바꿀 필요가 있다면 여길 바꾼다.
+typedef WIDECHAR			TCHAR;
+
