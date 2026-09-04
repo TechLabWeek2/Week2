@@ -26,6 +26,10 @@ public:
 
 	V* Find(K key)
 	{
-		
+		V value = map.find(key);
+		if (value == nullptr)
+		{
+			
+		}
 	}
 };

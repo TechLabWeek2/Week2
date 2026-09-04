@@ -222,7 +222,8 @@ public:
 		{
 			for (int32 i = 0; i < Size - dataNum; i++)
 			{
-				Add(T{});
+				AllocateMemory();
+				data[i] = T{};
 			}
 		}
 		else
