@@ -47,6 +47,48 @@ public:
 		: data(nullptr), dataNum(0), dataMax(DATA_MAX_INIT)
 	{}
 
+	TArray(const TArray& otherArray) // 복사 생성자
+		: data(nullptr), dataNum(0), dataMax(DATA_MAX_INIT)
+	{
+		if (otherArray.data)
+		{
+			this->data = new T[otherArray.Max()];
+			for (int32 i = 0; i < otherArray.Num(); i++)
+			{
+				this->data[i] = otherArray.data[i];
+			}
+			this->dataNum = otherArray.Num();
+			this->dataMax = otherArray.Max();
+		}
+	}
+
+	TArray& operator= (const TArray& otherArray) // = : 깊은 복사 
+	{
+		if (this == &otherArray)
+		{
+			return *this;
+		}
+
+		delete[] this->data;
+		if (otherArray.data)
+		{
+			this->data = new T[otherArray.Max()];
+			for (int32 i = 0; i < otherArray.Num(); i++)
+			{
+				this->data[i] = otherArray.data[i];
+			}
+			this->dataNum = otherArray.Num();
+			this->dataMax = otherArray.Max();
+		}
+		else
+		{
+			this->data = nullptr;
+			this->dataNum = 0;
+			this->dataMax = DATA_MAX_INIT;
+		}
+		return *this;
+	}
+
 	~TArray()
 	{
 		delete[] data;
