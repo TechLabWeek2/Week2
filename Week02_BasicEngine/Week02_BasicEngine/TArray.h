@@ -1,70 +1,151 @@
 #pragma once
 #include "CoreType.h"
 
+#define DATA_MAX_INIT 10
+
 template <typename T>
 class TArray
 {
 private:
-	T* array;
-	int32 arrayNum; // array의 item 개수
-	int32 arrayMax; // array의 최대 크기
+	T* data;
+	int32 dataNum; // data의 item 개수
+	int32 dataMax; // data의 최대 크기
 
-	void AllocateMemory() // array의 공간이 부족한 경우 메모리를 재할당
+	void AllocateMemory() // data의 공간이 부족한 경우 메모리를 재할당
 	{
-		if (arrayNum == 0)
+		if (data == nullptr)
 		{
-			array = new T[arrayMax];
+			data = new T[dataMax];
 		}
-		else if (arrayNum >= arrayMax - 1)
+		else if (dataNum >= dataMax)
 		{
-			T* newArray = new T[arrayMax * 2];
-			for (int32 i = 0; i < arrayNum; i++)
+			T* newdata = new T[dataMax * 2];
+			for (int32 i = 0; i < dataNum; i++)
 			{
-				newArray[i] = array[i];
+				newdata[i] = data[i];
 			}
-			delete[] array;
-			array = newArray;
-			arrayMax *= 2;
+			delete[] data;
+			data = newdata;
+			dataMax *= 2;
 		}
 	}
-	void IndexCheck(int32 index) const // input으로 들어온 index가 범위안에 있는지 확인
+	void IndexCheck(int32 Index) const // input으로 들어온 index가 범위안에 있는지 확인
 	{
-		if (index < 0 || index > arrayMax)
+		if (Index < 0 || Index >= dataNum)
 		{
-			throw("Index out of range");
+			throw std::out_of_range("Index of out range");
 		}
+	
+	}
+	bool IsEmpty() const // data가 비어있는지 확인
+	{
+		return dataNum <= 0;
 	}
 
 public:
 	TArray()
-		: array(nullptr), arrayNum(0), arrayMax(10)
+		: data(nullptr), dataNum(0), dataMax(DATA_MAX_INIT)
 	{}
 
-	void Add(T item)
+	~TArray()
 	{
-		AllocateMemory();
-
-		array[arrayNum++] = item;
+		delete[] data;
 	}
 
-	void Insert(T item, int32 index)
+	T& operator[] (int32 Index) const
 	{
-		IndexCheck(index);
+		IndexCheck(Index);
+		return data[Index];
+	}
+
+	T& operator[] (int32 Index)
+	{
+		IndexCheck(Index);
+		return data[Index];
+	}
+
+	int32 Num() const // data의 Item 개수를 반환
+	{
+		return dataNum;
+	}
+
+	int32 Max() const // data의 최대 크기를 반환
+	{
+		return dataMax;
+	}
+
+	void Add(T Item) // Item을 data에 추가
+	{
 		AllocateMemory();
 
-		for (int32 i = arrayNum; i > index; i--)
+		data[dataNum++] = Item;
+	}
+
+	void Insert(T Item, int32 Index) // Item을 특정 Index에 추가
+	{
+		if (Index < 0 || Index > dataNum)
 		{
-			array[i + 1] = array[i];
+			throw std::out_of_range("Index of out range");
 		}
-		array[index] = item;
-		arrayNum++;
+		AllocateMemory();
+
+		for (int32 i = dataNum - 1; i > Index; i--)
+		{
+			data[i + 1] = data[i];
+		}
+		data[Index] = Item;
+		dataNum++;
 	}
 
-	T Pop()
+	T Pop() // 마지막 Item을 Pop
 	{
-		T poppedValue = array[arrayNum];
+		if (IsEmpty())
+		{
+			throw std::out_of_range("Pop() on empty data");
+		}
 
-		arrayNum--;
+		T poppedValue = data[dataNum - 1];
+		dataNum--;
+
 		return poppedValue;
+	}
+
+	void RemoveAt(int32 Index) // 특정 Index의 Item을 제거
+	{
+		if (IsEmpty())
+		{
+			throw std::out_of_range("RemoveAt() on empty data");
+		}
+		IndexCheck(Index);
+
+		for (int32 i = Index; i < dataNum - 1; i++)
+		{
+			data[i] = data[i + 1];
+		}
+		dataNum--;
+	}
+
+	int32 Find(const T Item) const // 첫번째로 찾은 Item의 Index를 반환. 없으면 -1 반환
+	{
+		for (int32 i = 0; i < dataNum; i++)
+		{
+			if (data[i] == Item)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	void Remove(const T Item) // 첫번째로 찾은 Item을 제거
+	{
+		int32 foundIndex = Find(Item);
+
+		if (foundIndex == -1)
+		{
+			throw std::out_of_range("Remove() couldn't find Item");
+		}
+
+		RemoveAt(foundIndex);
 	}
 };
