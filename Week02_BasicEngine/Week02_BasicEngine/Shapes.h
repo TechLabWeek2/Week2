@@ -8,6 +8,13 @@ enum ETypePrimitive {
 	EPT_Max,
 };
 
+FVertexSimple line_vertices[] =
+{
+	{  0.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f }, // Top vertex (red)
+	{  1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-right vertex (green)
+	{ -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f }  // Bottom-left vertex (blue)
+};
+
 FVertexSimple triangle_vertices[] =
 {
 	{  0.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f }, // Top vertex (red)
@@ -17,10 +24,7 @@ FVertexSimple triangle_vertices[] =
 
 FVertexSimple cube_vertices[] =
 {
-	// ========================================
 	// Front face (Z+)
-	// Normal direction: +Z
-	// ========================================
 	{ -0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Bottom-left
 	{  0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-right
 	{ -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-left
@@ -30,10 +34,7 @@ FVertexSimple cube_vertices[] =
 	{  0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-right
 
 
-	// ========================================
 	// Back face (Z-)
-	// Normal direction: -Z
-	// ========================================
 	{  0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 1.0f }, // Bottom-right
 	{ -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f }, // Bottom-left
 	{  0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-right
@@ -43,10 +44,7 @@ FVertexSimple cube_vertices[] =
 	{ -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-left
 
 
-	// ========================================
 	// Left face (X-)
-	// Normal direction: -X
-	// ========================================
 	{ -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 1.0f }, // Bottom-back
 	{ -0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-front
 	{ -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-back
@@ -56,10 +54,7 @@ FVertexSimple cube_vertices[] =
 	{ -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-front
 
 
-	// ========================================
 	// Right face (X+)
-	// Normal direction: +X
-	// ========================================
 	{  0.5f, -0.5f,  0.5f, 0.5f, 0.5f, 0.5f, 1.0f }, // Bottom-front
 	{  0.5f, -0.5f, -0.5f, 1.0f, 0.5f, 0.0f, 1.0f }, // Bottom-back
 	{  0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.5f, 1.0f }, // Top-front
@@ -69,10 +64,7 @@ FVertexSimple cube_vertices[] =
 	{  0.5f,  0.5f, -0.5f, 0.5f, 0.0f, 0.5f, 1.0f }, // Top-back
 
 
-	// ========================================
 	// Top face (Y+)
-	// Normal direction: +Y
-	// ========================================
 	{ -0.5f,  0.5f,  0.5f, 0.0f, 0.5f, 1.0f, 1.0f }, // Front-left
 	{  0.5f,  0.5f,  0.5f, 0.5f, 0.5f, 0.0f, 1.0f }, // Front-right
 	{ -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 1.0f }, // Back-left
@@ -82,10 +74,7 @@ FVertexSimple cube_vertices[] =
 	{  0.5f,  0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f }, // Back-right
 
 
-	// ========================================
 	// Bottom face (Y-)
-	// Normal direction: -Y
-	// ========================================
 	{ -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.0f, 1.0f }, // Back-left
 	{  0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 1.0f }, // Back-right
 	{ -0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Front-left

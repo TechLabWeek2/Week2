@@ -31,7 +31,11 @@ struct FConstants {
     FVector Offset;
     float Scale;
     FVector Rotation;
-    float Pad;
+    float Pad1;
+    FVector CameraLocation;
+    float Pad2;
+    FVector CameraRotation;
+    float Pad3;
 };
 
 class URenderer
@@ -56,7 +60,7 @@ public:
     void ReleaseConstantBuffer();
 
     //상수 버퍼를 갱신하는 함수
-    void UpdateConstant(FVector Offset, float Scale, FVector Rotation);
+    void UpdateConstant(FVector Offset, float Scale, FVector Rotation, FVector CameraLocation, FVector CameraRotation);
 
     void CreateShader();
 

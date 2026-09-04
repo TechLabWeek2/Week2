@@ -78,10 +78,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
     // Renderer와 Shader 생성 이후에 버텍스 버퍼를 생성합니다.
+    UINT numVerticesLine = sizeof(line_vertices) / sizeof(FVertexSimple);
     UINT numVerticesTriangle = sizeof(triangle_vertices) / sizeof(FVertexSimple);
     UINT numVerticesCube = sizeof(cube_vertices) / sizeof(FVertexSimple);
     UINT numVerticesSphere = sizeof(sphere_vertices) / sizeof(FVertexSimple);
 
+    ID3D11Buffer* vertexBufferLine = renderer.CreateVertexBuffer(line_vertices, sizeof(line_vertices));
     ID3D11Buffer* vertexBufferTriangle = renderer.CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
     ID3D11Buffer* vertexBufferCube = renderer.CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
     ID3D11Buffer* vertexBufferSphere = renderer.CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
@@ -119,7 +121,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     LARGE_INTEGER startTime, endTime;
     double elapsedTime = 0.0;
-    float degree = 0;
+    float degree = 100;
+
+    FVector CameraLocation = { 0,0,0 };
+    FVector CameraRotation = { 0,0,0 };
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
     {
@@ -148,10 +153,49 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         renderer.Prepare();
         renderer.PrepareShader();
 
-        UPrimitive* Primitive = new UPrimitive({ 0,0,0 }, { degree,degree,degree }, 0.1f, ETypePrimitive::EPT_Sphere);
-        degree += 1.f;
+
+        POINT currentMousePos;
+        GetCursorPos(&currentMousePos); // 현재 마우스 스크린 좌표 획득
+
+        static POINT lastMousePos = currentMousePos;
+        static bool isDragging = false;
+
+
+        if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽
+            CameraLocation.x -= 0.01f;
+        }
+        if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽
+            CameraLocation.x += 0.01f;
+        }
+        if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //위
+            CameraLocation.z += 0.01f;
+        }
+        if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //아래
+            CameraLocation.z -= 0.01f;
+        }
+        if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) { //우클릭 누른 상태
+            if (!isDragging) {
+                isDragging = true;
+                lastMousePos = currentMousePos;
+            }
+            float deltaX = (float)(currentMousePos.x - lastMousePos.x);
+            float deltaY = (float)(currentMousePos.y - lastMousePos.y);
+
+            float sensitivity = 0.2f; // 마우스 민감도 조절
+
+            CameraRotation.y += deltaX * sensitivity;
+            CameraRotation.x += deltaY * sensitivity;
+
+            lastMousePos = currentMousePos;
+        }
+        else {
+            isDragging = false;
+            lastMousePos = currentMousePos;
+        }
+        UPrimitive* Primitive = new UPrimitive({ 0,0,1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
+        degree -= 1.f;
         if (degree >= 360)   degree = 0;
-        renderer.UpdateConstant(Primitive->Location, Primitive->Radius, Primitive->Rotation);
+        renderer.UpdateConstant(Primitive->Location, Primitive->Radius, Primitive->Rotation, CameraLocation, CameraRotation);
         switch (Primitive->Type)
         {
         case EPT_Cube:

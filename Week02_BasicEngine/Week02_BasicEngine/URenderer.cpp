@@ -21,7 +21,7 @@ void URenderer::ReleaseConstantBuffer()
 }
 
 //상수 버퍼를 갱신하는 함수
-void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation)
+void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FVector CameraLocation, FVector CameraRotation)
 {
 	if (ConstantBuffer)
 	{
@@ -33,6 +33,8 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation)
 			constants->Offset = Offset;
 			constants->Scale = Scale;
 			constants->Rotation = { Rotation.x * 0.01745329252f,Rotation.y * 0.01745329252f,Rotation.z * 0.01745329252f };
+			constants->CameraLocation = CameraLocation;
+			constants->CameraRotation = CameraRotation;
 		}
 		DeviceContext->Unmap(ConstantBuffer, 0);
 	}
