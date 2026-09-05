@@ -2,6 +2,11 @@
 #include "URenderer.h"
 #include "Shapes.h"
 
+enum ETypeLine {
+    ETL_LB,
+    OTHER
+};
+
 class UPrimitive {
 public:
     FVector Location;
@@ -9,7 +14,8 @@ public:
     float Radius;
     float Mass;
     ETypePrimitive Type = ETypePrimitive::EPT_Cube;
-    UPrimitive(FVector location, FVector rotation, float radius, ETypePrimitive type) : Location(location), Rotation(rotation), Radius(radius) {
+    ETypeLine LineType = ETypeLine::OTHER;
+    UPrimitive(FVector location, FVector rotation, float radius, ETypePrimitive type, ETypeLine etl = OTHER) : Location(location), Rotation(rotation), Radius(radius), LineType(etl) {
         Mass = Radius;
         Type = type;
     }
@@ -78,12 +84,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
     // Renderer와 Shader 생성 이후에 버텍스 버퍼를 생성합니다.
-    UINT numVerticesLine = sizeof(line_vertices) / sizeof(FVertexSimple);
+    UINT numVerticesLine = sizeof(xline_vertices) / sizeof(FVertexSimple);
     UINT numVerticesTriangle = sizeof(triangle_vertices) / sizeof(FVertexSimple);
     UINT numVerticesCube = sizeof(cube_vertices) / sizeof(FVertexSimple);
     UINT numVerticesSphere = sizeof(sphere_vertices) / sizeof(FVertexSimple);
 
-    ID3D11Buffer* vertexBufferLine = renderer.CreateVertexBuffer(line_vertices, sizeof(line_vertices));
+    ID3D11Buffer* vertexBufferXLine = renderer.CreateVertexBuffer(xline_vertices, sizeof(xline_vertices));
+    ID3D11Buffer* vertexBufferYLine = renderer.CreateVertexBuffer(yline_vertices, sizeof(yline_vertices));
+    ID3D11Buffer* vertexBufferZLine = renderer.CreateVertexBuffer(zline_vertices, sizeof(zline_vertices));
     ID3D11Buffer* vertexBufferTriangle = renderer.CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
     ID3D11Buffer* vertexBufferCube = renderer.CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
     ID3D11Buffer* vertexBufferSphere = renderer.CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
@@ -123,8 +131,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     double elapsedTime = 0.0;
     float degree = 100;
 
-    FVector CameraLocation = { 0,0,0 };
-    FVector CameraForward = { 0,0,1 };
+    FVector CameraLocation = { 1,1,-1 };
+    FVector CameraForward = { -1,-1,1 };
+    FVector CameraRotation = { 0,0,0 };
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
     {
@@ -246,6 +255,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
             CameraForward = rotation2;
 
+            const float RAD_TO_DEG = 180.0f / 3.14159265359f;
+
+            // Pitch
+            CameraRotation.x = -atan2(
+                CameraForward.y,
+                sqrt(
+                    CameraForward.x * CameraForward.x +
+                    CameraForward.z * CameraForward.z
+                )
+            ) * RAD_TO_DEG;
+
+            // Yaw
+            CameraRotation.y = atan2(
+                CameraForward.x,
+                CameraForward.z
+            ) * RAD_TO_DEG;
+
+            // Roll
+            CameraRotation.z = 0.0f;
+
             lastMousePos = currentMousePos;
         }
         else
@@ -253,20 +282,39 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             isDragging = false;
             lastMousePos = currentMousePos;
         }
+
+
+
         PrimitiveList[0] = new UPrimitive({ 0,0,1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
         PrimitiveList[1] = new UPrimitive({ 0,0,-1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
         PrimitiveList[2] = new UPrimitive({ 0,1,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
         PrimitiveList[3] = new UPrimitive({ 0,-1,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
         PrimitiveList[4] = new UPrimitive({ 1,0,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
         PrimitiveList[5] = new UPrimitive({ -1,0,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
-        UPrimitiveCnt = 6;
+
+        //Line (Left-Bottom)
+        PrimitiveList[6] = new UPrimitive({ -0.9f,-0.9f,0 }, CameraRotation, 0.05f, ETypePrimitive::EPT_XLine, ETypeLine::ETL_LB);
+        PrimitiveList[7] = new UPrimitive({ -0.9f,-0.9f,0 }, CameraRotation, 0.05f, ETypePrimitive::EPT_YLine, ETypeLine::ETL_LB);
+        PrimitiveList[8] = new UPrimitive({ -0.9f,-0.9f,0 }, CameraRotation, 0.05f, ETypePrimitive::EPT_ZLine, ETypeLine::ETL_LB);
+
+
+/*        PrimitiveList[9] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_XLine);
+        PrimitiveList[10] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_YLine);
+        PrimitiveList[11] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_ZLine);*/
+        UPrimitiveCnt = 9;
         degree -= 1.f;
         if (degree >= 360)   degree = 0;
         for (int i = 0; i < UPrimitiveCnt; i++) {
-            renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, CameraForward);
+
+            FVector vector;
+            vector.x = 0;
+            vector.y = 0;
+            vector.z = 0;
             switch (PrimitiveList[i]->Type)
             {
             case EPT_Cube:
+                renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, CameraForward);
+                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
                 renderer.RenderPrimitive(vertexBufferCube, numVerticesCube);
                 break;
             case EPT_Sphere:
@@ -274,6 +322,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 break;
             case EPT_Triangle:
                 renderer.RenderPrimitive(vertexBufferTriangle, numVerticesTriangle);
+                break;
+            case EPT_XLine:
+                renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, vector);
+                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+                renderer.RenderPrimitive(vertexBufferXLine, numVerticesLine);
+
+                renderer.UpdateConstant({0,0,0}, 10.f, { 0,0,0 }, CameraLocation, CameraForward);
+                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+                renderer.RenderPrimitive(vertexBufferXLine, numVerticesLine);
+                break;
+            case EPT_YLine:
+                renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, vector);
+                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+                renderer.RenderPrimitive(vertexBufferYLine, numVerticesLine);
+
+                renderer.UpdateConstant({ 0,0,0 }, 10.f, { 0,0,0 }, CameraLocation, CameraForward);
+                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+                renderer.RenderPrimitive(vertexBufferYLine, numVerticesLine);
+                break;
+            case EPT_ZLine:
+                renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, vector);
+                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+                renderer.RenderPrimitive(vertexBufferZLine, numVerticesLine);
+
+                renderer.UpdateConstant({ 0,0,0 }, 10.f, { 0,0,0 }, CameraLocation, CameraForward);
+                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+                renderer.RenderPrimitive(vertexBufferZLine, numVerticesLine);
                 break;
             default:
                 break;

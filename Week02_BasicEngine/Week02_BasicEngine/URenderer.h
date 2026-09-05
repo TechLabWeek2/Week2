@@ -54,6 +54,43 @@ public:
 
         return dot;
     }
+    FVector RotationFromAxes(
+        const FVector& XAxis,
+        const FVector& YAxis,
+        const FVector& ZAxis)
+    {
+        FMatrix4x4 R;
+
+        R.m[0][0] = XAxis.x;
+        R.m[0][1] = XAxis.y;
+        R.m[0][2] = XAxis.z;
+
+        R.m[1][0] = YAxis.x;
+        R.m[1][1] = YAxis.y;
+        R.m[1][2] = YAxis.z;
+
+        R.m[2][0] = ZAxis.x;
+        R.m[2][1] = ZAxis.y;
+        R.m[2][2] = ZAxis.z;
+
+        float angleY = std::asin(-R.m[2][0]);
+
+        float angleX = std::atan2(
+            R.m[2][1],
+            R.m[2][2]
+        );
+
+        float angleZ = std::atan2(
+            R.m[1][0],
+            R.m[0][0]
+        );
+
+        return {
+            (angleX* 57.3f),
+            (angleY* 57.3f),
+            (angleZ* 57.3f)
+        };
+    }
 };
 
 struct alignas(16) FConstants {

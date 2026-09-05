@@ -5,14 +5,28 @@ enum ETypePrimitive {
 	EPT_Triangle,
 	EPT_Cube,
 	EPT_Sphere,
+	EPT_XLine,
+	EPT_YLine,
+	EPT_ZLine,
 	EPT_Max,
 };
 
-FVertexSimple line_vertices[] =
+FVertexSimple xline_vertices[] =
 {
-	{  0.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f }, // Top vertex (red)
-	{  1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-right vertex (green)
-	{ -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f }  // Bottom-left vertex (blue)
+	{  0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f },
+	{  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f }
+};
+
+FVertexSimple yline_vertices[] =
+{
+	{  0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f },
+	{  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f }
+};
+
+FVertexSimple zline_vertices[] =
+{
+	{  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f },
+	{  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f }
 };
 
 FVertexSimple triangle_vertices[] =

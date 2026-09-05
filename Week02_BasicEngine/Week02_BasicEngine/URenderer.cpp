@@ -98,10 +98,19 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 		M2.m[3][3] = 0;
 		FMatrix4x4 viewMatrix = worldMatrix * M * M2;
 		////////////////////////////////////////////////
+
 		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
-		FConstants* constants = (FConstants*)constantbufferMSR.pData;
-		{
-			constants->World = viewMatrix;
+		if (!(CameraRotation.x == 0 && CameraRotation.y == 0 && CameraRotation.z == 0)) {
+			FConstants* constants = (FConstants*)constantbufferMSR.pData;
+			{
+				constants->World = viewMatrix;
+			}
+		}
+		else {
+			FConstants* constants = (FConstants*)constantbufferMSR.pData;
+			{
+				constants->World = worldMatrix;
+			}
 		}
 		DeviceContext->Unmap(ConstantBuffer, 0);
 	}
