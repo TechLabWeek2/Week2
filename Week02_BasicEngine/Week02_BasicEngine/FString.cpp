@@ -17,15 +17,15 @@ void FString::AppendChars(const WIDECHAR* Str, int32 Count)
 {
 	if (Count <= 0) return;
 
-	int32 OldEnd = static_cast<int32>(Data.size());
-	//size - 1 자리는 널 문자열 자리다. 거기서부터 쓰기 시작.
+	int32 OldEnd = static_cast<int32>(Data.Num());
+	//Num - 1 자리는 널 문자열 자리다. 거기서부터 쓰기 시작.
 	int32 WritePos = OldEnd ? OldEnd - 1 : 0;
 
 	//새로운 널 자리 넣어야 하므로 + 1
-	Data.resize(WritePos + Count + 1);
+	Data.Resize(WritePos + Count + 1);
 
 	//Str을 붙여 넣는다.
-	std::wmemcpy(Data.data() + WritePos, Str, Count);
+	std::wmemcpy(Data.Data() + WritePos, Str, Count);
 	Data[WritePos + Count] = '\0';
 }
 
@@ -40,7 +40,7 @@ int32 FString::Find(const ElementType* SubStr, int32 InSubStrLen) const
 		return -1;
 	}
 
-	const TCHAR* Base = Data.data();
+	const TCHAR* Base = Data.Data();
 	for (int32 i = 0; i <= MyLen - SubLen; i++)
 	{
 		if (std::memcmp(Base + i, SubStr, static_cast<size_t>(SubLen)) == 0)
@@ -53,8 +53,8 @@ int32 FString::Find(const ElementType* SubStr, int32 InSubStrLen) const
 
 bool FString::Equals(const FString& Other) const
 {
-	int32 Num = Data.size();
-	int32 OtherNum = Other.Data.size();
+	int32 Num = Data.Num();
+	int32 OtherNum = Other.Data.Num();
 
 	if (Num != OtherNum)
 	{
@@ -80,7 +80,7 @@ int32 FString::Compare(const FString& Other) const
 	{
 		// 공통 구간까지 원소 단위로 비교 (바이트 비교인 memcmp와 달리
 		// wmemcmp는 TCHAR 값 자체를 수치로 비교하므로 대소 순서가 정확함)
-		int32 Result = std::wmemcmp(Data.data(), Other.Data.data(), static_cast<size_t>(MinLen));
+		int32 Result = std::wmemcmp(Data.Data(), Other.Data.Data(), static_cast<size_t>(MinLen));
 		if (Result != 0)
 		{
 			return Result;

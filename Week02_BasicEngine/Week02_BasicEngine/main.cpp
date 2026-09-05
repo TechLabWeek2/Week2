@@ -4,7 +4,6 @@
 #include "TSet.h"
 #include "TMap.h"
 
-#include "CoreType.h"
 #include "FString.h"
 
 int main()
@@ -21,6 +20,9 @@ int main()
 	F1 += L"Test2";
 
 	std::wcout << F1 << std::endl;
+
+	std::cout << F1.Find(L"e", 1) << std::endl;
+
 
 	return 0;
 }

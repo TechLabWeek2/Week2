@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreType.h"
+#include "TArray.h"
 #include <vector>
 #include <cassert>
 #include <cstring>
@@ -37,7 +38,8 @@ public:
 private:
 	//문자열 저장
 	//나중에 TArray가 생기면 여기만 바꾸면 됨.
-	typedef std::vector<ElementType> DataType;
+	typedef TArray<ElementType> DataType;
+	//typedef std::vector<ElementType> DataType;
 
 	DataType Data;
 
@@ -45,7 +47,7 @@ public:
 	//문자열 길이
 	[[nodiscard]] __forceinline int32 Len()const
 	{
-		return Data.size() ? Data.size() - 1 : 0;
+		return Data.Num() ? Data.Num() - 1 : 0;
 	}
 
 	//비어 있는지
@@ -53,7 +55,7 @@ public:
 	{
 		//널 종단문자 \0도 원소로 카운트한다
 	// 그래서 0이면 완전히 빈 배열, 1이면 널 문자 하나만 있는 상태
-		return Data.size() <= 1;
+		return Data.Num() <= 1;
 	}
 
 	//========================================연산자 오버로딩========================================
@@ -62,7 +64,7 @@ public:
 	[[nodiscard]] __forceinline const ElementType* operator*() const
 	{
 		//data() : 내부 버퍼의 raw point 반환 메서드
-		return Data.empty() ? L"" : Data.data();
+		return Data.IsEmpty() ? L"" : Data.Data();
 	}
 
 	inline ElementType& operator[](int32 Index)
