@@ -151,7 +151,13 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="FString.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="UCubeComp.cpp" />
+    <ClCompile Include="UObject.cpp" />
+    <ClCompile Include="UPlaneComp.cpp" />
+    <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="URenderer.cpp" />
+    <ClCompile Include="USceneComponent.cpp" />
+    <ClCompile Include="USphereComp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h" />
@@ -163,7 +169,13 @@
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Shapes.h" />
+    <ClInclude Include="UCubeComp.h" />
+    <ClInclude Include="UObject.h" />
+    <ClInclude Include="UPlaneComp.h" />
+    <ClInclude Include="UPrimitiveComponent.h" />
     <ClInclude Include="URenderer.h" />
+    <ClInclude Include="USceneComponent.h" />
+    <ClInclude Include="USphereComp.h" />
     <ClInclude Include="Utils\Math.hpp" />
   </ItemGroup>
   <ItemGroup>
