@@ -92,7 +92,7 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 		
 		M2.m[0][0] = 1 / tan(0.52);
 		M2.m[1][1] = 1 / tan(0.52);
-		M2.m[2][2] = -(farZ) / (farZ - nearZ);
+		M2.m[2][2] = (farZ) / (farZ - nearZ);
 		M2.m[2][3] = 1;
 		M2.m[3][2] = -(farZ * nearZ) / (farZ - nearZ);
 		M2.m[3][3] = 0;
@@ -170,7 +170,7 @@ void URenderer::ReleaseShader()
 }
 
 // 렌더러 초기화 함수
-void URenderer::Create(HWND hWindow)
+void URenderer::Create(HWND hWindow, UINT screenWidth, UINT screenHeight)
 {
 	// Direct3D 장치 및 스왑 체인 생성
 	CreateDeviceAndSwapChain(hWindow);
@@ -181,7 +181,9 @@ void URenderer::Create(HWND hWindow)
 	// 래스터라이저 상태 생성
 	CreateRasterizerState();
 
-	// 깊이 스텐실 버퍼 및 블렌드 상태는 이 코드에서는 다루지 않음
+	// 깊이 스텐실 버퍼 및 블렌드 상태
+	CreateDepthStencilBuffer(screenWidth, screenHeight);
+	CreateDepthStencilState();
 }
 
 // Direct3D 장치 및 스왑 체인을 생성하는 함수
@@ -320,8 +322,10 @@ void URenderer::Prepare()
 	DeviceContext->RSSetViewports(1, &ViewportInfo);
 	DeviceContext->RSSetState(RasterizerState);
 
-	DeviceContext->OMSetRenderTargets(1, &FrameBufferRTV, nullptr);
+	DeviceContext->OMSetRenderTargets(1, &FrameBufferRTV, DepthStencilView);
 	DeviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
+	DeviceContext->OMSetDepthStencilState(DepthStencilState, 1);
+	DeviceContext->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH, 1.f, 0);
 }
 
 //Simple Shader 사용을 위한 PrepareShader 함수
@@ -365,4 +369,31 @@ ID3D11Buffer* URenderer::CreateVertexBuffer(FVertexSimple* vertices, UINT byteWi
 
 void URenderer::ReleaseVertexBuffer(ID3D11Buffer* vertexBuffer) {
 	vertexBuffer->Release();
+}
+
+void URenderer::CreateDepthStencilBuffer(UINT screenWidth, UINT screenHeight)
+{
+	D3D11_TEXTURE2D_DESC depthstencildesc = {};
+	depthstencildesc.Width = screenWidth;
+	depthstencildesc.Height = screenHeight;
+	depthstencildesc.MipLevels = 1;
+	depthstencildesc.ArraySize = 1;
+	depthstencildesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthstencildesc.SampleDesc.Count = 1;
+	depthstencildesc.Usage = D3D11_USAGE_DEFAULT;
+	depthstencildesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+	Device->CreateTexture2D(&depthstencildesc, nullptr, &DepthStencilBuffer);
+	Device->CreateDepthStencilView(DepthStencilBuffer, nullptr, &DepthStencilView);
+}
+
+void URenderer::CreateDepthStencilState()
+{
+	D3D11_DEPTH_STENCIL_DESC depthstencildesc = {};
+	depthstencildesc.DepthEnable = true;
+	depthstencildesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthstencildesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthstencildesc.StencilEnable = false;
+
+	Device->CreateDepthStencilState(&depthstencildesc, &DepthStencilState);
 }

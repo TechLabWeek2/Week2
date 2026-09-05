@@ -70,7 +70,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     URenderer	renderer;
 
     // D3D11 생성하는 함수를 호출합니다.
-    renderer.Create(hWnd);
+    renderer.Create(hWnd, 1024, 1024);
     // 렌더러 생성 직후에 쉐이더를 생성하는 함수를 호출합니다.
     renderer.CreateShader();
     //생성 함수 추가

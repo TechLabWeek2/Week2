@@ -110,6 +110,9 @@ public:
     ID3D11RenderTargetView* FrameBufferRTV = nullptr; // 텍스처를 렌더 타겟으로 사용하는 뷰
     ID3D11RasterizerState* RasterizerState = nullptr; // 래스터라이저 상태(컬링, 채우기 모드 등 정의)
     ID3D11Buffer* ConstantBuffer = nullptr; // 쉐이더에 데이터를 전달하기 위한 상수 버퍼
+    ID3D11Texture2D* DepthStencilBuffer = nullptr; // 깊이, 스텐실 버퍼
+    ID3D11DepthStencilView* DepthStencilView = nullptr; // 깊이 버퍼 연결 인터페이스
+    ID3D11DepthStencilState* DepthStencilState = nullptr; // 깊이, 스텐실을 어떻게 처리할지 
 
     FLOAT ClearColor[4] = { 0.025f, 0.025f, 0.025f, 1.0f }; // 화면을 초기화(clear)할 때 사용할 색상 (RGBA)
     D3D11_VIEWPORT ViewportInfo; // 렌더링 영역을 정의하는 뷰포트 정보
@@ -125,7 +128,7 @@ public:
 
     void ReleaseShader();
 
-    void Create(HWND hWindow);
+    void Create(HWND hWindow, UINT screenWidth, UINT screenHeight);
 
     // Direct3D 장치 및 스왑 체인을 생성하는 함수
     void CreateDeviceAndSwapChain(HWND hWindow);
@@ -165,4 +168,9 @@ public:
 
     void ReleaseVertexBuffer(ID3D11Buffer* vertexBuffer);
 
+    // 깊이 스텐실 버퍼 생성
+    void CreateDepthStencilBuffer(UINT screenWidth, UINT screenHeight);
+
+    // 깊이 스텐실 state 생성
+    void CreateDepthStencilState();
 };
