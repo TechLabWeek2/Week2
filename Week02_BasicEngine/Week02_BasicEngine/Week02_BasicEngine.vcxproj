@@ -149,6 +149,7 @@
     <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="FString.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="URenderer.cpp" />
   </ItemGroup>
@@ -169,6 +170,13 @@
     <FxCompile Include="ShaderW0.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CoreType.h" />
+    <ClInclude Include="FString.h" />
+    <ClInclude Include="TArray.h" />
+    <ClInclude Include="TMap.h" />
+    <ClInclude Include="TSet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
