@@ -11,25 +11,60 @@ private:
 
 public:
 	TMap()
-	{
-	}
+	{}
 
-	TMap operator[] (const K& key) const
+	V& operator[] (const K& key)
 	{
 		return map[key];
 	}
 
-	void Add(K key, V value)
+	int32 Num() const
+	{
+		return static_cast<int32>(map.size());
+	}
+
+	void Emplace(const K& key, const V& value)
+	{
+		map.emplace(key, value);
+	}
+
+	void Add(const K& key, const V& value)
 	{
 		map[key] = value;
 	}
 
-	V* Find(K key)
+	V* Find(const K& key)
 	{
-		V value = map.find(key);
-		if (value == nullptr)
+		auto iter = map.find(key);
+		if (iter != map.end())
 		{
-			
+			return &iter->second;
 		}
+		return nullptr;
+	}
+
+	const V* Find(const K& key) const
+	{
+		auto iter = map.find(key);
+		if (iter != map.end())
+		{
+			return &iter->second;
+		}
+		return nullptr;
+	}
+
+	bool Contains(const K& key) const
+	{
+		return map.count(key) > 0;
+	}
+
+	bool Remove(const K& key)
+	{
+		return map.erase(key) > 0;
+	}
+
+	void Empty()
+	{
+		map.clear();
 	}
 };
