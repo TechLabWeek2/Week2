@@ -24,7 +24,7 @@ void URenderer::ReleaseConstantBuffer()
 }
 
 //상수 버퍼를 갱신하는 함수
-void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FVector CameraLocation, FVector CameraRotation)
+void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FVector CameraLocation, FVector CameraForword)
 {
 	if (ConstantBuffer)
 	{
@@ -56,7 +56,7 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 			rotationMatrix *
 			translationMatrix;
 		////////////////////////////////////////////////
-		FVector ZAxis = CameraRotation;
+		FVector ZAxis = CameraForword;
 		ZAxis.Normalize();
 		FVector XAxis;
 		XAxis.x = ZAxis.z;
@@ -100,7 +100,7 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 		////////////////////////////////////////////////
 
 		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
-		if (!(CameraRotation.x == 0 && CameraRotation.y == 0 && CameraRotation.z == 0)) {
+		if (!(CameraForword.x == 0 && CameraForword.y == 0 && CameraForword.z == 0)) {
 			FConstants* constants = (FConstants*)constantbufferMSR.pData;
 			{
 				constants->World = viewMatrix;

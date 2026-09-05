@@ -119,7 +119,7 @@ public:
     void ReleaseConstantBuffer();
 
     //상수 버퍼를 갱신하는 함수
-    void UpdateConstant(FVector Offset, float Scale, FVector Rotation, FVector CameraLocation, FVector CameraRotation);
+    void UpdateConstant(FVector Offset, float Scale, FVector Rotation, FVector CameraLocation, FVector CameraForword);
 
     void CreateShader();
 
