@@ -30,28 +30,28 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 	{
 		D3D11_MAPPED_SUBRESOURCE constantbufferMSR;
 
-		FMatrix4x4 scaleMatrix =
-			FMatrix4x4::Scaling(
+		FMatrix scaleMatrix =
+			FMatrix::Scaling(
 				Scale,
 				Scale,
 				Scale
 			);
 
-		FMatrix4x4 rotationMatrix =
-			FMatrix4x4::Rotation(
+		FMatrix rotationMatrix =
+			FMatrix::Rotation(
 				Rotation.x,
 				Rotation.y,
 				Rotation.z
 			);
 
-		FMatrix4x4 translationMatrix =
-			FMatrix4x4::Translation(
+		FMatrix translationMatrix =
+			FMatrix::Translation(
 				Offset.x,
 				Offset.y,
 				Offset.z
 			);
 
-		FMatrix4x4 worldMatrix =
+		FMatrix worldMatrix =
 			scaleMatrix *
 			rotationMatrix *
 			translationMatrix;
@@ -68,7 +68,7 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 		YAxis.y = ZAxis.z * XAxis.x - ZAxis.x * XAxis.z;
 		YAxis.z = ZAxis.x * XAxis.y - ZAxis.y * XAxis.x;
 		YAxis.Normalize();
-		FMatrix4x4 M;
+		FMatrix M;
 		M.m[0][0] = XAxis.x;
 		M.m[0][1] = YAxis.x;
 		M.m[0][2] = ZAxis.x;
@@ -86,7 +86,7 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 		M.m[3][2] = -CameraLocation.x * ZAxis.x - CameraLocation.y * ZAxis.y - CameraLocation.z * ZAxis.z;
 		M.m[3][3] = 1.0f;
 
-		FMatrix4x4 M2;
+		FMatrix M2;
 		float nearZ = 0.1f; // 원하는 최소 거리
 		float farZ = 1000.f; // 원하는 최대 거리
 		
@@ -96,7 +96,7 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 		M2.m[2][3] = 1;
 		M2.m[3][2] = -(farZ * nearZ) / (farZ - nearZ);
 		M2.m[3][3] = 0;
-		FMatrix4x4 viewMatrix = worldMatrix * M * M2;
+		FMatrix viewMatrix = worldMatrix * M * M2;
 		////////////////////////////////////////////////
 
 		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utils/Math.hpp"
+#include "Utils/Math.h"
 #include "FString.h"
 
 struct FVector
@@ -104,7 +104,7 @@ public:
         const FVector& YAxis,
         const FVector& ZAxis)
     {
-        FMatrix4x4 R;
+        FMatrix R;
 
         R.m[0][0] = XAxis.x;
         R.m[0][1] = XAxis.y;

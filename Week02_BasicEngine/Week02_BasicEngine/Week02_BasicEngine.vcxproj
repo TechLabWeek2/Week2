@@ -159,6 +159,7 @@
     <ClCompile Include="URenderer.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="USphereComp.cpp" />
+    <ClCompile Include="Utils\Math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h" />
@@ -179,7 +180,7 @@
     <ClInclude Include="URenderer.h" />
     <ClInclude Include="USceneComponent.h" />
     <ClInclude Include="USphereComp.h" />
-    <ClInclude Include="Utils\Math.hpp" />
+    <ClInclude Include="Utils\Math.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ShaderW0.hlsl">

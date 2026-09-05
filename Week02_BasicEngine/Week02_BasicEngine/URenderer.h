@@ -25,7 +25,7 @@ struct FVertexSimple
 };
 
 struct alignas(16) FConstants {
-    FMatrix4x4 World;
+    FMatrix World;
 };
 
 class URenderer
