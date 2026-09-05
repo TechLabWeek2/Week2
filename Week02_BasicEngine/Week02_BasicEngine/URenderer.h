@@ -173,4 +173,10 @@ public:
 
     // 깊이 스텐실 state 생성
     void CreateDepthStencilState();
+
+    // 깊이 스텐실 버퍼 해제
+    void ReleaseDepthStencilBuffer();
+
+    // 깊이 스텐실 버퍼 생성
+    void ReleaseDepthStencilState();
 };

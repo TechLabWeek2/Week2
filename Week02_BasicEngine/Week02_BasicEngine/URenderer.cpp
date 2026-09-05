@@ -304,6 +304,8 @@ void URenderer::Release()
 
 	ReleaseFrameBuffer();
 	ReleaseDeviceAndSwapChain();
+	ReleaseDepthStencilState();
+	ReleaseDepthStencilBuffer();
 }
 
 // 스왑 체인의 백 버퍼와 프론트 버퍼를 교체하여 화면에 출력
@@ -396,4 +398,24 @@ void URenderer::CreateDepthStencilState()
 	depthstencildesc.StencilEnable = false;
 
 	Device->CreateDepthStencilState(&depthstencildesc, &DepthStencilState);
+}
+
+void URenderer::ReleaseDepthStencilBuffer()
+{
+	if (DepthStencilBuffer)
+	{
+		DepthStencilBuffer->Release();
+	}
+	if (DepthStencilView)
+	{
+		DepthStencilView->Release();
+	}
+}
+
+void URenderer::ReleaseDepthStencilState()
+{
+	if (DepthStencilState)
+	{
+		DepthStencilState->Release();
+	}
 }
