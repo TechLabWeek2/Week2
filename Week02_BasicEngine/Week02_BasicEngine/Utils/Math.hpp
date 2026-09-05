@@ -3,12 +3,19 @@
 #include <algorithm>
 #include <cmath>
 
+#define KINDA_SMALL_NUMBER	(1.e-4f)
 
 constexpr float PI = 3.14159265358979323846f;
 
 inline float DegreeToRadian(float degree)
 {
 	return degree * PI / 180.0f;
+}
+
+template<typename T>
+inline T Abs(const T A)
+{
+	return (A < (T)0) ? (T)-A : A;
 }
 
 struct Matrix3x3
