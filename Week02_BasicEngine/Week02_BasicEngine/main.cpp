@@ -134,6 +134,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     FVector CameraLocation = { 1,1,-1 };
     FVector CameraForward = { -1,-1,1 };
     FVector CameraRotation = { 0,0,0 };
+    FVector XAxis;
+    XAxis.x = CameraForward.z;
+    XAxis.y = 0;
+    XAxis.z = -CameraForward.x;
+    XAxis.Normalize();
+
+    FVector YAxis;
+    YAxis.x = CameraForward.y * XAxis.z - CameraForward.z * XAxis.y;
+    YAxis.y = CameraForward.z * XAxis.x - CameraForward.x * XAxis.z;
+    YAxis.z = CameraForward.x * XAxis.y - CameraForward.y * XAxis.x;
+    YAxis.Normalize();
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
     {
@@ -169,24 +180,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         static POINT lastMousePos = currentMousePos;
         static bool isDragging = false;
 
-        if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
-            FVector XAxis;
-            XAxis.x = CameraForward.z;
-            XAxis.y = 0;
-            XAxis.z = -CameraForward.x;
-            XAxis.Normalize();
+        XAxis.x = CameraForward.z;
+        XAxis.y = 0;
+        XAxis.z = -CameraForward.x;
+        XAxis.Normalize();
 
+        YAxis.x = CameraForward.y * XAxis.z - CameraForward.z * XAxis.y;
+        YAxis.y = CameraForward.z * XAxis.x - CameraForward.x * XAxis.z;
+        YAxis.z = CameraForward.x * XAxis.y - CameraForward.y * XAxis.x;
+        YAxis.Normalize();
+
+        if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
             CameraLocation.x -= XAxis.x * 0.01f;
             CameraLocation.y -= XAxis.y * 0.01f;
             CameraLocation.z -= XAxis.z * 0.01f;
         }
         if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
-            FVector XAxis;
-            XAxis.x = CameraForward.z;
-            XAxis.y = 0;
-            XAxis.z = -CameraForward.x;
-            XAxis.Normalize();
-
             CameraLocation.x += XAxis.x * 0.01f;
             CameraLocation.y += XAxis.y * 0.01f;
             CameraLocation.z += XAxis.z * 0.01f;
@@ -200,6 +209,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             CameraLocation.x -= CameraForward.x * 0.01f;
             CameraLocation.y -= CameraForward.y * 0.01f;
             CameraLocation.z -= CameraForward.z * 0.01f;
+        }
+        if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
+            CameraLocation.y += 0.01f;
+        }
+        if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
+            CameraLocation.y -= 0.01f;
         }
         if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
         {
@@ -230,13 +245,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
             rotation.Normalize();
 
-            FVector XAxis;
             XAxis.x = rotation.z;
             XAxis.y = 0;
             XAxis.z = -rotation.x;
             XAxis.Normalize();
 
-            FVector YAxis;
             YAxis.x = rotation.y * XAxis.z - rotation.z * XAxis.y;
             YAxis.y = rotation.z * XAxis.x - rotation.x * XAxis.z;
             YAxis.z = rotation.x * XAxis.y - rotation.y * XAxis.x;
