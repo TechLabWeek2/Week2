@@ -255,26 +255,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
             CameraForward = rotation2;
 
-            const float RAD_TO_DEG = 180.0f / 3.14159265359f;
-
-            // Pitch
-            CameraRotation.x = -atan2(
-                CameraForward.y,
-                sqrt(
-                    CameraForward.x * CameraForward.x +
-                    CameraForward.z * CameraForward.z
-                )
-            ) * RAD_TO_DEG;
-
-            // Yaw
-            CameraRotation.y = atan2(
-                CameraForward.x,
-                CameraForward.z
-            ) * RAD_TO_DEG;
-
-            // Roll
-            CameraRotation.z = 0.0f;
-
             lastMousePos = currentMousePos;
         }
         else
@@ -283,6 +263,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             lastMousePos = currentMousePos;
         }
 
+        const float RAD_TO_DEG = 180.0f / 3.14159265359f;
+
+        // Pitch
+        CameraRotation.x = -atan2(
+            CameraForward.y,
+            sqrt(
+                CameraForward.x * CameraForward.x +
+                CameraForward.z * CameraForward.z
+            )
+        ) * RAD_TO_DEG;
+
+        // Yaw
+        CameraRotation.y = atan2(
+            CameraForward.x,
+            CameraForward.z
+        ) * RAD_TO_DEG;
+
+        // Roll
+        CameraRotation.z = 0.0f;
 
 
         PrimitiveList[0] = new UPrimitive({ 0,0,1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
@@ -293,9 +292,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         PrimitiveList[5] = new UPrimitive({ -1,0,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
 
         //Line (Left-Bottom)
-        PrimitiveList[6] = new UPrimitive({ -0.9f,-0.9f,0 }, CameraRotation, 0.05f, ETypePrimitive::EPT_XLine, ETypeLine::ETL_LB);
-        PrimitiveList[7] = new UPrimitive({ -0.9f,-0.9f,0 }, CameraRotation, 0.05f, ETypePrimitive::EPT_YLine, ETypeLine::ETL_LB);
-        PrimitiveList[8] = new UPrimitive({ -0.9f,-0.9f,0 }, CameraRotation, 0.05f, ETypePrimitive::EPT_ZLine, ETypeLine::ETL_LB);
+        PrimitiveList[6] = new UPrimitive({ -0.9f,-0.9f,0 }, { -CameraRotation.x, -CameraRotation.y, -CameraRotation.z }, 0.05f, ETypePrimitive::EPT_XLine, ETypeLine::ETL_LB);
+        PrimitiveList[7] = new UPrimitive({ -0.9f,-0.9f,0 }, { -CameraRotation.x, -CameraRotation.y, -CameraRotation.z }, 0.05f, ETypePrimitive::EPT_YLine, ETypeLine::ETL_LB);
+        PrimitiveList[8] = new UPrimitive({ -0.9f,-0.9f,0 }, { -CameraRotation.x, -CameraRotation.y, -CameraRotation.z }, 0.05f, ETypePrimitive::EPT_ZLine, ETypeLine::ETL_LB);
 
 
 /*        PrimitiveList[9] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_XLine);
