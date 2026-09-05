@@ -58,8 +58,6 @@ public:
 		return Data.Num() <= 1;
 	}
 
-	//========================================연산자 오버로딩========================================
-
 	//포인터 접근
 	[[nodiscard]] __forceinline const ElementType* operator*() const
 	{
@@ -121,8 +119,6 @@ public:
 		return Os << *Str;
 	}
 
-	//========================================연산자 오버로딩========================================
-	// 
 	//인덱스 검사
 	[[nodiscard]] __forceinline bool IsValidIndex(int32 Index) const
 	{
@@ -162,6 +158,8 @@ public:
 
 	//비교
 	[[nodiscard]] int32 Compare(const FString& Other) const;
+		
+	static FString Printf(const TCHAR* Fmt, ...);
 
 private:
 	static int32 CStrLen(const TCHAR* InStr);

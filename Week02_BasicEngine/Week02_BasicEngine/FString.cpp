@@ -1,4 +1,5 @@
 #include "FString.h"
+#include <cstdarg>
 
 //void FString::AppendChars(const ANSICHAR* Str, int32 Count)
 //{
@@ -91,6 +92,47 @@ int32 FString::Compare(const FString& Other) const
 	// 예시: "Hi" < "Hi!" (길이 차이로 결정)
 	return MyLen - OtherLen;
 
+}
+
+FString FString::Printf(const TCHAR* Fmt, ...)
+{
+	va_list Args;
+	va_start(Args, Fmt);
+
+	// vsnprintf(narrow)와 달리 vswprintf(wide)는 "버퍼가 부족할 때 필요한 크기를
+	// 알려주는" 동작이 표준/플랫폼마다 일관되지 않고, 실패 시 그냥 음수만 반환할
+	// 수 있다. 그래서 "일단 시도 -> 부족하면 버퍼를 2배로 키워서 재시도" 방식으로
+	// 안전하게 처리한다.
+	int32 BufferSize = 256;
+
+	while (true)
+	{
+		TCHAR* Buffer = new TCHAR[BufferSize];
+
+		va_list ArgsCopy;
+		va_copy(ArgsCopy, Args);
+		int32 Written = static_cast<int32>(std::vswprintf(Buffer, static_cast<size_t>(BufferSize), Fmt, ArgsCopy));
+		va_end(ArgsCopy);
+
+		if (Written >= 0 && Written < BufferSize)
+		{
+			// 성공: Written은 널 종단자를 제외한 실제 글자 수
+			FString Result(Buffer);
+			delete[] Buffer;
+			va_end(Args);
+			return Result;
+		}
+
+		// 버퍼가 부족했거나 실패(음수) -> 버퍼를 2배로 늘려서 재시도
+		delete[] Buffer;
+		BufferSize *= 2;
+
+		if (BufferSize > (1 << 20)) // 100만 글자 넘어가면 무한루프 방지용으로 포기
+		{
+			va_end(Args);
+			return FString(L"[FString::Printf Error: format too long]");
+		}
+	}
 }
 
 int32 FString::CStrLen(const TCHAR* InStr)

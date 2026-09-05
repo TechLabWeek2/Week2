@@ -1,12 +1,45 @@
 #pragma once
 
 #include "Utils/Math.hpp"
+#include "FString.h"
 
-class FVector
+struct FVector
 {
 public:
     float x, y, z;
     FVector(float _x = 0, float _y = 0, float _z = 0) : x(_x), y(_y), z(_z) {}
+       
+
+    [[nodiscard]] __forceinline FVector operator+(const FVector& V) const
+    {
+        return FVector(x + V.x, y + V.y, z + V.z);
+    }
+
+    [[nodiscard]] __forceinline FVector operator-(const FVector& V) const
+    {
+        return FVector(x - V.x, y - V.y, z - V.z);
+    }
+
+    [[nodiscard]] __forceinline FVector operator*(const FVector& V) const
+    {
+        return FVector(x * V.x, y * V.y, z * V.z);
+    }
+
+    [[nodiscard]] __forceinline FVector operator/(const FVector& V) const
+    {
+        return FVector(x / V.x, y / V.y, z / V.z);
+    }
+
+    [[nodiscard]] __forceinline bool operator==(const FVector& V) const
+    {
+        return x == V.x && y == V.y && z == V.z;
+    }
+
+    [[nodiscard]] __forceinline bool operator!=(const FVector& V) const
+    {
+        return x != V.x || y != V.y || z != V.z;
+    }
+
     void Normalize()
     {
         float d = x * x + y * y + z * z;
@@ -23,7 +56,7 @@ public:
         y = y / d;
         z = z / d;
     }
-    FVector Cross(FVector v1, FVector v2)
+    [[nodiscard]] FVector Cross(const FVector& v1, const FVector& v2) const
     {
         FVector cross;
         cross.x = v1.y * v2.z - v1.z * v2.y;
@@ -32,12 +65,40 @@ public:
 
         return cross;
     }
-    float Dot(FVector v1, FVector v2)
+
+    [[nodiscard]] FVector Cross(const FVector& v1)const
+    {
+        return Cross(*this, v1);
+    }
+
+    [[nodiscard]] float Dot(const FVector& v1, const FVector& v2) const
     {
         float dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 
         return dot;
     }
+
+    [[nodiscard]] float Dot(const FVector& v1) const
+    {
+        return Dot(*this, v1);
+    }
+
+    [[nodiscard]] __forceinline bool Equals(const FVector& V, float Tolerance = KINDA_SMALL_NUMBER) const;
+
+    [[nodiscard]] float Size() const;
+
+    [[nodiscard]] float SizeSquared() const;
+
+    [[nodiscard]] float Length() const;
+
+    [[nodiscard]] float SquaredLength() const;
+
+    [[nodiscard]] bool IsNearlyZero(float Tolerance = KINDA_SMALL_NUMBER) const;
+
+    [[nodiscard]] bool IsZero() const;
+
+    [[nodiscard]] FString ToString() const;
+
     FVector RotationFromAxes(
         const FVector& XAxis,
         const FVector& YAxis,
@@ -76,4 +137,89 @@ public:
         };
     }
 };
+
+struct FVector2
+{
+public:
+    float x, y;
+
+    [[nodiscard]] FVector2() = default;
+    [[nodiscard]] FVector2(float _x = 0, float _y = 0) : x(_x), y(_y) {}
+
+    [[nodiscard]] __forceinline FVector2 operator+(const FVector2& V) const
+    {
+        return FVector2(x + V.x, y + V.y);
+    }
+
+    [[nodiscard]] __forceinline FVector2 operator-(const FVector2& V) const
+    {
+        return FVector2(x - V.x, y - V.y);
+    }
+
+    [[nodiscard]] __forceinline FVector2 operator*(const FVector2& V) const
+    {
+        return FVector2(x * V.x, y * V.y);
+    }
+
+    [[nodiscard]] __forceinline FVector2 operator/(const FVector2& V) const
+    {
+        return FVector2(x / V.x, y / V.y);
+    }
+
+    [[nodiscard]] __forceinline bool operator==(const FVector2& V) const
+    {
+        return x == V.x && y == V.y;
+    }
+
+    [[nodiscard]] __forceinline bool operator!=(const FVector2& V) const
+    {
+        return x != V.x || y != V.y;
+    }
+
+    void Normalize()
+    {
+        float d = x * x + y * y;
+        if (d == 1)
+        {
+            return;
+        }
+        if (d < (1.0E-8F))
+        {
+            return;
+        }
+        d = sqrt(d);
+        x = x / d;
+        y = y / d;
+    }
+
+    [[nodiscard]] float Dot(const FVector2& v1, const FVector2& v2) const
+    {
+        float dot = v1.x * v2.x + v1.y * v2.y;
+
+        return dot;
+    }
+
+    [[nodiscard]] float Dot(const FVector2& v1) const
+    {
+        return Dot(*this, v1);
+    }
+
+    [[nodiscard]] __forceinline bool Equals(const FVector2& V, float Tolerance = KINDA_SMALL_NUMBER) const;
+
+    [[nodiscard]] float Size() const;
+
+    [[nodiscard]] float SizeSquared() const;
+
+    [[nodiscard]] float Length() const;
+
+    [[nodiscard]] float SquaredLength() const;
+
+    [[nodiscard]] bool IsNearlyZero(float Tolerance = KINDA_SMALL_NUMBER) const;
+
+    [[nodiscard]] bool IsZero() const;
+
+    [[nodiscard]] FString ToString() const;
+};
+
+
 
