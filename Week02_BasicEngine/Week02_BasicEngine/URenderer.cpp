@@ -64,9 +64,10 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 		XAxis.z = -ZAxis.x;
 		XAxis.Normalize();
 		FVector YAxis;
-		YAxis.x = ZAxis.y * XAxis.y - XAxis.z * ZAxis.y;
+		YAxis.x = ZAxis.y * XAxis.z - ZAxis.z * XAxis.y;
 		YAxis.y = ZAxis.z * XAxis.x - ZAxis.x * XAxis.z;
 		YAxis.z = ZAxis.x * XAxis.y - ZAxis.y * XAxis.x;
+		YAxis.Normalize();
 		FMatrix4x4 M;
 		M.m[0][0] = XAxis.x;
 		M.m[0][1] = YAxis.x;
@@ -85,7 +86,17 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 		M.m[3][2] = -CameraLocation.x * ZAxis.x - CameraLocation.y * ZAxis.y - CameraLocation.z * ZAxis.z;
 		M.m[3][3] = 1.0f;
 
-		FMatrix4x4 viewMatrix = worldMatrix * M;
+		FMatrix4x4 M2;
+		float nearZ = 0.1f; // 원하는 최소 거리
+		float farZ = 1000.f; // 원하는 최대 거리
+		
+		M2.m[0][0] = 1 / tan(0.52);
+		M2.m[1][1] = 1 / tan(0.52);
+		M2.m[2][2] = -(farZ) / (farZ - nearZ);
+		M2.m[2][3] = 1;
+		M2.m[3][2] = -(farZ * nearZ) / (farZ - nearZ);
+		M2.m[3][3] = 0;
+		FMatrix4x4 viewMatrix = worldMatrix * M * M2;
 		////////////////////////////////////////////////
 		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
 		FConstants* constants = (FConstants*)constantbufferMSR.pData;

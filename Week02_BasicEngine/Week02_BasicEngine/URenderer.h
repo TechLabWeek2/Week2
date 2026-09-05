@@ -41,6 +41,19 @@ public:
         y = y / d;
         z = z / d;
     }
+    FVector Cross(FVector v1, FVector v2) {
+        FVector cross;
+        cross.x = v1.y * v2.z - v1.z * v2.y;
+        cross.y = v1.z * v2.x - v1.x * v2.z;
+        cross.z = v1.x * v2.y - v1.y * v2.x;
+
+        return cross;
+    }
+    float Dot(FVector v1, FVector v2) {
+        float dot = v1.x* v2.x + v1.y * v2.y + v1.z * v2.z;
+
+        return dot;
+    }
 };
 
 struct alignas(16) FConstants {

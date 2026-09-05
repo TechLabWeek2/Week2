@@ -90,9 +90,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     bool bIsExit = false;
 
-    UPrimitive** PrimitiveList = nullptr;
+    UPrimitive** PrimitiveList = new UPrimitive* [30];
 
-    int TargetBallCount = 1;
+    int UPrimitiveCnt = 6;
 
     ETypePrimitive typePrimitive = EPT_Cube;
 
@@ -124,7 +124,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     float degree = 100;
 
     FVector CameraLocation = { 0,0,0 };
-    FVector CameraRotation = { 0,0,1 };
+    FVector CameraForward = { 0,0,1 };
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
     {
@@ -160,18 +160,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         static POINT lastMousePos = currentMousePos;
         static bool isDragging = false;
 
+        if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
+            FVector XAxis;
+            XAxis.x = CameraForward.z;
+            XAxis.y = 0;
+            XAxis.z = -CameraForward.x;
+            XAxis.Normalize();
 
-        if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽
-            CameraLocation.x -= 0.01f;
+            CameraLocation.x -= XAxis.x * 0.01f;
+            CameraLocation.y -= XAxis.y * 0.01f;
+            CameraLocation.z -= XAxis.z * 0.01f;
         }
-        if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽
-            CameraLocation.x += 0.01f;
+        if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
+            FVector XAxis;
+            XAxis.x = CameraForward.z;
+            XAxis.y = 0;
+            XAxis.z = -CameraForward.x;
+            XAxis.Normalize();
+
+            CameraLocation.x += XAxis.x * 0.01f;
+            CameraLocation.y += XAxis.y * 0.01f;
+            CameraLocation.z += XAxis.z * 0.01f;
         }
-        if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //위
-            CameraLocation.z += 0.01f;
+        if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
+            CameraLocation.x += CameraForward.x * 0.01f;
+            CameraLocation.y += CameraForward.y * 0.01f;
+            CameraLocation.z += CameraForward.z * 0.01f;
         }
-        if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //아래
-            CameraLocation.z -= 0.01f;
+        if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
+            CameraLocation.x -= CameraForward.x * 0.01f;
+            CameraLocation.y -= CameraForward.y * 0.01f;
+            CameraLocation.z -= CameraForward.z * 0.01f;
         }
         if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
         {
@@ -184,38 +203,48 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             float deltaX = (float)(currentMousePos.x - lastMousePos.x);
             float deltaY = (float)(currentMousePos.y - lastMousePos.y);
 
-            float sensitivity = 0.02f;
+            float sensitivity = 0.002f;
 
             float angleX = deltaX * sensitivity;
-            float angleY = deltaY * sensitivity;
+            float angleY = -deltaY * sensitivity;
 
             // 좌우 회전
             FVector rotation;
 
-            rotation.x = CameraRotation.x * cos(angleX)
-                + CameraRotation.z * sin(angleX);
+            rotation.x = CameraForward.x * cos(angleX)
+                + CameraForward.z * sin(angleX);
 
-            rotation.y = CameraRotation.y;
+            rotation.y = CameraForward.y;
 
-            rotation.z = -CameraRotation.x * sin(angleX)
-                + CameraRotation.z * cos(angleX);
+            rotation.z = -CameraForward.x * sin(angleX)
+                + CameraForward.z * cos(angleX);
 
             rotation.Normalize();
+
+            FVector XAxis;
+            XAxis.x = rotation.z;
+            XAxis.y = 0;
+            XAxis.z = -rotation.x;
+            XAxis.Normalize();
+
+            FVector YAxis;
+            YAxis.x = rotation.y * XAxis.z - rotation.z * XAxis.y;
+            YAxis.y = rotation.z * XAxis.x - rotation.x * XAxis.z;
+            YAxis.z = rotation.x * XAxis.y - rotation.y * XAxis.x;
+            YAxis.Normalize();
 
             // 상하 회전
             FVector rotation2;
 
-            rotation2.x = rotation.x;
+            rotation2.x = rotation.x * cos(angleY) + YAxis.x * sin(angleY) + XAxis.x * YAxis.Dot(XAxis, rotation) * (1.0f - cos(angleY));
 
-            rotation2.y = rotation.y * cos(angleY)
-                - rotation.z * sin(angleY);
+            rotation2.y = rotation.y * cos(angleY) + YAxis.y * sin(angleY) + XAxis.y * YAxis.Dot(XAxis, rotation) * (1.0f - cos(angleY));
 
-            rotation2.z = rotation.y * sin(angleY)
-                + rotation.z * cos(angleY);
+            rotation2.z = rotation.z * cos(angleY) + YAxis.z * sin(angleY) + XAxis.z * YAxis.Dot(XAxis, rotation) * (1.0f - cos(angleY));
 
             rotation2.Normalize();
 
-            CameraRotation = rotation2;
+            CameraForward = rotation2;
 
             lastMousePos = currentMousePos;
         }
@@ -224,23 +253,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             isDragging = false;
             lastMousePos = currentMousePos;
         }
-        UPrimitive* Primitive = new UPrimitive({ 0,0,1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
+        PrimitiveList[0] = new UPrimitive({ 0,0,1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
+        PrimitiveList[1] = new UPrimitive({ 0,0,-1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
+        PrimitiveList[2] = new UPrimitive({ 0,1,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
+        PrimitiveList[3] = new UPrimitive({ 0,-1,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
+        PrimitiveList[4] = new UPrimitive({ 1,0,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
+        PrimitiveList[5] = new UPrimitive({ -1,0,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
+        UPrimitiveCnt = 6;
         degree -= 1.f;
         if (degree >= 360)   degree = 0;
-        renderer.UpdateConstant(Primitive->Location, Primitive->Radius, Primitive->Rotation, CameraLocation, CameraRotation);
-        switch (Primitive->Type)
-        {
-        case EPT_Cube:
-            renderer.RenderPrimitive(vertexBufferCube, numVerticesCube);
-            break;
-        case EPT_Sphere:
-            renderer.RenderPrimitive(vertexBufferSphere, numVerticesSphere);
-            break;
-        case EPT_Triangle:
-            renderer.RenderPrimitive(vertexBufferTriangle, numVerticesTriangle);
-            break;
-        default:
-            break;
+        for (int i = 0; i < UPrimitiveCnt; i++) {
+            renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, CameraForward);
+            switch (PrimitiveList[i]->Type)
+            {
+            case EPT_Cube:
+                renderer.RenderPrimitive(vertexBufferCube, numVerticesCube);
+                break;
+            case EPT_Sphere:
+                renderer.RenderPrimitive(vertexBufferSphere, numVerticesSphere);
+                break;
+            case EPT_Triangle:
+                renderer.RenderPrimitive(vertexBufferTriangle, numVerticesTriangle);
+                break;
+            default:
+                break;
+            }
         }
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
@@ -251,7 +288,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::Text("Hello Jungle World!");
         ImGui::Checkbox("Bound Ball To Screen", &bBoundBallToScreen);
         ImGui::Checkbox("Pinball Movement", &bPinballMovement);
-        ImGui::InputInt("Target Ball Count", &TargetBallCount);
         ImGui::End();
 
         ImGui::Render();
