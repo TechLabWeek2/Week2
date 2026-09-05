@@ -139,6 +139,7 @@ struct FMatrix4x4
 			return result;
 		}	
 	public:
+
 		// 이동 행렬
 		static FMatrix4x4 Translation(float x, float y, float z)
 		{
@@ -201,6 +202,100 @@ struct FMatrix4x4
 			FMatrix4x4 rotationZ = RotationZ(DegreeToRadian(angleZ));
 			return rotationZ * rotationY * rotationX;
 		}	
+
+		// 역행렬을 계산하고 out에 결과를 저장, 역행렬을 구할 수 없다면 identity 행렬을 반환하고 false를 반환
+		static bool MatrixInverse(const FMatrix4x4& src, FMatrix4x4& out)
+		{
+			FMatrix4x4 tmp;
+			float det[4];
+
+			//2x2 minor determinant를 미리 계산
+			tmp.m[0][0] = src.m[2][2] * src.m[3][3] - src.m[2][3] * src.m[3][2]; 
+			tmp.m[0][1] = src.m[1][2] * src.m[3][3] - src.m[1][3] * src.m[3][2];
+			tmp.m[0][2] = src.m[1][2] * src.m[2][3] - src.m[1][3] * src.m[2][2];
+						  
+			tmp.m[1][0] = src.m[2][2] * src.m[3][3] - src.m[2][3] * src.m[3][2];
+			tmp.m[1][1] = src.m[0][2] * src.m[3][3] - src.m[0][3] * src.m[3][2];
+			tmp.m[1][2] = src.m[0][2] * src.m[2][3] - src.m[0][3] * src.m[2][2];
+						 
+			tmp.m[2][0] = src.m[1][2] * src.m[3][3] - src.m[1][3] * src.m[3][2];
+			tmp.m[2][1] = src.m[0][2] * src.m[3][3] - src.m[0][3] * src.m[3][2];
+			tmp.m[2][2] = src.m[0][2] * src.m[1][3] - src.m[0][3] * src.m[1][2];
+						  
+			tmp.m[3][0] = src.m[1][2] * src.m[2][3] - src.m[1][3] * src.m[2][2];
+			tmp.m[3][1] = src.m[0][2] * src.m[2][3] - src.m[0][3] * src.m[2][2];
+			tmp.m[3][2] = src.m[0][2] * src.m[1][3] - src.m[0][3] * src.m[1][2];
+			
+			//3x3 minor determinant 계산
+			det[0] = src.m[1][1] * tmp.m[0][0] - src.m[2][1] * tmp.m[0][1] + src.m[3][1] * tmp.m[0][2];
+			det[1] = src.m[0][1] * tmp.m[1][0] - src.m[2][1] * tmp.m[1][1] + src.m[3][1] * tmp.m[1][2];
+			det[2] = src.m[0][1] * tmp.m[2][0] - src.m[1][1] * tmp.m[2][1] + src.m[3][1] * tmp.m[2][2];
+			det[3] = src.m[0][1] * tmp.m[3][0] - src.m[1][1] * tmp.m[3][1] + src.m[2][1] * tmp.m[3][2];
+
+			// Determinant 계산
+			const float determinant = src.m[0][0] * det[0] - src.m[1][0] * det[1] + src.m[2][0] * det[2] - src.m[3][0] * det[3];
+
+			if (determinant == 0.0f)
+			{
+				out = FMatrix4x4::Identity;
+				return false;
+			}
+
+			const float RDet = 1.0f / determinant;
+
+			out.m[0][0] = RDet * det[0];
+			out.m[0][1] = -RDet * det[1];
+			out.m[0][2] = RDet * det[2];
+			out.m[0][3] = -RDet * det[3];
+			out.m[1][0] = -RDet * (src.m[1][0] * tmp.m[0][0] - src.m[2][0] * tmp.m[0][1] + src.m[3][0] * tmp.m[0][2]);
+			out.m[1][1] = RDet * (src.m[0][0] * tmp.m[1][0] - src.m[2][0] * tmp.m[1][1] + src.m[3][0] * tmp.m[1][2]);
+			out.m[1][2] = -RDet * (src.m[0][0] * tmp.m[2][0] - src.m[1][0] * tmp.m[2][1] + src.m[3][0] * tmp.m[2][2]);
+			out.m[1][3] = RDet * (src.m[0][0] * tmp.m[3][0] - src.m[1][0] * tmp.m[3][1] + src.m[2][0] * tmp.m[3][2]);
+			out.m[2][0] = RDet * (
+				src.m[1][0] * (src.m[2][1] * src.m[3][3] - src.m[2][3] * src.m[3][1]) -
+				src.m[2][0] * (src.m[1][1] * src.m[3][3] - src.m[1][3] * src.m[3][1]) +
+				src.m[3][0] * (src.m[1][1] * src.m[2][3] - src.m[1][3] * src.m[2][1])
+				);
+			out.m[2][1] = -RDet * (
+				src.m[0][0] * (src.m[2][1] * src.m[3][3] - src.m[2][3] * src.m[3][1]) -
+				src.m[2][0] * (src.m[0][1] * src.m[3][3] - src.m[0][3] * src.m[3][1]) +
+				src.m[3][0] * (src.m[0][1] * src.m[2][3] - src.m[0][3] * src.m[2][1])
+				);
+			out.m[2][2] = RDet * (
+				src.m[0][0] * (src.m[1][1] * src.m[3][3] - src.m[1][3] * src.m[3][1]) -
+				src.m[1][0] * (src.m[0][1] * src.m[3][3] - src.m[0][3] * src.m[3][1]) +
+				src.m[3][0] * (src.m[0][1] * src.m[1][3] - src.m[0][3] * src.m[1][1])
+				);
+			out.m[2][3] = -RDet * (
+				src.m[0][0] * (src.m[1][1] * src.m[2][3] - src.m[1][3] * src.m[2][1]) -
+				src.m[1][0] * (src.m[0][1] * src.m[2][3] - src.m[0][3] * src.m[2][1]) +
+				src.m[2][0] * (src.m[0][1] * src.m[1][3] - src.m[0][3] * src.m[1][1])
+				);
+			out.m[3][0] = -RDet * (
+				src.m[1][0] * (src.m[2][1] * src.m[3][2] - src.m[2][2] * src.m[3][1]) -
+				src.m[2][0] * (src.m[1][1] * src.m[3][2] - src.m[1][2] * src.m[3][1]) +
+				src.m[3][0] * (src.m[1][1] * src.m[2][2] - src.m[1][2] * src.m[2][1])
+				);
+			out.m[3][1] = RDet * (
+				src.m[0][0] * (src.m[2][1] * src.m[3][2] - src.m[2][2] * src.m[3][1]) -
+				src.m[2][0] * (src.m[0][1] * src.m[3][2] - src.m[0][2] * src.m[3][1]) +
+				src.m[3][0] * (src.m[0][1] * src.m[2][2] - src.m[0][2] * src.m[2][1])
+				);
+			out.m[3][2] = -RDet * (
+				src.m[0][0] * (src.m[1][1] * src.m[3][2] - src.m[1][2] * src.m[3][1]) -
+				src.m[1][0] * (src.m[0][1] * src.m[3][2] - src.m[0][2] * src.m[3][1]) +
+				src.m[3][0] * (src.m[0][1] * src.m[1][2] - src.m[0][2] * src.m[1][1])
+				);
+			out.m[3][3] = RDet * (
+				src.m[0][0] * (src.m[1][1] * src.m[2][2] - src.m[1][2] * src.m[2][1]) -
+				src.m[1][0] * (src.m[0][1] * src.m[2][2] - src.m[0][2] * src.m[2][1]) +
+				src.m[2][0] * (src.m[0][1] * src.m[1][2] - src.m[0][2] * src.m[1][1])
+				);
+
+
+			return true;
+
+		}
 		
 		// Transpose된 행렬을 반환
 		FMatrix4x4 Transposed() const
@@ -230,7 +325,11 @@ struct FMatrix4x4
 			}
 		}
 		
+		
 	public:
 		float m[4][4];
-		
+		static const FMatrix4x4 Identity;
+
 };
+
+inline const FMatrix4x4 FMatrix4x4::Identity{};
