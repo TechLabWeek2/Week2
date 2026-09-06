@@ -3,5 +3,9 @@
 class USphereComp :
     public UPrimitiveComponent
 {
+public:
+    USphereComp();
+
+    virtual void Render(URenderer* Renderer) override;
 };
 

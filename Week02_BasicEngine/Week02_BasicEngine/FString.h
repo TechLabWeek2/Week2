@@ -67,7 +67,7 @@ public:
 
 	inline ElementType& operator[](int32 Index)
 	{
-		assert(IsValidIndex(Index), "String index out of bounds: Index %i from a string with a length of %i", Index, Len());
+		assert((IsValidIndex(Index), "String index out of bounds: Index %i from a string with a length of %i", Index, Len()));
 		return Data[Index];
 	}
 

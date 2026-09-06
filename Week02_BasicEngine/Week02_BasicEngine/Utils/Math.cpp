@@ -50,24 +50,24 @@ FMatrix FMatrix::operator*(const FMatrix& other) const
 	return result;
 }
 
-FMatrix FMatrix::Translation(float x, float y, float z)
+FMatrix FMatrix::Translation(FVector location)
 {
 	FMatrix result;
 
-	result.m[3][0] = x;
-	result.m[3][1] = y;
-	result.m[3][2] = z;
+	result.m[3][0] = location.x;
+	result.m[3][1] = location.y;
+	result.m[3][2] = location.z;
 
 	return result;
 }
 
-FMatrix FMatrix::Scaling(float sx, float sy, float sz)
+FMatrix FMatrix::Scaling(FVector scale)
 {
 	FMatrix result;
 
-	result.m[0][0] = sx;
-	result.m[1][1] = sy;
-	result.m[2][2] = sz;
+	result.m[0][0] = scale.x;
+	result.m[1][1] = scale.y;
+	result.m[2][2] = scale.z;
 
 	return result;
 }
@@ -103,11 +103,11 @@ FMatrix FMatrix::RotationZ(float angle)
 	return result;
 }
 
-FMatrix FMatrix::Rotation(float angleX, float angleY, float angleZ)
+FMatrix FMatrix::Rotation(FVector rotation)
 {
-	FMatrix rotationX = RotationX(DegreeToRadian(angleX));
-	FMatrix rotationY = RotationY(DegreeToRadian(angleY));
-	FMatrix rotationZ = RotationZ(DegreeToRadian(angleZ));
+	FMatrix rotationX = RotationX(rotation.x);
+	FMatrix rotationY = RotationY(rotation.y);
+	FMatrix rotationZ = RotationZ(rotation.z);
 	return rotationZ * rotationY * rotationX;
 }
 
@@ -234,9 +234,9 @@ void FMatrix::Transpose()
 
 static FMatrix GetModelMatrix(const FVector& Location, const FVector& Rotation, const FVector& Scale)
 {
-	return  FMatrix::Scaling(Scale.x, Scale.y, Scale.z) *
-		FMatrix::Rotation(Rotation.x, Rotation.y, Rotation.z) *
-		FMatrix::Translation(Location.x, Location.y, Location.z);
+	return  FMatrix::Scaling(Scale) *
+		FMatrix::Rotation(Rotation) *
+		FMatrix::Translation(Location);
 		
 }
 

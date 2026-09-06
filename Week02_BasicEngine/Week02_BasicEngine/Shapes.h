@@ -11,20 +11,14 @@ enum ETypePrimitive {
 	EPT_Max,
 };
 
-FVertexSimple xline_vertices[] =
+FVertexSimple line_vertices[] =
 {
 	{  0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f },
-	{  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f }
-};
+	{  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f },
 
-FVertexSimple yline_vertices[] =
-{
 	{  0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f },
-	{  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f }
-};
+	{  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f },
 
-FVertexSimple zline_vertices[] =
-{
 	{  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f },
 	{  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f }
 };

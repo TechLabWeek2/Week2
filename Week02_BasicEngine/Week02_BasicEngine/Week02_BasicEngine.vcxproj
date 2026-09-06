@@ -152,6 +152,8 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="FString.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="UAxisGizmo.cpp" />
+    <ClCompile Include="UCameraComp.cpp" />
     <ClCompile Include="UCubeComp.cpp" />
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UPlaneComp.cpp" />
@@ -160,6 +162,7 @@
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="USphereComp.cpp" />
     <ClCompile Include="Utils\Math.cpp" />
+    <ClCompile Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h" />
@@ -173,6 +176,8 @@
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Shapes.h" />
+    <ClInclude Include="UAxisGizmo.h" />
+    <ClInclude Include="UCameraComp.h" />
     <ClInclude Include="UCubeComp.h" />
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UPlaneComp.h" />

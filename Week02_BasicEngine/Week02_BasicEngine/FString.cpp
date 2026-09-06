@@ -32,7 +32,7 @@ void FString::AppendChars(const WIDECHAR* Str, int32 Count)
 
 int32 FString::Find(const ElementType* SubStr, int32 InSubStrLen) const
 {
-	assert(InSubStrLen >= 0, "Invalid SubStrLen : %d", InSubStrLen);
+	assert((InSubStrLen >= 0, "Invalid SubStrLen : %d", InSubStrLen));
 
 	int32 SubLen = wcslen(SubStr);
 	int32 MyLen = Len();

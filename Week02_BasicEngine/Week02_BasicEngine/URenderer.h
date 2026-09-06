@@ -18,6 +18,8 @@
 #include "Core/Core.h"
 
 #include <math.h>
+#include "UCameraComp.h"
+
 struct FVertexSimple
 {
     float x, y, z;    // Position
@@ -30,6 +32,9 @@ struct alignas(16) FConstants {
 
 class URenderer
 {
+public:
+    UCameraComp* MainCamera = new UCameraComp();
+
 public:
     // Direct3D 11 장치(Device)와 장치 컨텍스트(Device Context) 및 스왑 체인(Swap Chain)을 관리하기 위한 포인터들
     ID3D11Device* Device = nullptr; // GPU와 통신하기 위한 Direct3D 장치
@@ -53,7 +58,7 @@ public:
     void ReleaseConstantBuffer();
 
     //상수 버퍼를 갱신하는 함수
-    void UpdateConstant(FVector Offset, float Scale, FVector Rotation, FVector CameraLocation, FVector CameraForword);
+    void UpdateConstant(FMatrix Matrix);
 
     void CreateShader();
 

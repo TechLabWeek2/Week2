@@ -1,7 +1,7 @@
 #pragma once
 #include "UPrimitiveComponent.h"
 
-class UCubeComp :
+class UAxisGizmo:
     public UPrimitiveComponent
 {
 public:
@@ -9,8 +9,7 @@ public:
     int32 NumVertices;
 
 public:
-    UCubeComp();
+    UAxisGizmo();
 
     virtual void Render(URenderer* Renderer) override;
 };
-

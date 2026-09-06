@@ -24,13 +24,13 @@ void URenderer::ReleaseConstantBuffer()
 }
 
 //상수 버퍼를 갱신하는 함수
-void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FVector CameraLocation, FVector CameraForword)
+void URenderer::UpdateConstant(FMatrix Matrix)
 {
 	if (ConstantBuffer)
 	{
 		D3D11_MAPPED_SUBRESOURCE constantbufferMSR;
 
-		FMatrix scaleMatrix =
+		/*FMatrix scaleMatrix =
 			FMatrix::Scaling(
 				Scale,
 				Scale,
@@ -54,64 +54,58 @@ void URenderer::UpdateConstant(FVector Offset, float Scale, FVector Rotation, FV
 		FMatrix worldMatrix =
 			scaleMatrix *
 			rotationMatrix *
-			translationMatrix;
-		////////////////////////////////////////////////
-		FVector ZAxis = CameraForword;
-		ZAxis.Normalize();
-		FVector XAxis;
-		XAxis.x = ZAxis.z;
-		XAxis.y = 0;
-		XAxis.z = -ZAxis.x;
-		XAxis.Normalize();
-		FVector YAxis;
-		YAxis.x = ZAxis.y * XAxis.z - ZAxis.z * XAxis.y;
-		YAxis.y = ZAxis.z * XAxis.x - ZAxis.x * XAxis.z;
-		YAxis.z = ZAxis.x * XAxis.y - ZAxis.y * XAxis.x;
-		YAxis.Normalize();
-		FMatrix M;
-		M.m[0][0] = XAxis.x;
-		M.m[0][1] = YAxis.x;
-		M.m[0][2] = ZAxis.x;
-		M.m[0][3] = 0.0f;
-		M.m[1][0] = XAxis.y;
-		M.m[1][1] = YAxis.y;
-		M.m[1][2] = ZAxis.y;
-		M.m[1][3] = 0.0f;
-		M.m[2][0] = XAxis.z;
-		M.m[2][1] = YAxis.z;
-		M.m[2][2] = ZAxis.z;
-		M.m[2][3] = 0.0f;
-		M.m[3][0] = -CameraLocation.x * XAxis.x - CameraLocation.y * XAxis.y - CameraLocation.z * XAxis.z;
-		M.m[3][1] = -CameraLocation.x * YAxis.x - CameraLocation.y * YAxis.y - CameraLocation.z * YAxis.z;
-		M.m[3][2] = -CameraLocation.x * ZAxis.x - CameraLocation.y * ZAxis.y - CameraLocation.z * ZAxis.z;
-		M.m[3][3] = 1.0f;
+			translationMatrix;*/
+			////////////////////////////////////////////////
+	/*		FVector ZAxis = CameraForword;
+			ZAxis.Normalize();
+			FVector XAxis;
+			XAxis.x = ZAxis.z;
+			XAxis.y = 0;
+			XAxis.z = -ZAxis.x;
+			XAxis.Normalize();
+			FVector YAxis;
+			YAxis.x = ZAxis.y * XAxis.z - ZAxis.z * XAxis.y;
+			YAxis.y = ZAxis.z * XAxis.x - ZAxis.x * XAxis.z;
+			YAxis.z = ZAxis.x * XAxis.y - ZAxis.y * XAxis.x;
+			YAxis.Normalize();
+			FMatrix M;
+			M.m[0][0] = XAxis.x;
+			M.m[0][1] = YAxis.x;
+			M.m[0][2] = ZAxis.x;
+			M.m[0][3] = 0.0f;
+			M.m[1][0] = XAxis.y;
+			M.m[1][1] = YAxis.y;
+			M.m[1][2] = ZAxis.y;
+			M.m[1][3] = 0.0f;
+			M.m[2][0] = XAxis.z;
+			M.m[2][1] = YAxis.z;
+			M.m[2][2] = ZAxis.z;
+			M.m[2][3] = 0.0f;
+			M.m[3][0] = -CameraLocation.x * XAxis.x - CameraLocation.y * XAxis.y - CameraLocation.z * XAxis.z;
+			M.m[3][1] = -CameraLocation.x * YAxis.x - CameraLocation.y * YAxis.y - CameraLocation.z * YAxis.z;
+			M.m[3][2] = -CameraLocation.x * ZAxis.x - CameraLocation.y * ZAxis.y - CameraLocation.z * ZAxis.z;
+			M.m[3][3] = 1.0f;
 
-		FMatrix M2;
-		float nearZ = 0.1f; // 원하는 최소 거리
-		float farZ = 1000.f; // 원하는 최대 거리
-		
-		M2.m[0][0] = 1 / tan(0.52);
-		M2.m[1][1] = 1 / tan(0.52);
-		M2.m[2][2] = (farZ) / (farZ - nearZ);
-		M2.m[2][3] = 1;
-		M2.m[3][2] = -(farZ * nearZ) / (farZ - nearZ);
-		M2.m[3][3] = 0;
-		FMatrix viewMatrix = worldMatrix * M * M2;
-		////////////////////////////////////////////////
+			FMatrix M2;
+			float nearZ = 0.1f; // 원하는 최소 거리
+			float farZ = 1000.f; // 원하는 최대 거리
+
+			M2.m[0][0] = 1 / tan(0.52);
+			M2.m[1][1] = 1 / tan(0.52);
+			M2.m[2][2] = (farZ) / (farZ - nearZ);
+			M2.m[2][3] = 1;
+			M2.m[3][2] = -(farZ * nearZ) / (farZ - nearZ);
+			M2.m[3][3] = 0;
+			FMatrix viewMatrix = worldMatrix * M* M2;*/
+			////////////////////////////////////////////////
 
 		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
-		if (!(CameraForword.x == 0 && CameraForword.y == 0 && CameraForword.z == 0)) {
-			FConstants* constants = (FConstants*)constantbufferMSR.pData;
-			{
-				constants->World = viewMatrix;
-			}
+
+		FConstants* constants = (FConstants*)constantbufferMSR.pData;
+		{
+			constants->World = Matrix;
 		}
-		else {
-			FConstants* constants = (FConstants*)constantbufferMSR.pData;
-			{
-				constants->World = worldMatrix;
-			}
-		}
+
 		DeviceContext->Unmap(ConstantBuffer, 0);
 	}
 }

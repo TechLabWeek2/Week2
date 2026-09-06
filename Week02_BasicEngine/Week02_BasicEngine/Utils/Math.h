@@ -37,7 +37,6 @@ public:
 
 	FMatrix operator*(const FMatrix& other) const;
 public:
-
 	
 	// Rotation의 정보를 행렬로 변환하여 제공하는 함수
 	static FMatrix RotationMatrix(const FVector& InOtherVector);
@@ -49,11 +48,11 @@ public:
 
 
 	// 이동 행렬
-	static FMatrix Translation(float x, float y, float z);
+	static FMatrix Translation(FVector location);
 	static FMatrix TranslationMatrixInverse(const FVector& Other);
 
 
-	static FMatrix Scaling(float sx, float sy, float sz);
+	static FMatrix Scaling(FVector scale);
 	static FMatrix ScaleMatrixInverse(const FVector& Other);
 
 	//angle은 라디안 단위
@@ -64,7 +63,7 @@ public:
 	static FMatrix RotationZ(float angle);
 
 	//입력은 degree 단위
-	static FMatrix Rotation(float angleX, float angleY, float angleZ);
+	static FMatrix Rotation(FVector rotation);
 
 	// 역행렬을 계산하고 out에 결과를 저장, 역행렬을 구할 수 없다면 identity 행렬을 반환하고 false를 반환
 	static bool MatrixInverse(const FMatrix& src, FMatrix& out);

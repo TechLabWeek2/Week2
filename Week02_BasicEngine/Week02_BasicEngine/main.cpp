@@ -1,12 +1,14 @@
 #include <windows.h>
 #include "URenderer.h"
 #include "Shapes.h"
-#include <stdio.h>
+#include "UCubeComp.h"
+#include "UCameraComp.h"
+#include "UAxisGizmo.h"
 #if IMGUI_VERSION_NUM >= 19263
 namespace ImGui { extern IMGUI_API void DemoMarker(const char* file, int line, const char* section); }
 #define IMGUI_DEMO_MARKER(section)  do { ImGui::DemoMarker("imgui_demo.cpp", __LINE__, section); } while (0)
 #endif
-
+struct FVertexSimple;
 struct ExampleAppConsole
 {
     char                  InputBuf[256];
@@ -620,14 +622,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
     // Renderer와 Shader 생성 이후에 버텍스 버퍼를 생성합니다.
-    UINT numVerticesLine = sizeof(xline_vertices) / sizeof(FVertexSimple);
+    UINT numVerticesLine = sizeof(line_vertices) / sizeof(FVertexSimple);
     UINT numVerticesTriangle = sizeof(triangle_vertices) / sizeof(FVertexSimple);
     UINT numVerticesCube = sizeof(cube_vertices) / sizeof(FVertexSimple);
     UINT numVerticesSphere = sizeof(sphere_vertices) / sizeof(FVertexSimple);
 
-    ID3D11Buffer* vertexBufferXLine = renderer.CreateVertexBuffer(xline_vertices, sizeof(xline_vertices));
-    ID3D11Buffer* vertexBufferYLine = renderer.CreateVertexBuffer(yline_vertices, sizeof(yline_vertices));
-    ID3D11Buffer* vertexBufferZLine = renderer.CreateVertexBuffer(zline_vertices, sizeof(zline_vertices));
+    ID3D11Buffer* vertexBufferLine = renderer.CreateVertexBuffer(line_vertices, sizeof(line_vertices));
     ID3D11Buffer* vertexBufferTriangle = renderer.CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
     ID3D11Buffer* vertexBufferCube = renderer.CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
     ID3D11Buffer* vertexBufferSphere = renderer.CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
@@ -666,21 +666,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     LARGE_INTEGER startTime, endTime;
     double elapsedTime = 0.0;
     float degree = 100;
+    
+    //카메라
+    UCameraComp* Camera = renderer.MainCamera;
+    Camera->RelativeLocation = { 0,2,-2 };
+    Camera->RelativeRotation = { DegreeToRadian(-45),DegreeToRadian(-135), 0 };
+    Camera->RelativeRotation = { DegreeToRadian(0),DegreeToRadian(0), 0 };
 
-    FVector CameraLocation = { 1,1,-1 };
-    FVector CameraForward = { -1,-1,1 };
-    FVector CameraRotation = { 0,0,0 };
-    FVector XAxis;
-    XAxis.x = CameraForward.z;
-    XAxis.y = 0;
-    XAxis.z = -CameraForward.x;
-    XAxis.Normalize();
+    //좌표축
+    UAxisGizmo* AxisGizmo = new UAxisGizmo();
 
-    FVector YAxis;
-    YAxis.x = CameraForward.y * XAxis.z - CameraForward.z * XAxis.y;
-    YAxis.y = CameraForward.z * XAxis.x - CameraForward.x * XAxis.z;
-    YAxis.z = CameraForward.x * XAxis.y - CameraForward.y * XAxis.x;
-    YAxis.Normalize();
+    AxisGizmo->Vertices = vertexBufferLine;
+    AxisGizmo->NumVertices = numVerticesLine;
+
+    ExampleAppConsole Console;
+    bool is_window_open = true;
+
+
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
     {
@@ -716,41 +718,39 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         static POINT lastMousePos = currentMousePos;
         static bool isDragging = false;
 
-        XAxis.x = CameraForward.z;
-        XAxis.y = 0;
-        XAxis.z = -CameraForward.x;
+        FVector ZAxis(cos(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x), sin(Camera->RelativeRotation.x), -sin(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x));
+        ZAxis.Normalize();
+        FVector XAxis = FVector(0, 1, 0).Cross(ZAxis);
         XAxis.Normalize();
-
-        YAxis.x = CameraForward.y * XAxis.z - CameraForward.z * XAxis.y;
-        YAxis.y = CameraForward.z * XAxis.x - CameraForward.x * XAxis.z;
-        YAxis.z = CameraForward.x * XAxis.y - CameraForward.y * XAxis.x;
+        FVector YAxis = ZAxis.Cross(XAxis);
         YAxis.Normalize();
 
         if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
-            CameraLocation.x -= XAxis.x * 0.01f;
-            CameraLocation.y -= XAxis.y * 0.01f;
-            CameraLocation.z -= XAxis.z * 0.01f;
+            Camera->RelativeLocation.x -= XAxis.x * 0.01f;
+            Camera->RelativeLocation.y -= XAxis.y * 0.01f;
+            Camera->RelativeLocation.z -= XAxis.z * 0.01f;
+            //Console.UE_LOG("%s %c %f %d %u %o %x","Hello",'A',3.14f,-100,100,100,255);
         }
         if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
-            CameraLocation.x += XAxis.x * 0.01f;
-            CameraLocation.y += XAxis.y * 0.01f;
-            CameraLocation.z += XAxis.z * 0.01f;
+            Camera->RelativeLocation.x += XAxis.x * 0.01f;
+            Camera->RelativeLocation.y += XAxis.y * 0.01f;
+            Camera->RelativeLocation.z += XAxis.z * 0.01f;
         }
         if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
-            CameraLocation.x += CameraForward.x * 0.01f;
-            CameraLocation.y += CameraForward.y * 0.01f;
-            CameraLocation.z += CameraForward.z * 0.01f;
+            Camera->RelativeLocation.x += ZAxis.x * 0.01f;
+            Camera->RelativeLocation.y += ZAxis.y * 0.01f;
+            Camera->RelativeLocation.z += ZAxis.z * 0.01f;
         }
         if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
-            CameraLocation.x -= CameraForward.x * 0.01f;
-            CameraLocation.y -= CameraForward.y * 0.01f;
-            CameraLocation.z -= CameraForward.z * 0.01f;
+            Camera->RelativeLocation.x -= ZAxis.x * 0.01f;
+            Camera->RelativeLocation.y -= ZAxis.y * 0.01f;
+            Camera->RelativeLocation.z -= ZAxis.z * 0.01f;
         }
         if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
-            CameraLocation.y += 0.01f;
+            Camera->RelativeLocation.y += 0.01f;
         }
         if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
-            CameraLocation.y -= 0.01f;
+            Camera->RelativeLocation.y -= 0.01f;
         }
         if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
         {
@@ -768,7 +768,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             float angleX = deltaX * sensitivity;
             float angleY = -deltaY * sensitivity;
 
-            // 좌우 회전
+            // 좌우
+            Camera->RelativeRotation.y += angleX;
+            // 상하
+            Camera->RelativeRotation.x += angleY;
+/*            // 좌우 회전
             FVector rotation;
 
             rotation.x = CameraForward.x * cos(angleX)
@@ -802,7 +806,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
             rotation2.Normalize();
 
-            CameraForward = rotation2;
+            CameraForward = rotation2;*/
 
             lastMousePos = currentMousePos;
         }
@@ -814,8 +818,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         const float RAD_TO_DEG = 180.0f / 3.14159265359f;
 
-        // Pitch
-        CameraRotation.x = -atan2(
+/*        // Pitch
+        Camera->RelativeRotation.x = -atan2(
             CameraForward.y,
             sqrt(
                 CameraForward.x * CameraForward.x +
@@ -824,13 +828,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ) * RAD_TO_DEG;
 
         // Yaw
-        CameraRotation.y = atan2(
+        Camera->RelativeRotation.y = atan2(
             CameraForward.x,
             CameraForward.z
         ) * RAD_TO_DEG;
 
         // Roll
-        CameraRotation.z = 0.0f;
+        Camera->RelativeRotation.z = 0.0f; */
 
 
         PrimitiveList[0] = new UPrimitive({ 0,0,1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
@@ -841,18 +845,34 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         PrimitiveList[5] = new UPrimitive({ -1,0,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
 
         //Line (Left-Bottom)
-        PrimitiveList[6] = new UPrimitive({ -0.9f,-0.9f,0 }, { -CameraRotation.x, -CameraRotation.y, -CameraRotation.z }, 0.05f, ETypePrimitive::EPT_XLine, ETypeLine::ETL_LB);
-        PrimitiveList[7] = new UPrimitive({ -0.9f,-0.9f,0 }, { -CameraRotation.x, -CameraRotation.y, -CameraRotation.z }, 0.05f, ETypePrimitive::EPT_YLine, ETypeLine::ETL_LB);
-        PrimitiveList[8] = new UPrimitive({ -0.9f,-0.9f,0 }, { -CameraRotation.x, -CameraRotation.y, -CameraRotation.z }, 0.05f, ETypePrimitive::EPT_ZLine, ETypeLine::ETL_LB);
+        PrimitiveList[6] = new UPrimitive({ -0.9f,-0.9f,0 }, { -Camera->RelativeRotation.x, -Camera->RelativeRotation.y, -Camera->RelativeRotation.z }, 0.05f, ETypePrimitive::EPT_XLine, ETypeLine::ETL_LB);
+        PrimitiveList[7] = new UPrimitive({ -0.9f,-0.9f,0 }, { -Camera->RelativeRotation.x, -Camera->RelativeRotation.y, -Camera->RelativeRotation.z }, 0.05f, ETypePrimitive::EPT_YLine, ETypeLine::ETL_LB);
+        PrimitiveList[8] = new UPrimitive({ -0.9f,-0.9f,0 }, { -Camera->RelativeRotation.x, -Camera->RelativeRotation.y, -Camera->RelativeRotation.z }, 0.05f, ETypePrimitive::EPT_ZLine, ETypeLine::ETL_LB);
 
 
 /*        PrimitiveList[9] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_XLine);
         PrimitiveList[10] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_YLine);
         PrimitiveList[11] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_ZLine);*/
         UPrimitiveCnt = 9;
-        degree -= 1.f;
-        if (degree >= 360)   degree = 0;
-        for (int i = 0; i < UPrimitiveCnt; i++) {
+
+        UCubeComp* Test = new UCubeComp();
+        Test->Vertices = vertexBufferCube;
+        Test->NumVertices = numVerticesCube;
+        Test->RelativeLocation = FVector(1, 0, 0);
+        Test->Render(&renderer);
+        Test->RelativeLocation = FVector(-1, 0, 0);
+        Test->Render(&renderer);
+        Test->RelativeLocation = FVector(0, 1, 0);
+        Test->Render(&renderer);
+        Test->RelativeLocation = FVector(0, -1, 0);
+        Test->Render(&renderer);
+        Test->RelativeLocation = FVector(0, 0, 1);
+        Test->Render(&renderer);
+        //Test->RelativeRotation = Camera->RelativeRotation;
+        Test->RelativeLocation = FVector(0, 0, -1);
+        Test->Render(&renderer);
+        AxisGizmo->Render(&renderer);
+        /*for (int i = 0; i < UPrimitiveCnt; i++) {
 
             FVector vector;
             vector.x = 0;
@@ -901,26 +921,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             default:
                 break;
             }
-        }
+        }*/
 
 
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
-
-        ExampleAppConsole Console;
-        bool is_window_open = true;
-        Console.UE_LOG(
-            "%s %c %f %d %u %o %x",
-            "Hello",
-            'A',
-            3.14f,
-            -100,
-            100,
-            100,
-            255
-        );
+        
         Console.Draw("Console Windows", &is_window_open);
+        
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
@@ -943,9 +952,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
-    renderer.ReleaseVertexBuffer(vertexBufferTriangle);
-    renderer.ReleaseVertexBuffer(vertexBufferCube);
-    renderer.ReleaseVertexBuffer(vertexBufferSphere);
     renderer.ReleaseConstantBuffer();
     renderer.ReleaseShader();
     renderer.Release();

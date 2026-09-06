@@ -48,6 +48,42 @@
     <ClCompile Include="URenderer.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
+    <ClCompile Include="FVector.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="FString.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="UCameraComp.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="UCubeComp.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="UObject.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="UPlaneComp.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="UPrimitiveComponent.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="USceneComponent.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="USphereComp.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Math.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.h">
+      <Filter>Header File</Filter>
+    </ClCompile>
+    <ClCompile Include="UAxisGizmo.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -80,16 +116,44 @@
     <ClInclude Include="Shapes.h">
       <Filter>Header File</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Core.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FVector.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="UCameraComp.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="UCubeComp.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="UObject.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="UPlaneComp.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="UPrimitiveComponent.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="USceneComponent.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="USphereComp.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Math.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="UAxisGizmo.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ShaderW0.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="FString.cpp">
-      <Filter>Source Code</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CoreType.h">
