@@ -84,6 +84,9 @@
     <ClCompile Include="UAxisGizmo.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
+    <ClCompile Include="FMatrix.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -147,6 +150,9 @@
       <Filter>Header File</Filter>
     </ClInclude>
     <ClInclude Include="UAxisGizmo.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FMatrix.h">
       <Filter>Header File</Filter>
     </ClInclude>
   </ItemGroup>
