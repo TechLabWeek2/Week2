@@ -84,3 +84,49 @@ FString FVector2::ToString() const
 {
     return FString::Printf(L"x = &f, y = %f", x, y);
 }
+
+
+
+bool FVector4::Equals(const FVector4& V, float Tolerance) const
+{
+    return Abs(x - V.x) <= Tolerance && Abs(y - V.y) <= Tolerance && Abs(z - V.z) <= Tolerance && Abs(w - V.w) <= Tolerance;
+}
+
+float FVector4::Size() const
+{
+    return sqrt(x * x + y * y + z * z + w * w);
+}
+
+float FVector4::SizeSquared() const
+{
+    return x * x + y * y + z * z + w * w;
+}
+
+float FVector4::Length() const
+{
+    return Size();
+}
+
+float FVector4::SquaredLength() const
+{
+    return SizeSquared();
+}
+
+bool FVector4::IsNearlyZero(float Tolerance) const
+{
+    return
+        Abs(x) <= Tolerance
+        && Abs(y) <= Tolerance
+        && Abs(z) <= Tolerance
+        && Abs(w) <= Tolerance;
+}
+
+bool FVector4::IsZero() const
+{
+    return x == 0.f && y == 0.f && z == 0.f && w == 0.f;
+}
+
+FString FVector4::ToString() const
+{
+    return FString::Printf(L"x = &f, y = %f, z = &f, w = %f", x, y, z, w);
+}

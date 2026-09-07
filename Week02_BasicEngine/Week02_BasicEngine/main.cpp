@@ -5,6 +5,8 @@
 #include "UCameraComp.h"
 #include "UAxisGizmo.h"
 #include "UPicking.h"
+#include "UObject.h"
+#include "UObjectArray.h"
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 1024
@@ -589,6 +591,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+void DrawStatWindow()
+{
+    if (ImGui::Begin("Stat"))
+    {
+        ImGui::Text(
+            "Live Objects: %u",
+            static_cast<unsigned int>(GUObjectArray.GetNum())
+        );
+
+        ImGui::Text(
+            "Heap Allocations: %u",
+            static_cast<unsigned int>(TotalAllocationCount)
+        );
+
+        ImGui::Text(
+            "Heap Memory: %u bytes",
+            static_cast<unsigned int>(TotalAllocationBytes)
+        );
+
+        ImGui::Text(
+            "Heap Memory: %.2f KiB",
+            static_cast<double>(TotalAllocationBytes) / 1024.0
+        );
+    }
+
+    ImGui::End();
+}
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
@@ -687,6 +717,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ExampleAppConsole Console;
     bool is_window_open = true;
 
+    UCubeComp* Test = new UCubeComp();
+    Test->Vertices = vertexBufferCube;
+    Test->NumVertices = numVerticesCube;
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
@@ -876,9 +909,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         PrimitiveList[11] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_ZLine);*/
         UPrimitiveCnt = 9;
 
-        UCubeComp* Test = new UCubeComp();
-        Test->Vertices = vertexBufferCube;
-        Test->NumVertices = numVerticesCube;
+     
         Test->RelativeLocation = FVector(1, 0, 0);
         Test->Render(&renderer);
         Test->RelativeLocation = FVector(-1, 0, 0);
@@ -950,7 +981,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::NewFrame();
         
         Console.Draw("Console Windows", &is_window_open);
-        
+        DrawStatWindow();
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 

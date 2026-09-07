@@ -22,6 +22,14 @@ public:
 	FMatrix& operator=(FMatrix&&) = default;
 
 	FMatrix operator*(const FMatrix& other) const;
+
+	FMatrix operator+(const FMatrix& other) const;
+
+	FMatrix operator-(const FMatrix& other) const;
+
+	FMatrix operator*(float scalar) const;
+
+	FMatrix operator/(float scalar) const;
 public:
 
 	// Rotation의 정보를 행렬로 변환하여 제공하는 함수
@@ -55,6 +63,15 @@ public:
 	static bool MatrixInverse(const FMatrix& src, FMatrix& out);
 
 	static FMatrix MatrixInverse(const FMatrix& src);
+
+	// Orthogonal Matrix인지 검사
+	bool IsOrthogonal();
+
+	// Orthonormal Matrix인지 검사
+	bool IsOrthonormal();
+
+	// Normal Matrix
+	FMatrix GetNormalMatrix();
 
 	// Transpose된 행렬을 반환
 	FMatrix Transposed() const;

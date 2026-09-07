@@ -22,6 +22,8 @@
 
 #include "FMatrix.h"
 #include "FVertexSimple.h"
+class UObject;
+class UCameraComponent;
 
 struct alignas(16) FConstants {
     FMatrix World;
@@ -112,4 +114,7 @@ public:
 
     // 깊이 스텐실 버퍼 생성
     void ReleaseDepthStencilState();
+
+    //GUObjectArray 순회하며 render 호출
+    void RenderScene(const TArray<UObject*> Objects, const UCameraComponent* Camera, float AspectRatio);
 };

@@ -14,6 +14,7 @@ public:
 public:
     USceneComponent();
 
-    FMatrix GetTransformMatrix() const;
+    FMatrix GetModelMatrix() const;
+
 };
 

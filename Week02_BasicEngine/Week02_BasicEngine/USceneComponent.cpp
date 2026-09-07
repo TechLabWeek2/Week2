@@ -1,4 +1,5 @@
 #include "USceneComponent.h"
+#include "Utils/Math.h"
 
 USceneComponent::USceneComponent()
 {
@@ -8,8 +9,9 @@ USceneComponent::USceneComponent()
 	primitiveType = EPT_None;
 }
 
-FMatrix USceneComponent::GetTransformMatrix() const
+FMatrix USceneComponent::GetModelMatrix() const
 {
+	//return FMatrix::GetModelMatrix(RelativeLocation, RelativeRotation, RelativeScale3D);
 	FMatrix scaleMatrix =
 		FMatrix::Scaling(RelativeScale3D);
 
