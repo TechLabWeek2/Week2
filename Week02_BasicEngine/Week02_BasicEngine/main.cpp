@@ -333,6 +333,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         static POINT lastMousePos = currentMousePos;
         static bool isDragging = false;
+        static bool wasLeftMouseDown = false;
+        const bool isLeftMouseDown = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+        const bool isLeftMousePressed = isLeftMouseDown && !wasLeftMouseDown;
+        wasLeftMouseDown = isLeftMouseDown;
 
         // camera forward
         FVector ZAxis(cos(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x), sin(Camera->RelativeRotation.x), -sin(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x));
@@ -395,7 +399,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
             lastMousePos = currentMousePos;
         }
-        else if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
+        else if (isLeftMousePressed)
         {
             if (!io.WantCaptureMouse)
             {
@@ -411,6 +415,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 float ndcY = 1.f - 2.f * (float)currentMousePos.y / screenHeight;
 
                 pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                if (pickedObjectPtr != nullptr) 
+                { 
+                    pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                }
             }
         }
         else

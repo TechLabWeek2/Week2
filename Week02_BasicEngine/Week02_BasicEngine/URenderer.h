@@ -27,6 +27,9 @@ class UCameraComponent;
 
 struct alignas(16) FConstants {
     FMatrix World;
+
+	float HightLightIntensity;
+	float Padding[3]; // 16바이트 정렬을 위해 패딩 추가
 };
 
 class URenderer
@@ -57,7 +60,7 @@ public:
     void ReleaseConstantBuffer();
 
     //상수 버퍼를 갱신하는 함수
-    void UpdateConstant(FMatrix Matrix);
+    void UpdateConstant(FMatrix Matrix, bool bIsSelected);
 
     void CreateShader();
 
@@ -118,3 +121,4 @@ public:
     //GUObjectArray 순회하며 render 호출
     void RenderScene(const TArray<UObject*> Objects, const UCameraComponent* Camera, float AspectRatio);
 };
+

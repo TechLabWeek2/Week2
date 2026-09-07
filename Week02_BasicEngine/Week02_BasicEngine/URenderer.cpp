@@ -25,7 +25,7 @@ void URenderer::ReleaseConstantBuffer()
 }
 
 //상수 버퍼를 갱신하는 함수
-void URenderer::UpdateConstant(FMatrix Matrix)
+void URenderer::UpdateConstant(FMatrix Matrix, bool bIsSelected)
 {
 	if (ConstantBuffer)
 	{
@@ -105,6 +105,12 @@ void URenderer::UpdateConstant(FMatrix Matrix)
 		FConstants* constants = (FConstants*)constantbufferMSR.pData;
 		{
 			constants->World = Matrix;
+
+			// HighLightIntensity를 bIsSelected 값에 따라 설정
+			constants->HightLightIntensity = bIsSelected ? 0.75f : 0.0f;
+			constants->Padding[0] = 0.0f;
+			constants->Padding[1] = 0.0f;
+			constants->Padding[2] = 0.0f;
 		}
 
 		DeviceContext->Unmap(ConstantBuffer, 0);

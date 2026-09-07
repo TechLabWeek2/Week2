@@ -14,6 +14,9 @@ struct PS_INPUT
 cbuffer constants : register(b0)
 {
     row_major float4x4 World;
+    
+    float HightLightIntensity;
+    float3 Padding;
 }
 
 PS_INPUT mainVS(VS_INPUT input)
@@ -22,8 +25,10 @@ PS_INPUT mainVS(VS_INPUT input)
     
     
     output.position = mul(input.position, World);
+    
     // Pass the color to the pixel shader
-    output.color = input.color;
+    
+    output.color = lerp(input.color, HightLightIntensity, 0.5); // 하이라이트 효과
     
     return output;
 }

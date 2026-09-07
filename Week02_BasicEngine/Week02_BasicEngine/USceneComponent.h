@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "UObject.h"
 #include "FVector.h"
 #include "Shapes.h"
@@ -10,7 +10,7 @@ public:
     FVector RelativeLocation;
     FVector RelativeRotation;
     FVector RelativeScale3D;
-
+    bool bIsSelected = false;
 public:
     USceneComponent();
 
