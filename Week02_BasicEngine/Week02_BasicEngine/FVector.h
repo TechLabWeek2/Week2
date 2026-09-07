@@ -265,6 +265,8 @@ public:
         return x != V.x || y != V.y || z != V.z || w != V.w;
     }
 
+    FVector4 operator*(const struct FMatrix& M) const;
+
     void Normalize()
     {
         float d = x * x + y * y + z * z + w * w;

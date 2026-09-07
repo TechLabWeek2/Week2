@@ -5,6 +5,8 @@ class UPrimitiveComponent :
     public USceneComponent
 {
 public:
+    ETypePrimitive primitiveType;
+
     UPrimitiveComponent();
 
     virtual void Render(URenderer* Renderer) = 0;

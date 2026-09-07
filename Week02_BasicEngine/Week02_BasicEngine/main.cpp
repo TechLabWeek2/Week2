@@ -862,7 +862,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             float ndcX = 2 * currentMousePos.x / SCREEN_WIDTH - 1;  // screen xy to NDC xy
             float ndcY = 1 - 2 * currentMousePos.y / SCREEN_HEIGHT;
 
-            //pickedObjectPtr = UPicking::GetPickedComponent(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, &SceneComponentList, SceneComponentCnt, &bIsPicking);
+            //pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, &PrimitiveComponentList, PrimitiveComponentCnt, &bIsPicking);
         }
         else
         {

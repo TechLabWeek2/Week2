@@ -10,7 +10,7 @@ public:
     FVector RelativeLocation;
     FVector RelativeRotation;
     FVector RelativeScale3D;
-    ETypePrimitive primitiveType;
+
 public:
     USceneComponent();
 

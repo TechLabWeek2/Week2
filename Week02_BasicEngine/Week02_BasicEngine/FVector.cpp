@@ -1,5 +1,17 @@
 #include "FVector.h"
 
+FVector4 FVector4::operator*(const FMatrix& M) const
+{
+    FVector4 result(0, 0, 0, 0);
+
+    result.x = x * M.m[0][0] + y * M.m[1][0] + z * M.m[2][0] + w * M.m[3][0];
+    result.y = x * M.m[0][1] + y * M.m[1][1] + z * M.m[2][1] + w * M.m[3][1];
+    result.z = x * M.m[0][2] + y * M.m[1][2] + z * M.m[2][2] + w * M.m[3][2];
+    result.w = x * M.m[0][3] + y * M.m[1][3] + z * M.m[2][3] + w * M.m[3][3];
+
+    return result;
+}
+
 bool FVector::Equals(const FVector& V, float Tolerance) const
 {
     return Abs(x - V.x) <= Tolerance && Abs(y - V.y) <= Tolerance && Abs(z - V.z) <= Tolerance;

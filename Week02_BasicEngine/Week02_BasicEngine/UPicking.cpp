@@ -1,6 +1,6 @@
 #include "UPicking.h"
 
-USceneComponent* UPicking::GetPickedComponent(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, USceneComponent** &SceneComponentList, int32 SceneComponentCnt, bool* bIsPicking)
+UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, UPrimitiveComponent** &PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking)
 {
     // picking
     ndcX = ndcX;  // screen xy to NDC xy
@@ -22,22 +22,22 @@ USceneComponent* UPicking::GetPickedComponent(float ndcX, float ndcY, UCameraCom
     float distanceMin = 10000.f;
     bool bIsFound = false;
 
-    USceneComponent* pickedObject = nullptr;
+    UPrimitiveComponent* pickedObject = nullptr;
 
-    for (int32 i = 0; i < SceneComponentCnt; i++)
+    for (int32 i = 0; i < PrimitiveComponentCnt; i++)
     {
-        FVector componentLocation(SceneComponentList[i]->RelativeLocation.x, SceneComponentList[i]->RelativeLocation.y, SceneComponentList[i]->RelativeLocation.z);
+        FVector componentLocation(PrimitiveComponentList[i]->RelativeLocation.x, PrimitiveComponentList[i]->RelativeLocation.y, PrimitiveComponentList[i]->RelativeLocation.z);
         FVector difference = componentLocation - Camera->RelativeLocation; // camera -> component 벡터
         if (difference.Dot(rayVector) < 0) // 오브젝트가 카메라 뒤에 있으면 무시
         {
             continue;
         }
         float distanceRay = difference.Cross(rayVector).Size() / rayVector.Size(); // component에서 Ray까지의 최단거리
-        if (distanceRay < SceneComponentList[i]->RelativeScale3D.Size()) // Sphere Boundary 체크로 1차 거르기
+        if (distanceRay < PrimitiveComponentList[i]->RelativeScale3D.Size() * sqrt(3)) // Sphere Boundary 체크로 1차 거르기
         {
-            FVertexSimple* targetVertices;
+            const FVertexSimple* targetVertices;
             int32 numVertices;
-            switch (SceneComponentList[i]->primitiveType) // 각각의 맞는 xxxxx_vertices[]를 로드
+            switch (PrimitiveComponentList[i]->primitiveType) // 각각의 맞는 xxxxx_vertices[]를 로드
             {
             case EPT_Sphere:
                 targetVertices = sphere_vertices;
@@ -47,6 +47,8 @@ USceneComponent* UPicking::GetPickedComponent(float ndcX, float ndcY, UCameraCom
                 targetVertices = cube_vertices;
                 numVertices = sizeof(cube_vertices) / sizeof(FVertexSimple);
                 break;
+            default:
+                break;
             }
             //////////////////////////////////////
             targetVertices = cube_vertices; // 임시
@@ -54,20 +56,24 @@ USceneComponent* UPicking::GetPickedComponent(float ndcX, float ndcY, UCameraCom
             //////////////////////////////////////
 
             // 로컬 좌표를 월드좌표로 변환해야함
-            FMatrix transformMatrix = SceneComponentList[i]->GetModelMatrix();
-            for (uint32 j = 0; j < numVertices; j++)
-            {
-                FVector targetVerticesLocal(targetVertices[j].x, targetVertices[j].y, targetVertices[j].z);
-                //FVector targetVerticesWorld = targetVerticesLocal * transformMatrix;
-            }
-
+            FMatrix transformMatrix = PrimitiveComponentList[i]->GetModelMatrix();
             for (uint32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘
             {
                 float epslion = 0.001f;
 
-                FVector v0(targetVertices[j].x, targetVertices[j].y, targetVertices[j].z);
-                FVector v1(targetVertices[j + 1].x, targetVertices[j + 1].y, targetVertices[j + 1].z);
-                FVector v2(targetVertices[j + 2].x, targetVertices[j + 2].y, targetVertices[j + 2].z);
+                FVertexSimple currentVertices[3];
+                for (uint32 k = 0; k < 3; k++)
+                {
+                    FVector4 targetVerticesLocal(targetVertices[j + k].x, targetVertices[j + k].y, targetVertices[j + k].z, 1);
+                    FVector4 targetVerticesWorld = targetVerticesLocal * transformMatrix;
+                    currentVertices[k].x = targetVerticesWorld.x;
+                    currentVertices[k].y = targetVerticesWorld.y;
+                    currentVertices[k].z = targetVerticesWorld.z;
+                }
+
+                FVector v0(currentVertices[0].x, currentVertices[0].y, currentVertices[0].z);
+                FVector v1(currentVertices[1].x, currentVertices[1].y, currentVertices[1].z);
+                FVector v2(currentVertices[2].x, currentVertices[2].y, currentVertices[2].z);
 
                 FVector edge1 = v1 - v0;
                 FVector edge2 = v2 - v0;
@@ -93,14 +99,14 @@ USceneComponent* UPicking::GetPickedComponent(float ndcX, float ndcY, UCameraCom
                     continue;
                 }
 
-                FVector sCroosEdge1 = s.Cross(edge1);
-                float v = inverseDet * rayVector.Dot(sCroosEdge1);
+                FVector sCrossEdge1 = s.Cross(edge1);
+                float v = inverseDet * rayVector.Dot(sCrossEdge1);
                 if (v < -epslion || u + v > 1 + epslion) // v 는 0 ~ 1, u + v < 1 이어야함
                 {
                     continue;
                 }
 
-                float t = inverseDet * edge2.Dot(sCroosEdge1);
+                float t = inverseDet * edge2.Dot(sCrossEdge1);
                 if (t < epslion) // t가 음수이면 광선방향의 뒷쪽임
                 {
                     continue;
@@ -113,7 +119,7 @@ USceneComponent* UPicking::GetPickedComponent(float ndcX, float ndcY, UCameraCom
                     *bIsPicking = true;
                     bIsFound = true;
                     distanceMin = distanceCamera;
-                    pickedObject = SceneComponentList[i];
+                    pickedObject = PrimitiveComponentList[i];
                 }
             }
         }

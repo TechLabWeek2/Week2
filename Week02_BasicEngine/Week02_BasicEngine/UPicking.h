@@ -1,10 +1,10 @@
 #pragma once
-#include "USceneComponent.h"
+#include "UPrimitiveComponent.h"
 #include "UCameraComp.h"
-#include "FVector.h"
 #include "FMatrix.h"
 #include "FMeshResource.h"
 #include "Shapes.h"
+#include "TArray.h"
 
 class UPicking
 {
@@ -25,5 +25,5 @@ public:
 	//FVector dirToWorld;
 
 public:
-	static USceneComponent* GetPickedComponent(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, USceneComponent** &SceneComponentList, int32 SceneComponentCnt, bool* bIsPicking);
+	static UPrimitiveComponent* GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, UPrimitiveComponent** &PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking);
 };
