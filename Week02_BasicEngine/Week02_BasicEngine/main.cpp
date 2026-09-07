@@ -4,6 +4,10 @@
 #include "UCubeComp.h"
 #include "UCameraComp.h"
 #include "UAxisGizmo.h"
+
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 1024
+
 #if IMGUI_VERSION_NUM >= 19263
 namespace ImGui { extern IMGUI_API void DemoMarker(const char* file, int line, const char* section); }
 #define IMGUI_DEMO_MARKER(section)  do { ImGui::DemoMarker("imgui_demo.cpp", __LINE__, section); } while (0)
@@ -601,14 +605,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // 1024 x 1024 크기에 윈도우 생성
     HWND hWnd = CreateWindowExW(0, WindowClass, Title, WS_POPUP | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 1024, 1024,
+        CW_USEDEFAULT, CW_USEDEFAULT, SCREEN_WIDTH, SCREEN_HEIGHT,
         nullptr, nullptr, hInstance, nullptr);
 
     // Renderer Class를 생성합니다.
     URenderer	renderer;
 
     // D3D11 생성하는 함수를 호출합니다.
-    renderer.Create(hWnd, 1024, 1024);
+    renderer.Create(hWnd, SCREEN_WIDTH, SCREEN_HEIGHT);
     // 렌더러 생성 직후에 쉐이더를 생성하는 함수를 호출합니다.
     renderer.CreateShader();
     //생성 함수 추가
@@ -718,10 +722,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         static POINT lastMousePos = currentMousePos;
         static bool isDragging = false;
 
+        //picking
+        bool bIsPicking = false;
+        UObject* pickedObject = nullptr;
+
+        // camera forward
         FVector ZAxis(cos(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x), sin(Camera->RelativeRotation.x), -sin(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x));
         ZAxis.Normalize();
+        // camera right
         FVector XAxis = FVector(0, 1, 0).Cross(ZAxis);
         XAxis.Normalize();
+        // camera up
         FVector YAxis = ZAxis.Cross(XAxis);
         YAxis.Normalize();
 
@@ -809,6 +820,59 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             CameraForward = rotation2;*/
 
             lastMousePos = currentMousePos;
+        }
+        if (GetAsyncKeyState(VK_RBUTTON))
+        {
+            // picking
+            ScreenToClient(hWnd, &currentMousePos);
+            float ndcX = 2 * currentMousePos.x / SCREEN_WIDTH - 1;  // screen xy to NDC xy
+            float ndcY = 1 - 2 * currentMousePos.y / SCREEN_HEIGHT;
+            float ndcZ = 0.f;
+            float ndcW = 1.f;
+
+            float viewX = ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT) * tanf(DegreeToRadian(Camera->FOV / 2)) * ndcX;
+            float viewY = tanf(DegreeToRadian(Camera->FOV / 2)) * ndcY;
+            float viewZ = ndcW;
+
+            FVector forward = ZAxis;
+            FVector right = XAxis;
+            FVector up = YAxis;
+
+            float worldX = right.x * viewX + up.x * viewY + forward.x * viewZ;
+            float worldY = right.y * viewX + up.y * viewY + forward.y * viewZ;
+            float worldZ = right.z * viewX + up.z * viewY + forward.z * viewZ;
+
+            FVector dirToWorld(worldX, worldY, worldZ);
+            dirToWorld.Normalize();
+
+            const float thresholdRatio = 100.f;
+            float distanceMin = 10000.f;
+            bool bIsFound = false;
+           
+            for (int32 i = 0; i < UPrimitiveCnt; i++)
+            {
+                FVector primitiveLocation(PrimitiveList[i]->Location.x, PrimitiveList[i]->Location.y, PrimitiveList[i]->Location.z);
+                FVector difference = primitiveLocation - Camera->RelativeLocation;
+                if (difference.Dot(dirToWorld) < 0) // 오브젝트가 카메라 뒤에 있음
+                {
+                    continue;
+                }
+                float distanceRay = difference.Cross(dirToWorld).Size() / dirToWorld.Size();
+                float distanceCamera = (Camera->RelativeLocation - primitiveLocation).Size();
+                distanceCamera = distanceCamera < 0.001f ? 0.001f : distanceCamera;
+                if (distanceRay < thresholdRatio / distanceCamera && distanceMin > distanceCamera)
+                {
+                    bIsPicking = true;
+                    bIsFound = true;
+                    distanceMin = distanceCamera;
+                    //pickedObject = PrimitiveList[i];  // 수정필요
+                }
+            }
+            if (bIsFound == false) // 선택된 오브젝트가 없음
+            {
+                bIsPicking = false;
+                pickedObject = nullptr;
+            }
         }
         else
         {
