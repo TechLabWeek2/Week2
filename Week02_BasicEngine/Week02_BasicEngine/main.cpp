@@ -4,6 +4,7 @@
 #include "UCubeComp.h"
 #include "UCameraComp.h"
 #include "UAxisGizmo.h"
+#include "UPicking.h"
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 1024
@@ -724,7 +725,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         //picking
         bool bIsPicking = false;
-        UObject* pickedObject = nullptr;
+        UObject* pickedObjectPtr = nullptr;
 
         // camera forward
         FVector ZAxis(cos(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x), sin(Camera->RelativeRotation.x), -sin(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x));
@@ -827,52 +828,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             ScreenToClient(hWnd, &currentMousePos);
             float ndcX = 2 * currentMousePos.x / SCREEN_WIDTH - 1;  // screen xy to NDC xy
             float ndcY = 1 - 2 * currentMousePos.y / SCREEN_HEIGHT;
-            float ndcZ = 0.f;
-            float ndcW = 1.f;
 
-            float viewX = ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT) * tanf(DegreeToRadian(Camera->FOV / 2)) * ndcX;
-            float viewY = tanf(DegreeToRadian(Camera->FOV / 2)) * ndcY;
-            float viewZ = ndcW;
-
-            FVector forward = ZAxis;
-            FVector right = XAxis;
-            FVector up = YAxis;
-
-            float worldX = right.x * viewX + up.x * viewY + forward.x * viewZ;
-            float worldY = right.y * viewX + up.y * viewY + forward.y * viewZ;
-            float worldZ = right.z * viewX + up.z * viewY + forward.z * viewZ;
-
-            FVector dirToWorld(worldX, worldY, worldZ);
-            dirToWorld.Normalize();
-
-            const float thresholdRatio = 100.f;
-            float distanceMin = 10000.f;
-            bool bIsFound = false;
-           
-            for (int32 i = 0; i < UPrimitiveCnt; i++)
-            {
-                FVector primitiveLocation(PrimitiveList[i]->Location.x, PrimitiveList[i]->Location.y, PrimitiveList[i]->Location.z);
-                FVector difference = primitiveLocation - Camera->RelativeLocation;
-                if (difference.Dot(dirToWorld) < 0) // 오브젝트가 카메라 뒤에 있음
-                {
-                    continue;
-                }
-                float distanceRay = difference.Cross(dirToWorld).Size() / dirToWorld.Size();
-                float distanceCamera = (Camera->RelativeLocation - primitiveLocation).Size();
-                distanceCamera = distanceCamera < 0.001f ? 0.001f : distanceCamera;
-                if (distanceRay < thresholdRatio / distanceCamera && distanceMin > distanceCamera)
-                {
-                    bIsPicking = true;
-                    bIsFound = true;
-                    distanceMin = distanceCamera;
-                    //pickedObject = PrimitiveList[i];  // 수정필요
-                }
-            }
-            if (bIsFound == false) // 선택된 오브젝트가 없음
-            {
-                bIsPicking = false;
-                pickedObject = nullptr;
-            }
+            //pickedObjectPtr = UPicking::GetPickedObject(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, &ObjectList, ObjectCnt, &bIsPicking);
         }
         else
         {

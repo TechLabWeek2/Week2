@@ -156,6 +156,7 @@
     <ClCompile Include="UCameraComp.cpp" />
     <ClCompile Include="UCubeComp.cpp" />
     <ClCompile Include="UObject.cpp" />
+    <ClCompile Include="UPicking.cpp" />
     <ClCompile Include="UPlaneComp.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="URenderer.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="UCameraComp.h" />
     <ClInclude Include="UCubeComp.h" />
     <ClInclude Include="UObject.h" />
+    <ClInclude Include="UPicking.h" />
     <ClInclude Include="UPlaneComp.h" />
     <ClInclude Include="UPrimitiveComponent.h" />
     <ClInclude Include="URenderer.h" />
