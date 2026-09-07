@@ -64,11 +64,11 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
             int32 numVertices = 0;
             switch (PrimitiveComponent->primitiveType) // 각각의 맞는 xxxxx_vertices[]를 로드
             {
-            case EPT_Sphere:
+            case ETypePrimitive::Sphere:
                 targetVertices = sphere_vertices;
                 numVertices = sizeof(sphere_vertices) / sizeof(FVertexSimple);
                 break;
-            case EPT_Cube:
+            case ETypePrimitive::Cube:
                 targetVertices = cube_vertices;
                 numVertices = sizeof(cube_vertices) / sizeof(FVertexSimple);
                 break;

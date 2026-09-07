@@ -3,17 +3,6 @@
 #pragma once
 #include "FMeshResource.h"
 
-enum ETypePrimitive {
-	EPT_None,
-	EPT_Triangle,
-	EPT_Cube,
-	EPT_Sphere,
-	EPT_XLine,
-	EPT_YLine,
-	EPT_ZLine,
-	EPT_Max,
-};
-
 extern FVertexSimple line_vertices[6];
 
 extern FVertexSimple triangle_vertices[3];

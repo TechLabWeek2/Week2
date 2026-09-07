@@ -2,7 +2,7 @@
 
 USphereComp::USphereComp()
 {
-	primitiveType = EPT_Sphere;
+	primitiveType = ETypePrimitive::Sphere;
 }
 
 void USphereComp::Render(URenderer* Renderer)

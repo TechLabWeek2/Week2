@@ -2,7 +2,7 @@
 
 UCubeComp::UCubeComp()
 {
-	primitiveType = EPT_Cube;
+	primitiveType = ETypePrimitive::Cube;
 }
 
 void UCubeComp::Render(URenderer* Renderer)

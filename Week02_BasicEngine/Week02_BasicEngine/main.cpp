@@ -2,14 +2,15 @@
 #include "URenderer.h"
 #include "Shapes.h"
 #include "UCubeComp.h"
+#include "USphereComp.h"
 #include "UCameraComp.h"
 #include "UAxisGizmo.h"
 #include "UPicking.h"
 #include "UObject.h"
 #include "UObjectArray.h"
 
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 1024
+#define SCREEN_WIDTH 1800
+#define SCREEN_HEIGHT 1200
 
 #pragma once 
 
@@ -24,21 +25,6 @@ UCameraComp* Camera = new UCameraComp();
 enum ETypeLine {
     ETL_LB,
     OTHER
-};
-
-class UPrimitive {
-public:
-    FVector Location;
-    FVector Rotation;
-    float Radius;
-    float Mass;
-    ETypePrimitive Type = ETypePrimitive::EPT_Cube;
-    ETypeLine LineType = ETypeLine::OTHER;
-    UPrimitive(FVector location, FVector rotation, float radius, ETypePrimitive type, ETypeLine etl = OTHER) : Location(location), Rotation(rotation), Radius(radius), LineType(etl) {
-        Mass = Radius;
-        Type = type;
-    }
-    virtual ~UPrimitive() {}
 };
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -94,114 +80,146 @@ void DrawStatWindow()
 }
 
 //Test를 위해서 변수를 넘겨줌
-void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube, UPrimitiveComponent*& pickedPrimitivePtr)
+void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube, ID3D11Buffer* vertexBufferSphere, uint32 numVerticesSphere, UPrimitiveComponent*& pickedPrimitivePtr)
 {
-    if (ImGui::Begin("Create"))
+    ImGui::Begin("Jungle Control Panel");
+    ImGui::Text("Hello Jungle World!");
+    ImGui::Text("FPS %d (%d ms)", 999, 999);
+    const char* typeNames[] = { "None", "Triangle", "Cube", "Sphere", "XLine", "YLine", "ZLine", "Max" };
+    static ETypePrimitive current = ETypePrimitive::Cube;
+    if (ImGui::BeginCombo("Primitive", typeNames[(int32)current]))
     {
-        static float Lx = 0, Ly = 0, Lz = 0;
-        static float Rx = 0, Ry = 0, Rz = 0;
-        static float Sx = 0.1f, Sy = 0.1f, Sz = 0.1f;
-        static bool IsOrthogonal = false;
-        static float FOV = 60.f;
-        static float CLx = 0, CLy = 0, CLz = 0;
-        static float CRx = 0, CRy = 0, CRz = 0;
-        if (ImGui::Button("Spawn", ImVec2(50.0f, 0.0f))) 
+        for (int32 i = 2; i < (int32)ETypePrimitive::XLine; i++)
         {
-            UCubeComp* obj = new UCubeComp();
-            obj->Vertices = vertexBufferCube;
-            obj->NumVertices = numVerticesCube;
-            obj->RelativeLocation = FVector(Lx, Ly, Lz);
-            obj->RelativeRotation = FVector(DegreeToRadian(Rx), DegreeToRadian(Ry), DegreeToRadian(Rz));
-            obj->RelativeScale3D = FVector(Sx, Sy, Sz);
-        }
-        ImGui::SameLine();
-
-        //Draw
-        ImGui::BeginGroup();
-
-        //Location
-        ImGui::Text("Location");
-        ImGui::SameLine(70);
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##Lx_input", &Lx);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##Ly_input", &Ly);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##Lz_input", &Lz);
-
-        //Rotation
-        ImGui::Text("Rotation");
-        ImGui::SameLine(70);
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##Rx_input", &Rx);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##Ry_input", &Ry);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##Rz_input", &Rz);
-
-        //Scale
-        ImGui::Text("Scale");
-        ImGui::SameLine(70);
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##Sx_input", &Sx);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##Sy_input", &Sy);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##Sz_input", &Sz);
-
-        ImGui::EndGroup();
-
-        ImGui::Separator();
-
-        if (ImGui::Button("Delete", ImVec2(50.0f, 0.0f))) 
-        {
-            if (pickedPrimitivePtr)
+            bool selected = ((int32)current == i);
+            if (ImGui::Selectable(typeNames[i], selected))
             {
-                GUObjectArray.RemoveObj(pickedPrimitivePtr);
+                current = (ETypePrimitive)i;
+            }
+            if (selected)
+            {
+                ImGui::SetItemDefaultFocus();
             }
         }
-
-        ImGui::Separator();
-
-        //카메라
-        ImGui::Checkbox("##Orthogonal", &Camera->IsOrthogonal);
-        ImGui::SameLine();
-        ImGui::Text("Orthogonal");
-
-        ImGui::Text("FOV");
-        ImGui::SameLine(130);
-        ImGui::SetNextItemWidth(170.0f);
-        ImGui::DragFloat("##FOV", &Camera->FOV, 0.1f, 0.0f, 90.f);
-        //Location
-        ImGui::Text("Camera Location");
-        ImGui::SameLine(130);
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CLx_input", &Camera->RelativeLocation.x);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CLy_input", &Camera->RelativeLocation.y);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CLz_input", &Camera->RelativeLocation.z);
-
-        //Rotation
-        ImGui::Text("Camera Rotation");
-        ImGui::SameLine(130);
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CRx_input", &Camera->RelativeRotation.x);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CRy_input", &Camera->RelativeRotation.y);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CRz_input", &Camera->RelativeRotation.z);
+        ImGui::EndCombo();
     }
+
+    static float Lx = 0, Ly = 0, Lz = 0;
+    static float Rx = 0, Ry = 0, Rz = 0;
+    static float Sx = 0.1f, Sy = 0.1f, Sz = 0.1f;
+    static bool IsOrthogonal = false;
+    static float FOV = 60.f;
+    static float CLx = 0, CLy = 0, CLz = 0;
+    static float CRx = 0, CRy = 0, CRz = 0;
+    static int spawnNum = 1;
+    if (ImGui::Button("Spawn", ImVec2(50.0f, 0.0f))) 
+    {
+        UPrimitiveComponent* newPrimitive = nullptr;
+        switch (current)
+        {
+        case ETypePrimitive::Cube:  //렌더러 정리 끝나면 할것 
+            newPrimitive = new UCubeComp();
+            newPrimitive->Vertices = vertexBufferCube;
+            newPrimitive->NumVertices = numVerticesCube;
+            break;
+        case ETypePrimitive::Sphere:
+            newPrimitive = new USphereComp();
+            newPrimitive->Vertices = vertexBufferSphere;
+            newPrimitive->NumVertices = numVerticesCube;
+            break;
+        }
+        newPrimitive->RelativeLocation = FVector(Lx, Ly, Lz);
+        newPrimitive->RelativeRotation = FVector(DegreeToRadian(Rx), DegreeToRadian(Ry), DegreeToRadian(Rz));
+        newPrimitive->RelativeScale3D = FVector(Sx, Sy, Sz);
+    }
+    ImGui::SameLine();
+    ImGui::InputInt("Number of spawn", &spawnNum);
+
+    //Draw
+    ImGui::BeginGroup();
+
+    //Location
+    ImGui::Text("Location");
+    ImGui::SameLine(70);
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##Lx_input", &Lx);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##Ly_input", &Ly);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##Lz_input", &Lz);
+
+    //Rotation
+    ImGui::Text("Rotation");
+    ImGui::SameLine(70);
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##Rx_input", &Rx);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##Ry_input", &Ry);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##Rz_input", &Rz);
+
+    //Scale
+    ImGui::Text("Scale");
+    ImGui::SameLine(70);
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##Sx_input", &Sx);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##Sy_input", &Sy);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##Sz_input", &Sz);
+
+    ImGui::EndGroup();
+
+    ImGui::Separator();
+
+    if (ImGui::Button("Delete", ImVec2(50.0f, 0.0f))) 
+    {
+        if (pickedPrimitivePtr)
+        {
+            GUObjectArray.RemoveObj(pickedPrimitivePtr);
+        }
+    }
+
+    ImGui::Separator();
+
+    //카메라
+    ImGui::Checkbox("##Orthogonal", &Camera->IsOrthogonal);
+    ImGui::SameLine();
+    ImGui::Text("Orthogonal");
+
+    ImGui::Text("FOV");
+    ImGui::SameLine(130);
+    ImGui::SetNextItemWidth(170.0f);
+    ImGui::DragFloat("##FOV", &Camera->FOV, 0.1f, 0.0f, 90.f);
+    //Location
+    ImGui::Text("Camera Location");
+    ImGui::SameLine(130);
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##CLx_input", &Camera->RelativeLocation.x);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##CLy_input", &Camera->RelativeLocation.y);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##CLz_input", &Camera->RelativeLocation.z);
+
+    //Rotation
+    ImGui::Text("Camera Rotation");
+    ImGui::SameLine(130);
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##CRx_input", &Camera->RelativeRotation.x);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##CRy_input", &Camera->RelativeRotation.y);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(50.0f);
+    ImGui::InputFloat("##CRz_input", &Camera->RelativeRotation.z);
 
     ImGui::End();
 }
@@ -451,24 +469,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         const float RAD_TO_DEG = 180.0f / 3.14159265359f;
 
-/*        // Pitch
-        Camera->RelativeRotation.x = -atan2(
-            CameraForward.y,
-            sqrt(
-                CameraForward.x * CameraForward.x +
-                CameraForward.z * CameraForward.z
-            )
-        ) * RAD_TO_DEG;
-
-        // Yaw
-        Camera->RelativeRotation.y = atan2(
-            CameraForward.x,
-            CameraForward.z
-        ) * RAD_TO_DEG;
-
-        // Roll
-        Camera->RelativeRotation.z = 0.0f; */
-
         //카메라 오류
         for (int i = 1; i < GUObjectArray.GetNum(); i++) {
             static_cast<UPrimitiveComponent*>(GUObjectArray.GetAllObjects()[i])->Render(&renderer);
@@ -479,7 +479,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::NewFrame();
         
         Console.Draw("Console Windows", &is_window_open);
-        DrawCreateWindow(vertexBufferCube, numVerticesCube, pickedObjectPtr);
+        DrawCreateWindow(vertexBufferCube, numVerticesCube, vertexBufferSphere, numVerticesSphere, pickedObjectPtr);
         DrawStatWindow();
 
         ImGui::Render();

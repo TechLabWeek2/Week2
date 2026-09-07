@@ -5,10 +5,6 @@ class UCubeComp :
     public UPrimitiveComponent
 {
 public:
-    ID3D11Buffer* Vertices;
-    int32 NumVertices;
-
-public:
     UCubeComp();
 
     virtual void Render(URenderer* Renderer) override;
