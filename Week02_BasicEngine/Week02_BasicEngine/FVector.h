@@ -222,5 +222,87 @@ public:
     [[nodiscard]] FString ToString() const;
 };
 
+struct FVector4
+{
+public:
+    float x, y, z, w;
 
+    [[nodiscard]] FVector4() = default;
+    [[nodiscard]] FVector4(float _x = 0, float _y = 0, float _z = 0, float _w = 0) : x(_x), y(_y), z(_z), w(_w) {}
 
+    [[nodiscard]] __forceinline FVector4 operator+(const FVector4& V) const
+    {
+        return FVector4(x + V.x, y + V.y, z + V.z, w + V.w);
+    }
+
+    [[nodiscard]] __forceinline FVector4 operator-(const FVector4& V) const
+    {
+        return FVector4(x - V.x, y - V.y, z - V.z, w - V.w);
+    }
+
+    [[nodiscard]] __forceinline FVector4 operator*(const FVector4& V) const
+    {
+        return FVector4(x * V.x, y * V.y, z * V.z, w * V.w);
+    }
+
+    [[nodiscard]] __forceinline FVector4 operator/(const FVector4& V) const
+    {
+        return FVector4(x / V.x, y / V.y, z / V.z, w / V.w);
+    }
+
+    [[nodiscard]] __forceinline bool operator==(const FVector4& V) const
+    {
+        return x == V.x && y == V.y && z == V.z && w == V.w;
+    }
+
+    [[nodiscard]] __forceinline bool operator!=(const FVector4& V) const
+    {
+        return x != V.x || y != V.y || z != V.z || w != V.w;
+    }
+
+    void Normalize()
+    {
+        float d = x * x + y * y + z * z + w * w;
+        if (d == 1)
+        {
+            return;
+        }
+        if (d < (1.0E-8F))
+        {
+            return;
+        }
+        d = sqrt(d);
+        x = x / d;
+        y = y / d;
+        z = z / d;
+        w = w / d;
+    }
+
+    [[nodiscard]] float Dot(const FVector4& v1, const FVector4& v2) const
+    {
+        float dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+
+        return dot;
+    }
+
+    [[nodiscard]] float Dot(const FVector4& v1) const
+    {
+        return Dot(*this, v1);
+    }
+
+    [[nodiscard]] __forceinline bool Equals(const FVector4& V, float Tolerance = KINDA_SMALL_NUMBER) const;
+
+    [[nodiscard]] float Size() const;
+
+    [[nodiscard]] float SizeSquared() const;
+
+    [[nodiscard]] float Length() const;
+
+    [[nodiscard]] float SquaredLength() const;
+
+    [[nodiscard]] bool IsNearlyZero(float Tolerance = KINDA_SMALL_NUMBER) const;
+
+    [[nodiscard]] bool IsZero() const;
+
+    [[nodiscard]] FString ToString() const;
+};

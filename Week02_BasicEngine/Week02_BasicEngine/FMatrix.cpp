@@ -46,6 +46,75 @@ FMatrix FMatrix::operator*(const FMatrix& other) const
 	return result;
 }
 
+FMatrix FMatrix::operator+(const FMatrix& other) const
+{
+	FMatrix result;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			result.m[i][j] = 0.0f;
+			for (int k = 0; k < 4; ++k)
+			{
+				result.m[i][j] = m[i][k] + other.m[k][j];
+			}
+		}
+	}
+	return result;
+}
+
+FMatrix FMatrix::operator-(const FMatrix& other) const
+{
+	FMatrix result;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			result.m[i][j] = 0.0f;
+			for (int k = 0; k < 4; ++k)
+			{
+				result.m[i][j] = m[i][k] - other.m[k][j];
+			}
+		}
+	}
+	return result;
+}
+
+FMatrix FMatrix::operator*(float scalar) const
+{
+	FMatrix result;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			result.m[i][j] = this->m[i][j];
+			for (int k = 0; k < 4; ++k)
+			{
+				result.m[i][j] *= scalar;
+			}
+		}
+	}
+	return result;
+}
+
+FMatrix FMatrix::operator/(float scalar) const
+{
+	if (scalar < KINDA_SMALL_NUMBER)	return (*this);
+	FMatrix result;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			result.m[i][j] = this->m[i][j];
+			for (int k = 0; k < 4; ++k)
+			{
+				result.m[i][j] /= scalar;
+			}
+		}
+	}
+	return result;
+}
+
 FMatrix FMatrix::Translation(FVector location)
 {
 	FMatrix result;
@@ -233,7 +302,11 @@ FMatrix FMatrix::MatrixInverse(const FMatrix& src)
 
 	// Determinant 계산
 	const float determinant = src.m[0][0] * det[0] - src.m[1][0] * det[1] + src.m[2][0] * det[2] - src.m[3][0] * det[3];
-
+	if (determinant == 0.0f)
+	{
+		M = FMatrix::Identity;
+		return M;
+	}
 	const float RDet = 1.0f / determinant;
 
 	M.m[0][0] = RDet * det[0];
@@ -288,6 +361,45 @@ FMatrix FMatrix::MatrixInverse(const FMatrix& src)
 
 	return M;
 
+}
+
+bool FMatrix::IsOrthogonal()
+{
+	FVector X(m[0][0], m[0][1], m[0][1]);
+	FVector Y(m[1][0], m[1][1], m[1][1]);
+	FVector Z(m[2][0], m[2][1], m[2][1]);
+
+	float XY = X.Dot(Y);
+	float YZ = Y.Dot(Z);
+	float ZX = Z.Dot(X);
+	return Abs(XY) <= KINDA_SMALL_NUMBER && Abs(YZ) <= KINDA_SMALL_NUMBER && Abs(ZX) <= KINDA_SMALL_NUMBER;
+}
+
+bool FMatrix::IsOrthonormal()
+{
+	FVector X(m[0][0], m[0][1], m[0][2]);
+	FVector Y(m[1][0], m[1][1], m[1][2]);
+	FVector Z(m[2][0], m[2][1], m[2][2]);
+
+	float XX = X.x * X.x + X.y * X.y + X.z * X.z;
+	float YY = Y.x * Y.x + Y.y * Y.y + Y.z * Y.z;
+	float ZZ = Z.x * Z.x + Z.y * Z.y + Z.z * Z.z;
+
+	float XY = X.x * Y.x + X.y * Y.y + X.z * Y.z;
+	float YZ = Y.x * Z.x + Y.y * Z.y + Y.z * Z.z;
+	float ZX = Z.x * X.x + Z.y * X.y + Z.z * X.z;
+
+	return Abs(XX - 1.0f) <= KINDA_SMALL_NUMBER && Abs(YY - 1.0f) <= KINDA_SMALL_NUMBER && Abs(ZZ - 1.0f) <= KINDA_SMALL_NUMBER &&
+		Abs(XY) <= KINDA_SMALL_NUMBER && Abs(YZ) <= KINDA_SMALL_NUMBER && Abs(ZX) <= KINDA_SMALL_NUMBER;
+}
+
+FMatrix FMatrix::GetNormalMatrix()
+{
+	FMatrix Inverse;
+	if (!MatrixInverse(*this, Inverse)) {
+		return Identity;
+	}
+	return Inverse.Transposed();
 }
 
 FMatrix FMatrix::Transposed() const
