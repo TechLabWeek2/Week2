@@ -78,13 +78,19 @@
     <ClCompile Include="Utils\Math.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
-    <ClCompile Include="Vertex.h">
+    <ClCompile Include="FVertexSimple.h">
       <Filter>Header File</Filter>
     </ClCompile>
     <ClCompile Include="UAxisGizmo.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
     <ClCompile Include="FMatrix.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="UPicking.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="Shapes.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
   </ItemGroup>
@@ -153,6 +159,9 @@
       <Filter>Header File</Filter>
     </ClInclude>
     <ClInclude Include="FMatrix.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="UPicking.h">
       <Filter>Header File</Filter>
     </ClInclude>
   </ItemGroup>

@@ -627,10 +627,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
     // Renderer와 Shader 생성 이후에 버텍스 버퍼를 생성합니다.
-    UINT numVerticesLine = sizeof(line_vertices) / sizeof(FVertexSimple);
-    UINT numVerticesTriangle = sizeof(triangle_vertices) / sizeof(FVertexSimple);
-    UINT numVerticesCube = sizeof(cube_vertices) / sizeof(FVertexSimple);
-    UINT numVerticesSphere = sizeof(sphere_vertices) / sizeof(FVertexSimple);
+    uint32 numVerticesLine = sizeof(line_vertices) / sizeof(FVertexSimple);
+    uint32 numVerticesTriangle = sizeof(triangle_vertices) / sizeof(FVertexSimple);
+    uint32 numVerticesCube = sizeof(cube_vertices) / sizeof(FVertexSimple);
+    uint32 numVerticesSphere = sizeof(sphere_vertices) / sizeof(FVertexSimple);
 
     ID3D11Buffer* vertexBufferLine = renderer.CreateVertexBuffer(line_vertices, sizeof(line_vertices));
     ID3D11Buffer* vertexBufferTriangle = renderer.CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
@@ -822,7 +822,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
             lastMousePos = currentMousePos;
         }
-        if (GetAsyncKeyState(VK_RBUTTON))
+        else if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
         {
             // picking
             ScreenToClient(hWnd, &currentMousePos);

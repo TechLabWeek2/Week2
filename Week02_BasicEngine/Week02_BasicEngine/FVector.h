@@ -26,6 +26,11 @@ public:
         return FVector(x * V.x, y * V.y, z * V.z);
     }
 
+    [[nodiscard]] __forceinline FVector operator*(int32 n) const
+    {
+        return FVector(x * n, y * n, z * n);
+    }
+
     [[nodiscard]] __forceinline FVector operator/(const FVector& V) const
     {
         return FVector(x / V.x, y / V.y, z / V.z);

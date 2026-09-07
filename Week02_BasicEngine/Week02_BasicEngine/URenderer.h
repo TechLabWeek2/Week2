@@ -21,12 +21,7 @@
 #include "UCameraComp.h"
 
 #include "FMatrix.h"
-
-struct FVertexSimple
-{
-    float x, y, z;    // Position
-    float r, g, b, a; // Color
-};
+#include "FVertexSimple.h"
 
 struct alignas(16) FConstants {
     FMatrix World;
