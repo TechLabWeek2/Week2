@@ -19,6 +19,8 @@
 #include "imGui/imgui_impl_win32.h"
 #include "ExampleAppConsole.h"
 
+UCameraComp* Camera = new UCameraComp();
+
 enum ETypeLine {
     ETL_LB,
     OTHER
@@ -262,9 +264,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     
     //카메라
     renderer.MainCamera = Camera;
-    Camera->RelativeLocation = { 0,2,-2 };
-    Camera->RelativeRotation = { DegreeToRadian(-45),DegreeToRadian(-135), 0 };
-    Camera->RelativeRotation = { DegreeToRadian(0),DegreeToRadian(0), 0 };
+    Camera->RelativeLocation = { -2.5f, 2.5f,-2.5f };
+    Camera->RelativeRotation = { -0.5f,-1.0f, 0 };
+    //Camera->RelativeRotation = { DegreeToRadian(0),DegreeToRadian(0), 0 };
 
     //좌표축
     UAxisGizmo* AxisGizmo = new UAxisGizmo();
@@ -287,6 +289,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test3->Vertices = vertexBufferCube;
     Test3->NumVertices = numVerticesCube;
     Test3->RelativeLocation = FVector(0, 0, 1);
+
+    GUObjectArray.RegisterObj(Test1);
+    GUObjectArray.RegisterObj(Test2);
+    GUObjectArray.RegisterObj(Test3);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
@@ -337,32 +343,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         FVector YAxis = ZAxis.Cross(XAxis);
         YAxis.Normalize();
 
+        const float cameraSpeed = 0.03f;
         if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
-            Camera->RelativeLocation.x -= XAxis.x * 0.01f;
-            Camera->RelativeLocation.y -= XAxis.y * 0.01f;
-            Camera->RelativeLocation.z -= XAxis.z * 0.01f;
+            Camera->RelativeLocation.x -= XAxis.x * cameraSpeed;
+            Camera->RelativeLocation.y -= XAxis.y * cameraSpeed;
+            Camera->RelativeLocation.z -= XAxis.z * cameraSpeed;
             //Console.UE_LOG("%s %c %f %d %u %o %x","Hello",'A',3.14f,-100,100,100,255);
         }
         if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
-            Camera->RelativeLocation.x += XAxis.x * 0.01f;
-            Camera->RelativeLocation.y += XAxis.y * 0.01f;
-            Camera->RelativeLocation.z += XAxis.z * 0.01f;
+            Camera->RelativeLocation.x += XAxis.x * cameraSpeed;
+            Camera->RelativeLocation.y += XAxis.y * cameraSpeed;
+            Camera->RelativeLocation.z += XAxis.z * cameraSpeed;
         }
         if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
-            Camera->RelativeLocation.x += ZAxis.x * 0.01f;
-            Camera->RelativeLocation.y += ZAxis.y * 0.01f;
-            Camera->RelativeLocation.z += ZAxis.z * 0.01f;
+            Camera->RelativeLocation.x += ZAxis.x * cameraSpeed;
+            Camera->RelativeLocation.y += ZAxis.y * cameraSpeed;
+            Camera->RelativeLocation.z += ZAxis.z * cameraSpeed;
         }
         if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
-            Camera->RelativeLocation.x -= ZAxis.x * 0.01f;
-            Camera->RelativeLocation.y -= ZAxis.y * 0.01f;
-            Camera->RelativeLocation.z -= ZAxis.z * 0.01f;
+            Camera->RelativeLocation.x -= ZAxis.x * cameraSpeed;
+            Camera->RelativeLocation.y -= ZAxis.y * cameraSpeed;
+            Camera->RelativeLocation.z -= ZAxis.z * cameraSpeed;
         }
         if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
-            Camera->RelativeLocation.y += 0.01f;
+            Camera->RelativeLocation.y += cameraSpeed;
         }
         if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
-            Camera->RelativeLocation.y -= 0.01f;
+            Camera->RelativeLocation.y -= cameraSpeed;
         }
         if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
         {
@@ -390,9 +397,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         else if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
         {
             // picking
+            RECT rect;
+            GetClientRect(hWnd, &rect);
+            float screenWidth = (float)(rect.right - rect.left);
+            float screenHeight = (float)(rect.bottom - rect.top);
+
+            GetCursorPos(&currentMousePos);
             ScreenToClient(hWnd, &currentMousePos);
-            float ndcX = 2.f * currentMousePos.x / SCREEN_WIDTH - 1.f;  // screen xy to NDC xy
-            float ndcY = 1.f - 2.f * currentMousePos.y / SCREEN_HEIGHT;
+            float ndcX = 2.f * (float)currentMousePos.x / screenWidth - 1.f;  // screen xy to NDC xy
+            float ndcY = 1.f - 2.f * (float)currentMousePos.y / screenHeight;
 
             pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
         }

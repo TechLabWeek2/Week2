@@ -492,12 +492,12 @@ FMatrix FMatrix::GetProjectionMatrixInverse(float FOV, float AspectRatio, float 
 FMatrix FMatrix::Perspective(float FOV, float AspectRatio, float NearClip, float FarClip)
 {
 	FMatrix M;
-	M.m[0][0] = 1 / (tan(FOV) * AspectRatio);
-	M.m[1][1] = 1 / tan(FOV);
+	M.m[0][0] = 1.f / (tanf(FOV / 2.f) * AspectRatio);
+	M.m[1][1] = 1.f / tanf(FOV / 2.f);
 	M.m[2][2] = (FarClip) / (FarClip - NearClip);
-	M.m[2][3] = 1;
+	M.m[2][3] = 1.f;
 	M.m[3][2] = -(FarClip * NearClip) / (FarClip - NearClip);
-	M.m[3][3] = 0;
+	M.m[3][3] = 0.f;
 	return M;
 }
 

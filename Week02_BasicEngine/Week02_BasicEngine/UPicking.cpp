@@ -3,14 +3,13 @@
 UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, const TArray<UObject*>& ObjectList, int32 ObjectListCnt, bool* bIsPicking)
 {
     // picking
-    ndcX = ndcX;  // screen xy to NDC xy
-    ndcY = ndcY;
     float ndcZ = 0.f;
     float ndcW = 1.f;
 
-    float viewX = Camera->AspectRatio * tanf(DegreeToRadian(Camera->FOV / 2)) * ndcX;
-    float viewY = tanf(DegreeToRadian(Camera->FOV / 2)) * ndcY;
-    float viewZ = ndcW;
+    FMatrix Proj = Camera->GetProjectionMatrix();
+    float viewX = ndcX / Proj.m[0][0];
+    float viewY = ndcY / Proj.m[1][1];
+    float viewZ = 1.f;
 
     float worldX = right.x * viewX + up.x * viewY + forward.x * viewZ;
     float worldY = right.y * viewX + up.y * viewY + forward.y * viewZ;
@@ -24,30 +23,22 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
 
     UPrimitiveComponent* pickedObject = nullptr;
 
-    UPrimitiveComponent** PrimitiveComponentList = new UPrimitiveComponent * [ObjectListCnt];
-    for (int32 i = 0; i < ObjectListCnt; i++)
+    UPrimitiveComponent* PrimitiveComponent = nullptr;
+    for (int32 i = 1; i < ObjectListCnt; i++)
     {
-        PrimitiveComponentList[i] = static_cast<UPrimitiveComponent*>(ObjectList[i]);
-    }
-
-    if (!PrimitiveComponentList)
-    {
-        return nullptr;
-    }
-    for (int32 i = 0; i < ObjectListCnt; i++)
-    {
-        FVector componentLocation(PrimitiveComponentList[i]->RelativeLocation.x, PrimitiveComponentList[i]->RelativeLocation.y, PrimitiveComponentList[i]->RelativeLocation.z);
+        PrimitiveComponent = static_cast<UPrimitiveComponent*>(ObjectList[i]);
+        FVector componentLocation(PrimitiveComponent->RelativeLocation.x, PrimitiveComponent->RelativeLocation.y, PrimitiveComponent->RelativeLocation.z);
         FVector difference = componentLocation - Camera->RelativeLocation; // camera -> component 벡터
         if (difference.Dot(rayVector) < 0) // 오브젝트가 카메라 뒤에 있으면 무시
         {
             continue;
         }
         float distanceRay = difference.Cross(rayVector).Size() / rayVector.Size(); // component에서 Ray까지의 최단거리
-        if (distanceRay < PrimitiveComponentList[i]->RelativeScale3D.Size() * sqrt(3) * 1000.f) // Sphere Boundary 체크로 1차 거르기
+        if (distanceRay < PrimitiveComponent->RelativeScale3D.Size() * sqrt(3)) // Sphere Boundary 체크로 1차 거르기
         {
             const FVertexSimple* targetVertices;
             int32 numVertices;
-            switch (PrimitiveComponentList[i]->primitiveType) // 각각의 맞는 xxxxx_vertices[]를 로드
+            switch (PrimitiveComponent->primitiveType) // 각각의 맞는 xxxxx_vertices[]를 로드
             {
             case EPT_Sphere:
                 targetVertices = sphere_vertices;
@@ -65,7 +56,7 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
             numVertices = sizeof(cube_vertices) / sizeof(FVertexSimple); // 임시
             //////////////////////////////////////
 
-            FMatrix transformMatrix = PrimitiveComponentList[i]->GetModelMatrix();
+            FMatrix transformMatrix = PrimitiveComponent->GetModelMatrix();
             for (uint32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘
             {
                 float epslion = 0.001f;
@@ -128,7 +119,7 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
                     *bIsPicking = true;
                     bIsFound = true;
                     distanceMin = distanceCamera;
-                    pickedObject = PrimitiveComponentList[i];
+                    pickedObject = PrimitiveComponent;
                 }
             }
         }
