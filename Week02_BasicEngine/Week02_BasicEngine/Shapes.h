@@ -3,6 +3,12 @@
 #pragma once
 #include "FMeshResource.h"
 
+struct FVertexSimple
+{
+	float x, y, z;    // Position
+	float r, g, b, a; // Color
+};
+
 enum ETypePrimitive {
 	EPT_None,
 	EPT_Triangle,

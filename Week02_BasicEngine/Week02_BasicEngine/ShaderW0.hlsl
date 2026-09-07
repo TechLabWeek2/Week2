@@ -28,7 +28,8 @@ PS_INPUT mainVS(VS_INPUT input)
     
     // Pass the color to the pixel shader
     
-    output.color = lerp(input.color, HightLightIntensity, 0.5); // 하이라이트 효과
+    //output.color = lerp(input.color, HightLightIntensity, 0.5); // 하이라이트 효과
+    output.color = input.color * HightLightIntensity; // 하이라이트 효과
     
     return output;
 }

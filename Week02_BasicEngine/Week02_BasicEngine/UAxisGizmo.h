@@ -1,6 +1,9 @@
 #pragma once
 #include "UPrimitiveComponent.h"
 
+class URenderer;
+class ID3D11Buffer;
+
 class UAxisGizmo:
     public UPrimitiveComponent
 {
@@ -11,5 +14,4 @@ public:
 public:
     UAxisGizmo();
 
-    virtual void Render(URenderer* Renderer) override;
 };

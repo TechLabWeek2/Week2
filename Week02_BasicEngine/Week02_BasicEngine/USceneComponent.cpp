@@ -1,6 +1,8 @@
 #include "USceneComponent.h"
 #include "Utils/Math.h"
 
+#include <iostream>
+
 USceneComponent::USceneComponent()
 {
 	RelativeLocation = FVector(0.0f, 0.0f, 0.0f);
@@ -20,4 +22,9 @@ FMatrix USceneComponent::GetModelMatrix() const
 	FMatrix translationMatrix =
 		FMatrix::Translation(RelativeLocation);
 	return scaleMatrix * rotationMatrix * translationMatrix;
+}
+
+void USceneComponent::Update(float deltaTime)
+{
+	std::wcout << FString(L"SceneComponent Update") << std::endl;
 }

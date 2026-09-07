@@ -1,5 +1,9 @@
 #include "URenderer.h"
 #include "UCameraComp.h"
+#include "FGraphicsDevice.h"
+#include "Shapes.h"
+#include "UPrimitiveComponent.h"
+#include "FMeshResource.h"
 
 
 void URenderer::CreateConstantBuffer() {
@@ -12,7 +16,11 @@ void URenderer::CreateConstantBuffer() {
 	constantbufferdesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	constantbufferdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-	Device->CreateBuffer(&constantbufferdesc, nullptr, &ConstantBuffer);
+	HRESULT hr = Device->CreateBuffer(&constantbufferdesc, nullptr, &ConstantBuffer);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
 }
 
 void URenderer::ReleaseConstantBuffer()
@@ -107,7 +115,7 @@ void URenderer::UpdateConstant(FMatrix Matrix, bool bIsSelected)
 			constants->World = Matrix;
 
 			// HighLightIntensity를 bIsSelected 값에 따라 설정
-			constants->HightLightIntensity = bIsSelected ? 0.75f : 0.0f;
+			constants->HightLightIntensity = bIsSelected ? 2.0f : 1.0f; 
 			constants->Padding[0] = 0.0f;
 			constants->Padding[1] = 0.0f;
 			constants->Padding[2] = 0.0f;
@@ -127,13 +135,31 @@ void URenderer::CreateShader()
 	ID3DBlob* vertexshaderCSO;
 	ID3DBlob* pixelshaderCSO;
 
-	D3DCompileFromFile(L"ShaderW0.hlsl", nullptr, nullptr, "mainVS", "vs_5_0", 0, 0, &vertexshaderCSO, nullptr);
+	HRESULT hr = D3DCompileFromFile(L"ShaderW0.hlsl", nullptr, nullptr, "mainVS", "vs_5_0", 0, 0, &vertexshaderCSO, nullptr);
 
-	Device->CreateVertexShader(vertexshaderCSO->GetBufferPointer(), vertexshaderCSO->GetBufferSize(), nullptr, &SimpleVertexShader);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
 
-	D3DCompileFromFile(L"ShaderW0.hlsl", nullptr, nullptr, "mainPS", "ps_5_0", 0, 0, &pixelshaderCSO, nullptr);
+	hr = Device->CreateVertexShader(vertexshaderCSO->GetBufferPointer(), vertexshaderCSO->GetBufferSize(), nullptr, &SimpleVertexShader);
 
-	Device->CreatePixelShader(pixelshaderCSO->GetBufferPointer(), pixelshaderCSO->GetBufferSize(), nullptr, &SimplePixelShader);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
+	hr = D3DCompileFromFile(L"ShaderW0.hlsl", nullptr, nullptr, "mainPS", "ps_5_0", 0, 0, &pixelshaderCSO, nullptr);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
+	hr = Device->CreatePixelShader(pixelshaderCSO->GetBufferPointer(), pixelshaderCSO->GetBufferSize(), nullptr, &SimplePixelShader);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
 
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
@@ -141,7 +167,11 @@ void URenderer::CreateShader()
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	Device->CreateInputLayout(layout, ARRAYSIZE(layout), vertexshaderCSO->GetBufferPointer(), vertexshaderCSO->GetBufferSize(), &SimpleInputLayout);
+	hr = Device->CreateInputLayout(layout, ARRAYSIZE(layout), vertexshaderCSO->GetBufferPointer(), vertexshaderCSO->GetBufferSize(), &SimpleInputLayout);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
 
 	Stride = sizeof(FVertexSimple);
 
@@ -174,95 +204,103 @@ void URenderer::ReleaseShader()
 void URenderer::Create(HWND hWindow, UINT screenWidth, UINT screenHeight)
 {
 	// Direct3D 장치 및 스왑 체인 생성
-	CreateDeviceAndSwapChain(hWindow);
+	//CreateDeviceAndSwapChain(hWindow);
 
 	// 프레임 버퍼 생성
-	CreateFrameBuffer();
+	//CreateFrameBuffer();
 
 	// 래스터라이저 상태 생성
-	CreateRasterizerState();
+	//CreateRasterizerState();
 
 	// 깊이 스텐실 버퍼 및 블렌드 상태
-	CreateDepthStencilBuffer(screenWidth, screenHeight);
-	CreateDepthStencilState();
+	//CreateDepthStencilBuffer(screenWidth, screenHeight);
+	//CreateDepthStencilState();
 }
 
 // Direct3D 장치 및 스왑 체인을 생성하는 함수
 void URenderer::CreateDeviceAndSwapChain(HWND hWindow)
 {
-	// 지원하는 Direct3D 기능 레벨을 정의
-	D3D_FEATURE_LEVEL featurelevels[] = { D3D_FEATURE_LEVEL_11_0 };
+	//// 지원하는 Direct3D 기능 레벨을 정의
+	//D3D_FEATURE_LEVEL featurelevels[] = { D3D_FEATURE_LEVEL_11_0 };
 
-	// 스왑 체인 설정 구조체 초기화
-	DXGI_SWAP_CHAIN_DESC swapchaindesc = {};
-	swapchaindesc.BufferDesc.Width = 0; // 창 크기에 맞게 자동으로 설정
-	swapchaindesc.BufferDesc.Height = 0; // 창 크기에 맞게 자동으로 설정
-	swapchaindesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; // 색상 포맷
-	swapchaindesc.SampleDesc.Count = 1; // 멀티 샘플링 비활성화
-	swapchaindesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; // 렌더 타겟으로 사용
-	swapchaindesc.BufferCount = 2; // 더블 버퍼링
-	swapchaindesc.OutputWindow = hWindow; // 렌더링할 창 핸들
-	swapchaindesc.Windowed = TRUE; // 창 모드
-	swapchaindesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // 스왑 방식
+	//// 스왑 체인 설정 구조체 초기화
+	//DXGI_SWAP_CHAIN_DESC swapchaindesc = {};
+	//swapchaindesc.BufferDesc.Width = 0; // 창 크기에 맞게 자동으로 설정
+	//swapchaindesc.BufferDesc.Height = 0; // 창 크기에 맞게 자동으로 설정
+	//swapchaindesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; // 색상 포맷
+	//swapchaindesc.SampleDesc.Count = 1; // 멀티 샘플링 비활성화
+	//swapchaindesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; // 렌더 타겟으로 사용
+	//swapchaindesc.BufferCount = 2; // 더블 버퍼링
+	//swapchaindesc.OutputWindow = hWindow; // 렌더링할 창 핸들
+	//swapchaindesc.Windowed = TRUE; // 창 모드
+	//swapchaindesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // 스왑 방식
 
-	// Direct3D 장치와 스왑 체인을 생성
-	D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
-		D3D11_CREATE_DEVICE_BGRA_SUPPORT | D3D11_CREATE_DEVICE_DEBUG,
-		featurelevels, ARRAYSIZE(featurelevels), D3D11_SDK_VERSION,
-		&swapchaindesc, &SwapChain, &Device, nullptr, &DeviceContext);
+	//// Direct3D 장치와 스왑 체인을 생성
+	//D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
+	//	D3D11_CREATE_DEVICE_BGRA_SUPPORT | D3D11_CREATE_DEVICE_DEBUG,
+	//	featurelevels, ARRAYSIZE(featurelevels), D3D11_SDK_VERSION,
+	//	&swapchaindesc, &SwapChain, &Device, nullptr, &DeviceContext);
 
-	// 생성된 스왑 체인의 정보 가져오기
-	SwapChain->GetDesc(&swapchaindesc);
+	//// 생성된 스왑 체인의 정보 가져오기
+	//SwapChain->GetDesc(&swapchaindesc);
 
-	// 뷰포트 정보 설정
-	ViewportInfo = { 0.0f, 0.0f, (float)swapchaindesc.BufferDesc.Width, (float)swapchaindesc.BufferDesc.Height, 0.0f, 1.0f };
+	//// 뷰포트 정보 설정
+	//ViewportInfo = { 0.0f, 0.0f, (float)swapchaindesc.BufferDesc.Width, (float)swapchaindesc.BufferDesc.Height, 0.0f, 1.0f };
+
+	Device = GGraphicsDevice.GetDevice();
+	DeviceContext = GGraphicsDevice.GetDeviceContext();
+	SwapChain = GGraphicsDevice.GetSwapChain();
+	//ViewportInfo = GGraphicsDevice.ViewportInfo
 }
 
 // Direct3D 장치 및 스왑 체인을 해제하는 함수
 void URenderer::ReleaseDeviceAndSwapChain()
 {
-	if (DeviceContext)
-	{
-		DeviceContext->Flush(); // 남아있는 GPU 명령 실행
-	}
+	//if (DeviceContext)
+	//{
+	//	DeviceContext->Flush(); // 남아있는 GPU 명령 실행
+	//}
 
-	if (SwapChain)
-	{
-		SwapChain->Release();
-		SwapChain = nullptr;
-	}
+	//if (SwapChain)
+	//{
+	//	SwapChain->Release();
+	//	SwapChain = nullptr;
+	//}
 
-	if (Device)
-	{
-		Device->Release();
-		Device = nullptr;
-	}
+	//if (Device)
+	//{
+	//	Device->Release();
+	//	Device = nullptr;
+	//}
 
-	if (DeviceContext)
-	{
-		DeviceContext->Release();
-		DeviceContext = nullptr;
-	}
+	//if (DeviceContext)
+	//{
+	//	DeviceContext->Release();
+	//	DeviceContext = nullptr;
+	//}
 }
 
 // 프레임 버퍼를 생성하는 함수
 void URenderer::CreateFrameBuffer()
 {
-	// 스왑 체인으로부터 백 버퍼 텍스처 가져오기
-	SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&FrameBuffer);
+//	// 스왑 체인으로부터 백 버퍼 텍스처 가져오기
+//	SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&FrameBuffer);
+//
+//	// 렌더 타겟 뷰 생성
+//	D3D11_RENDER_TARGET_VIEW_DESC framebufferRTVdesc = {};
+//	framebufferRTVdesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB; // 색상 포맷
+//	framebufferRTVdesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D; // 2D 텍스처
+//
+//	Device->CreateRenderTargetView(FrameBuffer, &framebufferRTVdesc, &FrameBufferRTV);
 
-	// 렌더 타겟 뷰 생성
-	D3D11_RENDER_TARGET_VIEW_DESC framebufferRTVdesc = {};
-	framebufferRTVdesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB; // 색상 포맷
-	framebufferRTVdesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D; // 2D 텍스처
-
-	Device->CreateRenderTargetView(FrameBuffer, &framebufferRTVdesc, &FrameBufferRTV);
+	FrameBuffer = GGraphicsDevice.GetRenderTarget();
+	FrameBufferRTV = GGraphicsDevice.GetRenderTargetView();
 }
 
 // 프레임 버퍼를 해제하는 함수
 void URenderer::ReleaseFrameBuffer()
 {
-	if (FrameBuffer)
+	/*if (FrameBuffer)
 	{
 		FrameBuffer->Release();
 		FrameBuffer = nullptr;
@@ -272,7 +310,7 @@ void URenderer::ReleaseFrameBuffer()
 	{
 		FrameBufferRTV->Release();
 		FrameBufferRTV = nullptr;
-	}
+	}*/
 }
 
 // 래스터라이저 상태를 생성하는 함수
@@ -282,7 +320,11 @@ void URenderer::CreateRasterizerState()
 	rasterizerdesc.FillMode = D3D11_FILL_SOLID; // 채우기 모드
 	rasterizerdesc.CullMode = D3D11_CULL_BACK; // 백 페이스 컬링
 
-	Device->CreateRasterizerState(&rasterizerdesc, &RasterizerState);
+	HRESULT hr = Device->CreateRasterizerState(&rasterizerdesc, &RasterizerState);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
 }
 
 // 래스터라이저 상태를 해제하는 함수
@@ -312,7 +354,7 @@ void URenderer::Release()
 // 스왑 체인의 백 버퍼와 프론트 버퍼를 교체하여 화면에 출력
 void URenderer::SwapBuffer()
 {
-	SwapChain->Present(1, 0); // 1: VSync 활성화
+	//SwapChain->Present(1, 0); // 1: VSync 활성화
 }
 
 //D3D11 렌더링에 필요한 준비 작업을 위한 Prepare 함수
@@ -376,7 +418,7 @@ void URenderer::ReleaseVertexBuffer(ID3D11Buffer* vertexBuffer) {
 
 void URenderer::CreateDepthStencilBuffer(UINT screenWidth, UINT screenHeight)
 {
-	D3D11_TEXTURE2D_DESC depthstencildesc = {};
+	/*D3D11_TEXTURE2D_DESC depthstencildesc = {};
 	depthstencildesc.Width = screenWidth;
 	depthstencildesc.Height = screenHeight;
 	depthstencildesc.MipLevels = 1;
@@ -387,7 +429,10 @@ void URenderer::CreateDepthStencilBuffer(UINT screenWidth, UINT screenHeight)
 	depthstencildesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
 	Device->CreateTexture2D(&depthstencildesc, nullptr, &DepthStencilBuffer);
-	Device->CreateDepthStencilView(DepthStencilBuffer, nullptr, &DepthStencilView);
+	Device->CreateDepthStencilView(DepthStencilBuffer, nullptr, &DepthStencilView);*/
+
+	DepthStencilBuffer = GGraphicsDevice.GetDepthStencilBuffer();
+	DepthStencilView = GGraphicsDevice.GetDepthStencilView();
 }
 
 void URenderer::CreateDepthStencilState()
@@ -398,19 +443,23 @@ void URenderer::CreateDepthStencilState()
 	depthstencildesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthstencildesc.StencilEnable = false;
 
-	Device->CreateDepthStencilState(&depthstencildesc, &DepthStencilState);
+	HRESULT hr = Device->CreateDepthStencilState(&depthstencildesc, &DepthStencilState);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
 }
 
 void URenderer::ReleaseDepthStencilBuffer()
 {
-	if (DepthStencilBuffer)
+	/*if (DepthStencilBuffer)
 	{
 		DepthStencilBuffer->Release();
 	}
 	if (DepthStencilView)
 	{
 		DepthStencilView->Release();
-	}
+	}*/
 }
 
 void URenderer::ReleaseDepthStencilState()
@@ -421,7 +470,46 @@ void URenderer::ReleaseDepthStencilState()
 	}
 }
 
-void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComponent* Camera, float AspectRatio)
+void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* Camera, float AspectRatio)
 {
 	if (Objects.IsEmpty()) return;
+
+	/*for (UObject* Obj : GUObjectArray.GetAllObjects())
+	{
+
+	}*/
+
+	for (int i = 0; i < Objects.Num(); i++)
+	{
+		if (Objects[i] == nullptr) continue;
+
+		//UPrimitiveComponent만 Render하도록
+		UPrimitiveComponent* PrimitiveComponent = dynamic_cast<UPrimitiveComponent*>(Objects[i]);
+		if (PrimitiveComponent)
+		{
+			UpdateConstant(PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix(), PrimitiveComponent->bIsSelected);
+			//DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			DeviceContext->IASetPrimitiveTopology(PrimitiveComponent->GetMeshResource()->Topology);
+			RenderPrimitive(PrimitiveComponent->GetMeshResource()->VertexBuffer, PrimitiveComponent->GetMeshResource()->numVertices);
+		}
+	}
+
+}
+
+void URenderer::Init()
+{
+	Device = GGraphicsDevice.GetDevice();
+	DeviceContext = GGraphicsDevice.GetDeviceContext();
+	SwapChain = GGraphicsDevice.GetSwapChain();
+	ViewportInfo = GGraphicsDevice.GetViewport();
+
+	FrameBuffer = GGraphicsDevice.GetRenderTarget();
+	FrameBufferRTV = GGraphicsDevice.GetRenderTargetView();
+
+	CreateRasterizerState();
+
+	DepthStencilBuffer = GGraphicsDevice.GetDepthStencilBuffer();
+	DepthStencilView = GGraphicsDevice.GetDepthStencilView();
+
+	CreateDepthStencilState();
 }

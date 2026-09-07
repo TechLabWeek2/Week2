@@ -57,6 +57,8 @@ public:
 		}
 	}
 
+	//TArray(std::initializer_list<T> InitList) : data(InitList) {}
+	 
 	TArray& operator= (const TArray& otherArray) // = : 깊은 복사 
 	{
 		if (this == &otherArray)

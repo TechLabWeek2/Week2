@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ExampleAppConsole.h" />
+    <ClCompile Include="FEngineLoop.cpp" />
     <ClCompile Include="FMatrix.cpp" />
     <ClCompile Include="FGraphicsDevice.cpp" />
     <ClCompile Include="FMeshResource.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="FString.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shapes.cpp" />
+    <ClCompile Include="MeshData.cpp" />
     <ClCompile Include="UAxisGizmo.cpp" />
     <ClCompile Include="UCameraComp.cpp" />
     <ClCompile Include="UCubeComp.cpp" />
@@ -173,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h" />
+    <ClInclude Include="FEngineLoop.h" />
     <ClInclude Include="FMatrix.h" />
     <ClInclude Include="FGraphicsDevice.h" />
     <ClInclude Include="FMeshResource.h" />

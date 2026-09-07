@@ -8,6 +8,15 @@ class UObjectArray
 public:
 /*	//GUObjectArray에 NewObj를 추가합니다.
 	void RegisterObj(UObject* NewObj)*/;
+	UObjectArray() = default;
+	UObjectArray(const UObjectArray&) = delete;
+	UObjectArray(UObjectArray&&) = delete;
+	UObjectArray& operator=(UObjectArray&&) = delete;
+
+	~UObjectArray();
+
+	//GUObjectArray에 NewObj를 추가합니다.
+	//void RegisterObj(UObject* NewObj);
 
 	//Obj를 delete 합니다.
 	void RemoveObj(UObject* Obj);
@@ -22,6 +31,9 @@ public:
 
 	//UObject의 개수를 반환합니다.
 	int32 GetNum()const;
+
+	//소멸
+	void Release();
 
 private:
 	//모든 UObject를 저장하는 배열

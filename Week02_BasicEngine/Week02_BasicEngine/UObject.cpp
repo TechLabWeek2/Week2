@@ -68,3 +68,4 @@ void UObject::operator delete(void* Ptr) noexcept
 	Header->~FAllocationHeader();
 	::operator delete(Header);	
 }
+

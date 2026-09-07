@@ -18,12 +18,13 @@
 #include "Core/Core.h"
 
 #include <math.h>
-#include "UCameraComp.h"
+//#include "UCameraComp.h"
 
 #include "FMatrix.h"
 #include "FMeshResource.h"
 class UObject;
-class UCameraComponent;
+class UCameraComp;
+struct FVertexSimple;
 
 struct alignas(16) FConstants {
     FMatrix World;
@@ -35,7 +36,8 @@ struct alignas(16) FConstants {
 class URenderer
 {
 public:
-    UCameraComp* MainCamera = new UCameraComp();
+    UCameraComp* MainCamera;
+    //UCameraComp* MainCamera = new UCameraComp();
 
 public:
     // Direct3D 11 장치(Device)와 장치 컨텍스트(Device Context) 및 스왑 체인(Swap Chain)을 관리하기 위한 포인터들
@@ -119,6 +121,7 @@ public:
     void ReleaseDepthStencilState();
 
     //GUObjectArray 순회하며 render 호출
-    void RenderScene(const TArray<UObject*> Objects, const UCameraComponent* Camera, float AspectRatio);
-};
+    void RenderScene(const TArray<UObject*> Objects, const UCameraComp* Camera, float AspectRatio);
 
+    void Init();
+};

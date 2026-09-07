@@ -5,6 +5,12 @@
 UObjectArray GUObjectArray;
 
 /*void UObjectArray::RegisterObj(UObject* NewObj)
+UObjectArray::~UObjectArray()
+{
+	Release();
+}
+
+void UObjectArray::RegisterObj(UObject* NewObj)
 {
 	if (NewObj == nullptr) return;
 
@@ -29,6 +35,10 @@ UObjectArray GUObjectArray;
 	NewObj->InternalIndex = Index;
 }*/
 
+UObjectArray::~UObjectArray()
+{
+}
+
 void UObjectArray::RemoveObj(UObject* Obj)
 {
 	if (Obj == nullptr) return;
@@ -47,4 +57,14 @@ void UObjectArray::RemoveObj(UObject* Obj)
 int32 UObjectArray::GetNum() const
 {
 	return Objects.Num();
+}
+
+void UObjectArray::Release()
+{
+	for (int i = 0; i < Objects.Num(); i++)
+	{
+		if (Objects[i] == nullptr) continue;
+		GUObjectArray.RemoveObj(Objects[i]);
+		//delete Objects[i];
+	}
 }
