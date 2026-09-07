@@ -15,6 +15,8 @@
 namespace ImGui { extern IMGUI_API void DemoMarker(const char* file, int line, const char* section); }
 #define IMGUI_DEMO_MARKER(section)  do { ImGui::DemoMarker("imgui_demo.cpp", __LINE__, section); } while (0)
 #endif
+
+UCameraComp* Camera = new UCameraComp();
 struct FVertexSimple;
 struct ExampleAppConsole
 {
@@ -627,6 +629,10 @@ void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube)
         static float Lx = 0, Ly = 0, Lz = 0;
         static float Rx = 0, Ry = 0, Rz = 0;
         static float Sx = 0.1f, Sy = 0.1f, Sz = 0.1f;
+        static bool IsOrthogonal = false;
+        static float FOV = 60.f;
+        static float CLx = 0, CLy = 0, CLz = 0;
+        static float CRx = 0, CRy = 0, CRz = 0;
         if (ImGui::Button("Spawn", ImVec2(50.0f, 0.0f))) {
             UCubeComp* obj = new UCubeComp();
             obj->Vertices = vertexBufferCube;
@@ -637,7 +643,7 @@ void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube)
         }
         ImGui::SameLine();
 
-
+        //Draw
         ImGui::BeginGroup();
 
         //Location
@@ -678,9 +684,46 @@ void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube)
 
         ImGui::EndGroup();
 
+        ImGui::Separator();
+
         if (ImGui::Button("Delete", ImVec2(50.0f, 0.0f))) {
             // 버튼이 클릭되었을 때 실행할 코드
         }
+
+        ImGui::Separator();
+
+        //카메라
+        ImGui::Checkbox("##Orthogonal", &Camera->IsOrthogonal);
+        ImGui::SameLine();
+        ImGui::Text("Orthogonal");
+
+        ImGui::Text("FOV");
+        ImGui::SameLine(130);
+        ImGui::SetNextItemWidth(170.0f);
+        ImGui::DragFloat("##FOV", &Camera->FOV, 0.1f, 0.0f, 90.f);
+        //Location
+        ImGui::Text("Camera Location");
+        ImGui::SameLine(130);
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CLx_input", &Camera->RelativeLocation.x);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CLy_input", &Camera->RelativeLocation.y);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CLz_input", &Camera->RelativeLocation.z);
+
+        //Rotation
+        ImGui::Text("Camera Rotation");
+        ImGui::SameLine(130);
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CRx_input", &Camera->RelativeRotation.x);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CRy_input", &Camera->RelativeRotation.y);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CRz_input", &Camera->RelativeRotation.z);
     }
 
     ImGui::End();
@@ -748,7 +791,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     float degree = 100;
     
     //카메라
-    UCameraComp* Camera = renderer.MainCamera;
+    renderer.MainCamera = Camera;
     Camera->RelativeLocation = { 0,2,-2 };
     Camera->RelativeRotation = { DegreeToRadian(-45),DegreeToRadian(-135), 0 };
     Camera->RelativeRotation = { DegreeToRadian(0),DegreeToRadian(0), 0 };
