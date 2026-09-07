@@ -1,6 +1,7 @@
 #pragma once
 #include "UObject.h"
 #include "FVector.h"
+
 class USceneComponent :
     public UObject
 {
@@ -12,6 +13,7 @@ public:
 public:
     USceneComponent();
 
-    FMatrix GetTransformMatrix() const;
+    FMatrix GetModelMatrix() const;
+
 };
 

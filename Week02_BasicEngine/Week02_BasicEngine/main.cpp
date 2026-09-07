@@ -6,6 +6,7 @@
 #include "UAxisGizmo.h"
 #include "UPicking.h"
 #include "UObject.h"
+#include "UObjectArray.h"
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 1024
@@ -596,7 +597,7 @@ void DrawStatWindow()
     {
         ImGui::Text(
             "Live Objects: %u",
-            static_cast<unsigned int>(GUObjectArray.Num())
+            static_cast<unsigned int>(GUObjectArray.GetNum())
         );
 
         ImGui::Text(

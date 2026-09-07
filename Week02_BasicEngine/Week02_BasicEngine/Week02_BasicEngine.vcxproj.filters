@@ -87,6 +87,15 @@
     <ClCompile Include="FMatrix.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
+    <ClCompile Include="UObjectArray.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="FMeshResource.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="FGraphicsDevice.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -153,6 +162,15 @@
       <Filter>Header File</Filter>
     </ClInclude>
     <ClInclude Include="FMatrix.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="UObjectArray.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FMeshResource.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FGraphicsDevice.h">
       <Filter>Header File</Filter>
     </ClInclude>
   </ItemGroup>

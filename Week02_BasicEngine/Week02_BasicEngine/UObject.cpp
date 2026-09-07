@@ -1,10 +1,10 @@
 #include "UObject.h"
 #include "UEngineStatics.h"
+#include "UObjectArray.h"
 #include <limits>
 #include <new>
 
 
-TArray<UObject*> GUObjectArray;
 uint32 TotalAllocationBytes = 0;
 uint32 TotalAllocationCount = 0;
 
@@ -19,20 +19,17 @@ namespace
 
 
 UObject::UObject()
-	: UUID(UEngineStatics::GenUUID()), InternalIndex(static_cast<int32>(GUObjectArray.Num()))
+	: UUID(UEngineStatics::GenUUID()), InternalIndex(0)
 {
-	GUObjectArray.Add(this);
+	InternalIndex = 0;
+	//GUOjbectArray에 추가되면서 InternalIndex도 재할당됨.
+	GUObjectArray.RegisterObj(this);
 }
 
 UObject::~UObject()
 {
-	const int32 RemovedIndex = static_cast<int32>(InternalIndex);
-	GUObjectArray.RemoveAtSwap(RemovedIndex);
-
-	if(RemovedIndex < GUObjectArray.Num())
-	{
-		GUObjectArray[RemovedIndex]->InternalIndex = RemovedIndex;
-	}
+	//GUObjectArray에 자기자신 제거
+	GUObjectArray.UnregisterObject(this);
 }
 
 
@@ -69,5 +66,5 @@ void UObject::operator delete(void* Ptr) noexcept
 	TotalAllocationBytes -= Header->Size + static_cast<uint32>(sizeof(FAllocationHeader));;
 	TotalAllocationCount--;
 	Header->~FAllocationHeader();
-	::operator delete(Header);
+	::operator delete(Header);	
 }

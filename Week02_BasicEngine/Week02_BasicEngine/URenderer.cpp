@@ -1,4 +1,5 @@
 #include "URenderer.h"
+#include "UCameraComp.h"
 
 
 void URenderer::CreateConstantBuffer() {
@@ -412,4 +413,9 @@ void URenderer::ReleaseDepthStencilState()
 	{
 		DepthStencilState->Release();
 	}
+}
+
+void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComponent* Camera, float AspectRatio)
+{
+	if (Objects.IsEmpty()) return;
 }
