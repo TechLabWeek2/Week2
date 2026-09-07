@@ -881,7 +881,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             float ndcX = 2 * currentMousePos.x / SCREEN_WIDTH - 1;  // screen xy to NDC xy
             float ndcY = 1 - 2 * currentMousePos.y / SCREEN_HEIGHT;
 
-            //pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, &PrimitiveComponentList, PrimitiveComponentCnt, &bIsPicking);
+            pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
         }
         else
         {
@@ -921,6 +921,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Console.Draw("Console Windows", &is_window_open);
         DrawCreateWindow(vertexBufferCube, numVerticesCube);
         DrawStatWindow();
+
+        ImGui::Begin("picking test");
+        if (pickedObjectPtr)
+        {
+            ImGui::Text("%f", pickedObjectPtr->RelativeLocation.x);
+            ImGui::Text("%f", pickedObjectPtr->RelativeLocation.y);
+            ImGui::Text("%f", pickedObjectPtr->RelativeLocation.z);
+        }
+        ImGui::End();
+
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 

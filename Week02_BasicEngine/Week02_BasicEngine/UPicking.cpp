@@ -1,6 +1,6 @@
 #include "UPicking.h"
 
-UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, UPrimitiveComponent** &PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking)
+UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, const TArray<UObject*>& ObjectList, int32 ObjectListCnt, bool* bIsPicking)
 {
     // picking
     ndcX = ndcX;  // screen xy to NDC xy
@@ -24,7 +24,17 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
 
     UPrimitiveComponent* pickedObject = nullptr;
 
-    for (int32 i = 0; i < PrimitiveComponentCnt; i++)
+    UPrimitiveComponent** PrimitiveComponentList = new UPrimitiveComponent * [ObjectListCnt];
+    for (int32 i = 0; i < ObjectListCnt; i++)
+    {
+        PrimitiveComponentList[i] = static_cast<UPrimitiveComponent*>(ObjectList[i]);
+    }
+
+    if (!PrimitiveComponentList)
+    {
+        return nullptr;
+    }
+    for (int32 i = 0; i < ObjectListCnt; i++)
     {
         FVector componentLocation(PrimitiveComponentList[i]->RelativeLocation.x, PrimitiveComponentList[i]->RelativeLocation.y, PrimitiveComponentList[i]->RelativeLocation.z);
         FVector difference = componentLocation - Camera->RelativeLocation; // camera -> component 벡터
@@ -55,14 +65,13 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
             numVertices = sizeof(cube_vertices) / sizeof(FVertexSimple); // 임시
             //////////////////////////////////////
 
-            // 로컬 좌표를 월드좌표로 변환해야함
             FMatrix transformMatrix = PrimitiveComponentList[i]->GetModelMatrix();
             for (uint32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘
             {
                 float epslion = 0.001f;
 
                 FVertexSimple currentVertices[3];
-                for (uint32 k = 0; k < 3; k++)
+                for (uint32 k = 0; k < 3; k++) // 로컬 좌표를 월드좌표로 변환해야함
                 {
                     FVector4 targetVerticesLocal(targetVertices[j + k].x, targetVertices[j + k].y, targetVertices[j + k].z, 1);
                     FVector4 targetVerticesWorld = targetVerticesLocal * transformMatrix;

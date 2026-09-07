@@ -25,5 +25,5 @@ public:
 	//FVector dirToWorld;
 
 public:
-	static UPrimitiveComponent* GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, UPrimitiveComponent** &PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking);
+	static UPrimitiveComponent* GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, const TArray<UObject*> &PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking);
 };
