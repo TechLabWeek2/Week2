@@ -88,13 +88,13 @@ public:
 
 	static FMatrix GetViewMatrixInverse(const FVector& Location, const FVector& Rotation);
 
-	static FMatrix GetProjectionMatrix(float FOV, float AspectRatio, float NearClip, float FarClip);
+	static FMatrix GetProjectionMatrix(float FOV, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal);
 
-	static FMatrix GetProjectionMatrixInverse(float FOV, float AspectRatio, float NearClip, float FarClip);
+	static FMatrix GetProjectionMatrixInverse(float FOV, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal);
 
-	static FMatrix Perspective(float fovY, float aspect, float nearZ, float farZ);
+	static FMatrix Perspective(float FOV, float AspectRatio, float NearClip, float FarClip);
 
-	static FMatrix Orthographic(float fovY, float aspect, float nearZ, float farZ);
+	static FMatrix Orthographic(float FOV, float AspectRatio, float NearClip, float FarClip);
 
 	/**
 	 * @brief LHY+ -> UE(LHZ+, X-forward) 기준변환 행렬과 그 역행렬

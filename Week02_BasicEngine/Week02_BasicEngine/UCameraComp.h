@@ -5,10 +5,11 @@ class UCameraComp :
     public USceneComponent
 {
 public:
-    float FOV = 60.0f;
+    float FOV = 30.0f;
     float AspectRatio = 10.f / 10.f;
     float NearClip = 0.1f;
     float FarClip = 1000.0f;
+    bool IsOrthogonal = false;
     FVector ZAxis;
     FVector XAxis;
     FVector YAxis;
