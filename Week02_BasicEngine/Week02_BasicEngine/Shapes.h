@@ -1,7 +1,7 @@
 // © 2024 KRAFTON, Inc. ALL RIGHTS RESERVED.
 
 #pragma once
-#include "FVertexSimple.h"
+#include "FMeshResource.h"
 
 enum ETypePrimitive {
 	EPT_None,

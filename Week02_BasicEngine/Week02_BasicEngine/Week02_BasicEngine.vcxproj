@@ -198,7 +198,6 @@
     <ClInclude Include="USceneComponent.h" />
     <ClInclude Include="USphereComp.h" />
     <ClInclude Include="Utils\Math.h" />
-    <ClInclude Include="FVertexSimple.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ShaderW0.hlsl">

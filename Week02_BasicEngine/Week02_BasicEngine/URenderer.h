@@ -21,7 +21,7 @@
 #include "UCameraComp.h"
 
 #include "FMatrix.h"
-#include "FVertexSimple.h"
+#include "FMeshResource.h"
 class UObject;
 class UCameraComponent;
 

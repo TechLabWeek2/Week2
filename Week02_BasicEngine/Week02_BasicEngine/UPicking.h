@@ -3,7 +3,7 @@
 #include "UCameraComp.h"
 #include "FVector.h"
 #include "FMatrix.h"
-#include "FVertexSimple.h"
+#include "FMeshResource.h"
 #include "Shapes.h"
 
 class UPicking
