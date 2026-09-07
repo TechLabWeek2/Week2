@@ -725,7 +725,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         //picking
         bool bIsPicking = false;
-        UObject* pickedObjectPtr = nullptr;
+        USceneComponent* pickedObjectPtr = nullptr;
 
         // camera forward
         FVector ZAxis(cos(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x), sin(Camera->RelativeRotation.x), -sin(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x));
@@ -829,7 +829,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             float ndcX = 2 * currentMousePos.x / SCREEN_WIDTH - 1;  // screen xy to NDC xy
             float ndcY = 1 - 2 * currentMousePos.y / SCREEN_HEIGHT;
 
-            //pickedObjectPtr = UPicking::GetPickedObject(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, &ObjectList, ObjectCnt, &bIsPicking);
+            //pickedObjectPtr = UPicking::GetPickedComponent(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, &SceneComponentList, SceneComponentCnt, &bIsPicking);
         }
         else
         {

@@ -1,6 +1,6 @@
 #include "UPicking.h"
 
-UObject* GetPickedObject(float ndcX, float ndcY, UCameraComp* Camera, FVector forward, FVector right, FVector up, UObject** ObjectList, int32 ObjectCnt, bool* bIsPicking)
+USceneComponent* GetPickedComponent(float ndcX, float ndcY, UCameraComp* Camera, FVector forward, FVector right, FVector up, USceneComponent** SceneComponentList, int32 SceneComponentCnt, bool* bIsPicking)
 {
     // picking
     ndcX = ndcX;  // screen xy to NDC xy
@@ -19,16 +19,14 @@ UObject* GetPickedObject(float ndcX, float ndcY, UCameraComp* Camera, FVector fo
     FVector dirToWorld(worldX, worldY, worldZ);
     dirToWorld.Normalize();
 
-    const float thresholdRatio = 100.f;
     float distanceMin = 10000.f;
     bool bIsFound = false;
 
-    UObject* pickedObject = nullptr;
+    USceneComponent* pickedObject = nullptr;
 
-    for (int32 i = 0; i < ObjectCnt; i++)
+    for (int32 i = 0; i < SceneComponentCnt; i++)
     {
-        //FVector primitiveLocation(ObjectList[i]->Location.x, ObjectList[i]->Location.y, ObjectList[i]->Location.z);
-        FVector primitiveLocation;
+        FVector primitiveLocation(SceneComponentList[i]->RelativeLocation.x, SceneComponentList[i]->RelativeLocation.y, SceneComponentList[i]->RelativeLocation.z);
         FVector difference = primitiveLocation - Camera->RelativeLocation;
         if (difference.Dot(dirToWorld) < 0) // 오브젝트가 카메라 뒤에 있음
         {
@@ -37,12 +35,12 @@ UObject* GetPickedObject(float ndcX, float ndcY, UCameraComp* Camera, FVector fo
         float distanceRay = difference.Cross(dirToWorld).Size() / dirToWorld.Size();
         float distanceCamera = (Camera->RelativeLocation - primitiveLocation).Size();
         distanceCamera = distanceCamera < 0.001f ? 0.001f : distanceCamera;
-        if (distanceRay < thresholdRatio / distanceCamera && distanceMin > distanceCamera)
+        if (distanceRay < SceneComponentList[i]->RelativeScale3D.Size() && distanceMin > distanceCamera)
         {
             *bIsPicking = true;
             bIsFound = true;
             distanceMin = distanceCamera;
-            //pickedObject = ObjectList[i];  // 수정필요
+            pickedObject = SceneComponentList[i];
         }
     }
     if (bIsFound == false) // 선택된 오브젝트가 없음

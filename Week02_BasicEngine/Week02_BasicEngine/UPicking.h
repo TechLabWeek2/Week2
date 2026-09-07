@@ -1,5 +1,5 @@
 #pragma once
-#include "UObject.h"
+#include "USceneComponent.h"
 #include "UCameraComp.h"
 #include "FVector.h";
 
@@ -23,5 +23,5 @@ public:
 	const float thresholdRatio = 100.f;
 
 public:
-	static UObject* GetPickedObject(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, UObject** &ObjectList, int32 ObjectCnt, bool* bIsPicking);
+	static USceneComponent* GetPickedComponent(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, USceneComponent** &SceneComponentList, int32 SceneComponentCnt, bool* bIsPicking);
 };
