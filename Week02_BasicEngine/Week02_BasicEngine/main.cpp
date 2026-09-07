@@ -619,6 +619,72 @@ void DrawStatWindow()
     ImGui::End();
 }
 
+//Test를 위해서 변수를 넘겨줌
+void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube)
+{
+    if (ImGui::Begin("Create"))
+    {
+        static float Lx = 0, Ly = 0, Lz = 0;
+        static float Rx = 0, Ry = 0, Rz = 0;
+        static float Sx = 0.1f, Sy = 0.1f, Sz = 0.1f;
+        if (ImGui::Button("Spawn", ImVec2(50.0f, 0.0f))) {
+            UCubeComp* obj = new UCubeComp();
+            obj->Vertices = vertexBufferCube;
+            obj->NumVertices = numVerticesCube;
+            obj->RelativeLocation = FVector(Lx, Ly, Lz);
+            obj->RelativeRotation = FVector(DegreeToRadian(Rx), DegreeToRadian(Ry), DegreeToRadian(Rz));
+            obj->RelativeScale3D = FVector(Sx, Sy, Sz);
+        }
+        ImGui::SameLine();
+
+
+        ImGui::BeginGroup();
+
+        //Location
+        ImGui::Text("Location");
+        ImGui::SameLine(70);
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##Lx_input", &Lx);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##Ly_input", &Ly);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##Lz_input", &Lz);
+
+        //Rotation
+        ImGui::Text("Rotation");
+        ImGui::SameLine(70);
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##Rx_input", &Rx);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##Ry_input", &Ry);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##Rz_input", &Rz);
+
+        //Scale
+        ImGui::Text("Scale");
+        ImGui::SameLine(70);
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##Sx_input", &Sx);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##Sy_input", &Sy);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##Sz_input", &Sz);
+
+        ImGui::EndGroup();
+
+        if (ImGui::Button("Delete", ImVec2(50.0f, 0.0f))) {
+            // 버튼이 클릭되었을 때 실행할 코드
+        }
+    }
+
+    ImGui::End();
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
@@ -669,27 +735,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     bool bIsExit = false;
 
-    UPrimitive** PrimitiveList = new UPrimitive* [30];
-
-    int UPrimitiveCnt = 6;
-
-    ETypePrimitive typePrimitive = EPT_Cube;
-
-    FVector offset(0.0f);
-    FVector velocity(0.0f);
-
-    //화면의 경계 위치
-    const float leftBorder = -1.0f;
-    const float rightBorder = 1.0f;
-    const float topBorder = -1.0f;
-    const float bottomBorder = 1.0f;
-    //화면을 넘어가는 것을 막을지 여부
-    bool bBoundBallToScreen = true;
-    bool bPinballMovement = true;
-
-    velocity.x = ((float)(rand() % 100 - 50)) * 0.001f;
-    velocity.y = ((float)(rand() % 100 - 50)) * 0.001f;
-
     //FPS 제한을 위한 설정
     const int targetFPS = 30;
     const double targetFrameTime = 1000.0 / targetFPS; //한 프레임의 목표 시간(밀리초 단위)
@@ -717,9 +762,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ExampleAppConsole Console;
     bool is_window_open = true;
 
-    UCubeComp* Test = new UCubeComp();
-    Test->Vertices = vertexBufferCube;
-    Test->NumVertices = numVerticesCube;
+    UCubeComp* Test1 = new UCubeComp();
+    Test1->Vertices = vertexBufferCube;
+    Test1->NumVertices = numVerticesCube;
+    Test1->RelativeLocation = FVector(1, 0, 0);
+    UCubeComp* Test2 = new UCubeComp();
+    Test2->Vertices = vertexBufferCube;
+    Test2->NumVertices = numVerticesCube;
+    Test2->RelativeLocation = FVector(0, 1, 0);
+    UCubeComp* Test3 = new UCubeComp();
+    Test3->Vertices = vertexBufferCube;
+    Test3->NumVertices = numVerticesCube;
+    Test3->RelativeLocation = FVector(0, 0, 1);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
@@ -817,41 +871,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             Camera->RelativeRotation.y += angleX;
             // 상하
             Camera->RelativeRotation.x += angleY;
-/*            // 좌우 회전
-            FVector rotation;
-
-            rotation.x = CameraForward.x * cos(angleX)
-                + CameraForward.z * sin(angleX);
-
-            rotation.y = CameraForward.y;
-
-            rotation.z = -CameraForward.x * sin(angleX)
-                + CameraForward.z * cos(angleX);
-
-            rotation.Normalize();
-
-            XAxis.x = rotation.z;
-            XAxis.y = 0;
-            XAxis.z = -rotation.x;
-            XAxis.Normalize();
-
-            YAxis.x = rotation.y * XAxis.z - rotation.z * XAxis.y;
-            YAxis.y = rotation.z * XAxis.x - rotation.x * XAxis.z;
-            YAxis.z = rotation.x * XAxis.y - rotation.y * XAxis.x;
-            YAxis.Normalize();
-
-            // 상하 회전
-            FVector rotation2;
-
-            rotation2.x = rotation.x * cos(angleY) + YAxis.x * sin(angleY) + XAxis.x * YAxis.Dot(XAxis, rotation) * (1.0f - cos(angleY));
-
-            rotation2.y = rotation.y * cos(angleY) + YAxis.y * sin(angleY) + XAxis.y * YAxis.Dot(XAxis, rotation) * (1.0f - cos(angleY));
-
-            rotation2.z = rotation.z * cos(angleY) + YAxis.z * sin(angleY) + XAxis.z * YAxis.Dot(XAxis, rotation) * (1.0f - cos(angleY));
-
-            rotation2.Normalize();
-
-            CameraForward = rotation2;*/
 
             lastMousePos = currentMousePos;
         }
@@ -890,97 +909,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // Roll
         Camera->RelativeRotation.z = 0.0f; */
 
-
-        PrimitiveList[0] = new UPrimitive({ 0,0,1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
-        PrimitiveList[1] = new UPrimitive({ 0,0,-1 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
-        PrimitiveList[2] = new UPrimitive({ 0,1,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
-        PrimitiveList[3] = new UPrimitive({ 0,-1,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
-        PrimitiveList[4] = new UPrimitive({ 1,0,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
-        PrimitiveList[5] = new UPrimitive({ -1,0,0 }, { 0,0,0 }, 0.1f, ETypePrimitive::EPT_Cube);
-
-        //Line (Left-Bottom)
-        PrimitiveList[6] = new UPrimitive({ -0.9f,-0.9f,0 }, { -Camera->RelativeRotation.x, -Camera->RelativeRotation.y, -Camera->RelativeRotation.z }, 0.05f, ETypePrimitive::EPT_XLine, ETypeLine::ETL_LB);
-        PrimitiveList[7] = new UPrimitive({ -0.9f,-0.9f,0 }, { -Camera->RelativeRotation.x, -Camera->RelativeRotation.y, -Camera->RelativeRotation.z }, 0.05f, ETypePrimitive::EPT_YLine, ETypeLine::ETL_LB);
-        PrimitiveList[8] = new UPrimitive({ -0.9f,-0.9f,0 }, { -Camera->RelativeRotation.x, -Camera->RelativeRotation.y, -Camera->RelativeRotation.z }, 0.05f, ETypePrimitive::EPT_ZLine, ETypeLine::ETL_LB);
-
-
-/*        PrimitiveList[9] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_XLine);
-        PrimitiveList[10] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_YLine);
-        PrimitiveList[11] = new UPrimitive({ 0,0,0 }, CameraRotation, 0.1f, ETypePrimitive::EPT_ZLine);*/
-        UPrimitiveCnt = 9;
-
-     
-        Test->RelativeLocation = FVector(1, 0, 0);
-        Test->Render(&renderer);
-        Test->RelativeLocation = FVector(-1, 0, 0);
-        Test->Render(&renderer);
-        Test->RelativeLocation = FVector(0, 1, 0);
-        Test->Render(&renderer);
-        Test->RelativeLocation = FVector(0, -1, 0);
-        Test->Render(&renderer);
-        Test->RelativeLocation = FVector(0, 0, 1);
-        Test->Render(&renderer);
-        //Test->RelativeRotation = Camera->RelativeRotation;
-        Test->RelativeLocation = FVector(0, 0, -1);
-        Test->Render(&renderer);
-        AxisGizmo->Render(&renderer);
-        /*for (int i = 0; i < UPrimitiveCnt; i++) {
-
-            FVector vector;
-            vector.x = 0;
-            vector.y = 0;
-            vector.z = 0;
-            switch (PrimitiveList[i]->Type)
-            {
-            case EPT_Cube:
-                renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, CameraForward);
-                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-                renderer.RenderPrimitive(vertexBufferCube, numVerticesCube);
-                break;
-            case EPT_Sphere:
-                renderer.RenderPrimitive(vertexBufferSphere, numVerticesSphere);
-                break;
-            case EPT_Triangle:
-                renderer.RenderPrimitive(vertexBufferTriangle, numVerticesTriangle);
-                break;
-            case EPT_XLine:
-                renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, vector);
-                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-                renderer.RenderPrimitive(vertexBufferXLine, numVerticesLine);
-
-                renderer.UpdateConstant({0,0,0}, 10.f, { 0,0,0 }, CameraLocation, CameraForward);
-                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-                renderer.RenderPrimitive(vertexBufferXLine, numVerticesLine);
-                break;
-            case EPT_YLine:
-                renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, vector);
-                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-                renderer.RenderPrimitive(vertexBufferYLine, numVerticesLine);
-
-                renderer.UpdateConstant({ 0,0,0 }, 10.f, { 0,0,0 }, CameraLocation, CameraForward);
-                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-                renderer.RenderPrimitive(vertexBufferYLine, numVerticesLine);
-                break;
-            case EPT_ZLine:
-                renderer.UpdateConstant(PrimitiveList[i]->Location, PrimitiveList[i]->Radius, PrimitiveList[i]->Rotation, CameraLocation, vector);
-                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-                renderer.RenderPrimitive(vertexBufferZLine, numVerticesLine);
-
-                renderer.UpdateConstant({ 0,0,0 }, 10.f, { 0,0,0 }, CameraLocation, CameraForward);
-                renderer.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-                renderer.RenderPrimitive(vertexBufferZLine, numVerticesLine);
-                break;
-            default:
-                break;
-            }
-        }*/
-
+        //카메라 오류
+        for (int i = 1; i < GUObjectArray.GetNum(); i++) {
+            static_cast<UPrimitiveComponent*>(GUObjectArray.GetAllObjects()[i])->Render(&renderer);
+        }
 
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
         
         Console.Draw("Console Windows", &is_window_open);
+        DrawCreateWindow(vertexBufferCube, numVerticesCube);
         DrawStatWindow();
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
