@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utils/Math.h"
+#include "FMatrix.h"
 #include "FString.h"
 
 struct FVector

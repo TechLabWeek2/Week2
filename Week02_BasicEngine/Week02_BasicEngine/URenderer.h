@@ -20,6 +20,8 @@
 #include <math.h>
 #include "UCameraComp.h"
 
+#include "FMatrix.h"
+
 struct FVertexSimple
 {
     float x, y, z;    // Position
