@@ -43,7 +43,7 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
             continue;
         }
         float distanceRay = difference.Cross(rayVector).Size() / rayVector.Size(); // component에서 Ray까지의 최단거리
-        if (distanceRay < PrimitiveComponentList[i]->RelativeScale3D.Size() * sqrt(3)) // Sphere Boundary 체크로 1차 거르기
+        if (distanceRay < PrimitiveComponentList[i]->RelativeScale3D.Size() * sqrt(3) * 1000.f) // Sphere Boundary 체크로 1차 거르기
         {
             const FVertexSimple* targetVertices;
             int32 numVertices;
