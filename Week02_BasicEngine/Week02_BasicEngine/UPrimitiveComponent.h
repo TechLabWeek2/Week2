@@ -15,7 +15,6 @@ public:
     UPrimitiveComponent();
 
     void Update(float deltaTime) override;
-    virtual void Render(URenderer* Renderer);
 
     FMeshResource* GetMeshResource() const;
     void SetMeshResource(FMeshResource* pMeshResource);

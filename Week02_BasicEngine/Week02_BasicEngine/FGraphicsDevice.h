@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include <d3d11.h>
+#include "Core/Core.h"
 
 class ID3D11Device;
 class ID3D11DeviceContext;

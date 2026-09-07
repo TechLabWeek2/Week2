@@ -1,5 +1,7 @@
 #pragma once
 #include <windows.h>
+#include <math.h>
+#include <d3d11.h>
 
 // D3D 사용에 필요한 라이브러리들을 링크합니다.
 #pragma comment(lib, "user32")
@@ -7,24 +9,29 @@
 #pragma comment(lib, "d3dcompiler")
 
 // D3D 사용에 필요한 헤더파일들을 포함합니다.
-#include <d3d11.h>
-#include <d3dcompiler.h>
-
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include "imGui/imgui_impl_win32.h"
 
 #include "Core/Core.h"
-
-#include <math.h>
-//#include "UCameraComp.h"
-
-#include "FMatrix.h"
 #include "FMeshResource.h"
+
+
 class UObject;
 class UCameraComp;
 struct FVertexSimple;
+
+class ID3D11Device;
+class ID3D11DeviceContext;
+class IDXGISwapChain;
+class ID3D11Texture2D;
+class ID3D11RenderTargetView;
+class ID3D11RasterizerState;
+class ID3D11Buffer;
+class ID3D11DepthStencilView;
+class ID3D11DepthStencilState;
+class D3D11_VIEWPORT;
 
 struct alignas(16) FConstants {
     FMatrix World;
@@ -68,21 +75,7 @@ public:
 
     void ReleaseShader();
 
-    void Create(HWND hWindow, UINT screenWidth, UINT screenHeight);
-
-    // Direct3D 장치 및 스왑 체인을 생성하는 함수
-    void CreateDeviceAndSwapChain(HWND hWindow);
-
-    // Direct3D 장치 및 스왑 체인을 해제하는 함수
-    void ReleaseDeviceAndSwapChain();
-
-    // 프레임 버퍼를 생성하는 함수
-    void CreateFrameBuffer();
-
-    // 프레임 버퍼를 해제하는 함수
-    void ReleaseFrameBuffer();
-
-    // 래스터라이저 상태를 생성하는 함수
+        // 래스터라이저 상태를 생성하는 함수
     void CreateRasterizerState();
 
     // 래스터라이저 상태를 해제하는 함수
@@ -91,10 +84,7 @@ public:
     // 렌더러에 사용된 모든 리소스를 해제하는 함수
     void Release();
 
-    // 스왑 체인의 백 버퍼와 프론트 버퍼를 교체하여 화면에 출력
-    void SwapBuffer();
-
-    //D3D11 렌더링에 필요한 준비 작업을 위한 Prepare 함수
+        //D3D11 렌더링에 필요한 준비 작업을 위한 Prepare 함수
     void Prepare();
 
     //Simple Shader 사용을 위한 PrepareShader 함수
@@ -108,16 +98,10 @@ public:
 
     void ReleaseVertexBuffer(ID3D11Buffer* vertexBuffer);
 
-    // 깊이 스텐실 버퍼 생성
-    void CreateDepthStencilBuffer(UINT screenWidth, UINT screenHeight);
-
-    // 깊이 스텐실 state 생성
+        // 깊이 스텐실 state 생성
     void CreateDepthStencilState();
 
-    // 깊이 스텐실 버퍼 해제
-    void ReleaseDepthStencilBuffer();
-
-    // 깊이 스텐실 버퍼 생성
+        // 깊이 스텐실 버퍼 생성
     void ReleaseDepthStencilState();
 
     //GUObjectArray 순회하며 render 호출

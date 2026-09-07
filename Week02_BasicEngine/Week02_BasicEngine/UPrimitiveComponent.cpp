@@ -11,10 +11,6 @@ void UPrimitiveComponent::Update(float deltaTime)
 	std::wcout << FString(L"PrimitiveComponent Update") << std::endl;
 }
 
-void UPrimitiveComponent::Render(URenderer* Renderer)
-{
-}
-
 FMeshResource* UPrimitiveComponent::GetMeshResource() const
 {
 	return MeshResource;
