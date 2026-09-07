@@ -4,7 +4,7 @@
 //전역 인스턴스
 UObjectArray GUObjectArray;
 
-void UObjectArray::RegisterObj(UObject* NewObj)
+/*void UObjectArray::RegisterObj(UObject* NewObj)
 {
 	if (NewObj == nullptr) return;
 
@@ -27,7 +27,7 @@ void UObjectArray::RegisterObj(UObject* NewObj)
 	}
 
 	NewObj->InternalIndex = Index;
-}
+}*/
 
 void UObjectArray::RemoveObj(UObject* Obj)
 {
@@ -36,13 +36,13 @@ void UObjectArray::RemoveObj(UObject* Obj)
 	delete Obj;
 }
 
-void UObjectArray::UnregisterObject(UObject* Obj)
+/*void UObjectArray::UnregisterObject(UObject* Obj)
 {
 	if (Obj == nullptr) return;
 
 	Objects[Obj->InternalIndex] = nullptr;
 	AvailableIndices.Add(Obj->InternalIndex);
-}
+}*/
 
 int32 UObjectArray::GetNum() const
 {

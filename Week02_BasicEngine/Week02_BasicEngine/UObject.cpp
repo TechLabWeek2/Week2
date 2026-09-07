@@ -23,13 +23,13 @@ UObject::UObject()
 {
 	InternalIndex = 0;
 	//GUOjbectArray에 추가되면서 InternalIndex도 재할당됨.
-	GUObjectArray.RegisterObj(this);
+	GUObjectArray.GetAllObjects().Add(this);
 }
 
 UObject::~UObject()
 {
 	//GUObjectArray에 자기자신 제거
-	GUObjectArray.UnregisterObject(this);
+	//GUObjectArray.UnregisterObject(this);
 }
 
 

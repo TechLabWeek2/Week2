@@ -6,13 +6,13 @@ class UObject;
 class UObjectArray
 {
 public:
-	//GUObjectArray에 NewObj를 추가합니다.
-	void RegisterObj(UObject* NewObj);
+/*	//GUObjectArray에 NewObj를 추가합니다.
+	void RegisterObj(UObject* NewObj)*/;
 
 	//Obj를 delete 합니다.
 	void RemoveObj(UObject* Obj);
-	//GUObjectArray에서 Obj를 제거합니다. delete 시키진 않습니다.
-	void UnregisterObject(UObject* Obj);
+/*	//GUObjectArray에서 Obj를 제거합니다. delete 시키진 않습니다.
+	void UnregisterObject(UObject* Obj);*/
 
 	//모든 Object 배열을 반환합니다.(읽기 전용)
 	const TArray<UObject*>& GetAllObjects() const { return Objects; }

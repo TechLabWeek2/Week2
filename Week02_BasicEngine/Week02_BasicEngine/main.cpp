@@ -330,7 +330,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         POINT currentMousePos;
         GetCursorPos(&currentMousePos); // 현재 마우스 스크린 좌표 획득
-
+        RECT Rect;
+        GetClientRect(hWnd, &Rect);
+        float Width = static_cast<float>(Rect.right - Rect.left);
+        float Height = static_cast<float>(Rect.bottom - Rect.top);
+        Camera->AspectRatio = Width / Height;
         static POINT lastMousePos = currentMousePos;
         static bool isDragging = false;
         static bool wasLeftMouseDown = false;
@@ -414,6 +418,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 float ndcX = 2.f * (float)currentMousePos.x / screenWidth - 1.f;  // screen xy to NDC xy
                 float ndcY = 1.f - 2.f * (float)currentMousePos.y / screenHeight;
 
+                if (pickedObjectPtr != nullptr)
+                {
+                    pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                }
                 pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
                 if (pickedObjectPtr != nullptr) 
                 { 
