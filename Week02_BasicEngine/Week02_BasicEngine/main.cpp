@@ -94,7 +94,7 @@ void DrawStatWindow()
 }
 
 //Test를 위해서 변수를 넘겨줌
-void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube, UPrimitiveComponent* pickedPrimitivePtr)
+void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube, UPrimitiveComponent*& pickedPrimitivePtr)
 {
     if (ImGui::Begin("Create"))
     {
@@ -365,14 +365,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             Camera->RelativeLocation.z += XAxis.z * cameraSpeed;
         }
         if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
-            Camera->RelativeLocation.x += ZAxis.x * cameraSpeed;
-            Camera->RelativeLocation.y += ZAxis.y * cameraSpeed;
-            Camera->RelativeLocation.z += ZAxis.z * cameraSpeed;
+            if (Camera->IsOrthogonal)
+            {
+                Camera->ZoomLevel -= 0.5f * cameraSpeed;
+            }
+            else
+            {
+                Camera->RelativeLocation.x += ZAxis.x * cameraSpeed;
+                Camera->RelativeLocation.y += ZAxis.y * cameraSpeed;
+                Camera->RelativeLocation.z += ZAxis.z * cameraSpeed;
+            }
         }
         if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
-            Camera->RelativeLocation.x -= ZAxis.x * cameraSpeed;
-            Camera->RelativeLocation.y -= ZAxis.y * cameraSpeed;
-            Camera->RelativeLocation.z -= ZAxis.z * cameraSpeed;
+            if (Camera->IsOrthogonal)
+            {
+                Camera->ZoomLevel += 0.5f * cameraSpeed;
+            }
+            else
+            {
+                Camera->RelativeLocation.x -= ZAxis.x * cameraSpeed;
+                Camera->RelativeLocation.y -= ZAxis.y * cameraSpeed;
+                Camera->RelativeLocation.z -= ZAxis.z * cameraSpeed;
+            }
         }
         if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
             Camera->RelativeLocation.y += cameraSpeed;

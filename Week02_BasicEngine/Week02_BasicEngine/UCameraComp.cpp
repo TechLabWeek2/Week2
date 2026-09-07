@@ -16,5 +16,5 @@ FMatrix UCameraComp::GetViewMatrix() const
 
 FMatrix UCameraComp::GetProjectionMatrix() const
 {
-	return FMatrix::GetProjectionMatrix(DegreeToRadian(FOV / 2.f), AspectRatio, NearClip, FarClip, IsOrthogonal);
+	return FMatrix::GetProjectionMatrix(DegreeToRadian(FOV / 2.f), ZoomLevel, AspectRatio, NearClip, FarClip, IsOrthogonal);
 }

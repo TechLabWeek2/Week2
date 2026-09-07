@@ -475,16 +475,16 @@ FMatrix FMatrix::GetViewMatrixInverse(const FVector& Location, const FVector& Ro
 	return FMatrix::MatrixInverse(FMatrix::GetViewMatrix(Location, Rotation) );
 }
 
-FMatrix FMatrix::GetProjectionMatrix(float FOV, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal) {
+FMatrix FMatrix::GetProjectionMatrix(float FOV, float Zoom, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal) {
 	if (IsOrthogonal)
-		return Orthographic(FOV, AspectRatio, NearClip, FarClip);
+		return Orthographic(Zoom, AspectRatio, NearClip, FarClip);
 	else
 		return Perspective(FOV, AspectRatio, NearClip, FarClip);
 }
 
-FMatrix FMatrix::GetProjectionMatrixInverse(float FOV, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal) {
+FMatrix FMatrix::GetProjectionMatrixInverse(float FOV, float Zoom, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal) {
 	if (IsOrthogonal)
-		return  FMatrix::MatrixInverse(Orthographic(FOV, AspectRatio, NearClip, FarClip));
+		return  FMatrix::MatrixInverse(Orthographic(Zoom, AspectRatio, NearClip, FarClip));
 	else
 		return  FMatrix::MatrixInverse(Perspective(FOV, AspectRatio, NearClip, FarClip));
 }
@@ -501,14 +501,14 @@ FMatrix FMatrix::Perspective(float FOV, float AspectRatio, float NearClip, float
 	return M;
 }
 
-FMatrix FMatrix::Orthographic(float FOV, float AspectRatio, float NearClip, float FarClip)
+FMatrix FMatrix::Orthographic(float Zoom, float AspectRatio, float NearClip, float FarClip)
 {
-	const float Height = 2.0f;
+	const float Height = Zoom * 5.f;
 	const float Width = Height * AspectRatio;
 	FMatrix M;
 	M.m[0][0] = 2.0f / Width;
 	M.m[1][1] = 2.0f / Height;
-	M.m[2][2] = 1 / (FarClip - NearClip);
+	M.m[2][2] = 1.f / (FarClip - NearClip);
 	M.m[3][2] = -NearClip / (FarClip - NearClip);
 	return M;
 }

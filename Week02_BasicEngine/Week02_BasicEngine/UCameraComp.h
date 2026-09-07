@@ -9,6 +9,7 @@ public:
     float AspectRatio = 10.f / 10.f;
     float NearClip = 0.1f;
     float FarClip = 1000.0f;
+    float ZoomLevel = 1.f;
     bool IsOrthogonal = false;
     FVector ZAxis;
     FVector XAxis;
@@ -19,4 +20,6 @@ public:
 
     FMatrix GetViewMatrix() const;
     FMatrix GetProjectionMatrix() const;
+    FMatrix GetProjectionMatrixOrthogonal() const;
+
 };

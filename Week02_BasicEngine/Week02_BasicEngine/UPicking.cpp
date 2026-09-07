@@ -6,17 +6,41 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
     float ndcZ = 0.f;
     float ndcW = 1.f;
 
-    FMatrix Proj = Camera->GetProjectionMatrix();
-    float viewX = ndcX / Proj.m[0][0];
-    float viewY = ndcY / Proj.m[1][1];
-    float viewZ = 1.f;
+    float viewX = 0.f;
+    float viewY = 0.f;
+    float viewZ = ndcW;
 
-    float worldX = right.x * viewX + up.x * viewY + forward.x * viewZ;
-    float worldY = right.y * viewX + up.y * viewY + forward.y * viewZ;
-    float worldZ = right.z * viewX + up.z * viewY + forward.z * viewZ;
+    float worldX = 0.f;
+    float worldY = 0.f;
+    float worldZ = 0.f;
 
-    FVector rayVector(worldX, worldY, worldZ);
-    rayVector.Normalize();
+    FVector rayOrigin;
+    FVector rayVector;
+
+    if (Camera->IsOrthogonal)
+    {
+        FMatrix Proj = Camera->GetProjectionMatrix();
+        viewX = ndcX / Proj.m[0][0];
+        viewY = ndcY / Proj.m[1][1];
+
+        rayOrigin = Camera->RelativeLocation + right * viewX + up * viewY;
+        rayVector = forward;
+        rayVector.Normalize();
+    }
+    else
+    {
+        FMatrix Proj = Camera->GetProjectionMatrix();
+        viewX = ndcX / Proj.m[0][0];
+        viewY = ndcY / Proj.m[1][1];
+
+        worldX = right.x * viewX + up.x * viewY + forward.x * viewZ;
+        worldY = right.y * viewX + up.y * viewY + forward.y * viewZ;
+        worldZ = right.z * viewX + up.z * viewY + forward.z * viewZ;
+
+        rayOrigin = Camera->RelativeLocation;
+        rayVector = FVector(worldX, worldY, worldZ);
+        rayVector.Normalize();
+    }
 
     float distanceMin = 10000.f;
     bool bIsFound = false;
@@ -28,7 +52,7 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
     {
         PrimitiveComponent = static_cast<UPrimitiveComponent*>(ObjectList[i]);
         FVector componentLocation(PrimitiveComponent->RelativeLocation.x, PrimitiveComponent->RelativeLocation.y, PrimitiveComponent->RelativeLocation.z);
-        FVector difference = componentLocation - Camera->RelativeLocation; // camera -> component 벡터
+        FVector difference = componentLocation - rayOrigin; // camera -> component 벡터
         if (difference.Dot(rayVector) < 0) // 오브젝트가 카메라 뒤에 있으면 무시
         {
             continue;
@@ -36,8 +60,8 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
         float distanceRay = difference.Cross(rayVector).Size() / rayVector.Size(); // component에서 Ray까지의 최단거리
         if (distanceRay < PrimitiveComponent->RelativeScale3D.Size() * sqrt(3)) // Sphere Boundary 체크로 1차 거르기
         {
-            const FVertexSimple* targetVertices;
-            int32 numVertices;
+            const FVertexSimple* targetVertices = nullptr;
+            int32 numVertices = 0;
             switch (PrimitiveComponent->primitiveType) // 각각의 맞는 xxxxx_vertices[]를 로드
             {
             case EPT_Sphere:
@@ -51,10 +75,6 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
             default:
                 break;
             }
-            //////////////////////////////////////
-            targetVertices = cube_vertices; // 임시
-            numVertices = sizeof(cube_vertices) / sizeof(FVertexSimple); // 임시
-            //////////////////////////////////////
 
             FMatrix transformMatrix = PrimitiveComponent->GetModelMatrix();
             for (uint32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘
@@ -92,7 +112,7 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
                 }
 
                 float inverseDet = 1 / det;
-                FVector s = Camera->RelativeLocation - v0;
+                FVector s = rayOrigin - v0;
                 float u = inverseDet * s.Dot(rayCrossEdge2);
                 if (u < -epslion || u > 1 + epslion) // u 는 0 ~ 1 이어야함
                 {
@@ -111,8 +131,8 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
                 {
                     continue;
                 }
-                FVector rayCastedLocation = Camera->RelativeLocation + rayVector * t;
-                float distanceCamera = (Camera->RelativeLocation - rayCastedLocation).Size(); // 충돌지점에서 camera까지의 거리
+                FVector rayCastedLocation = rayOrigin + rayVector * t;
+                float distanceCamera = (rayOrigin - rayCastedLocation).Size(); // 충돌지점에서 camera까지의 거리
                 distanceCamera = distanceCamera < 0.001f ? 0.001f : distanceCamera;
                 if (distanceMin > distanceCamera)
                 {
