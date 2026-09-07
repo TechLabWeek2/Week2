@@ -1,6 +1,6 @@
 #include "UPicking.h"
 
-USceneComponent* GetPickedComponent(float ndcX, float ndcY, UCameraComp* Camera, FVector forward, FVector right, FVector up, USceneComponent** SceneComponentList, int32 SceneComponentCnt, bool* bIsPicking)
+USceneComponent* UPicking::GetPickedComponent(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, USceneComponent** &SceneComponentList, int32 SceneComponentCnt, bool* bIsPicking)
 {
     // picking
     ndcX = ndcX;  // screen xy to NDC xy
@@ -26,15 +26,15 @@ USceneComponent* GetPickedComponent(float ndcX, float ndcY, UCameraComp* Camera,
 
     for (int32 i = 0; i < SceneComponentCnt; i++)
     {
-        FVector primitiveLocation(SceneComponentList[i]->RelativeLocation.x, SceneComponentList[i]->RelativeLocation.y, SceneComponentList[i]->RelativeLocation.z);
-        FVector difference = primitiveLocation - Camera->RelativeLocation;
-        if (difference.Dot(dirToWorld) < 0) // 오브젝트가 카메라 뒤에 있음
+        FVector componentLocation(SceneComponentList[i]->RelativeLocation.x, SceneComponentList[i]->RelativeLocation.y, SceneComponentList[i]->RelativeLocation.z);
+        FVector difference = componentLocation - Camera->RelativeLocation; // camera -> component 벡터
+        if (difference.Dot(dirToWorld) < 0) // 오브젝트가 카메라 뒤에 있으면 무시
         {
             continue;
         }
-        float distanceRay = difference.Cross(dirToWorld).Size() / dirToWorld.Size();
-        float distanceCamera = (Camera->RelativeLocation - primitiveLocation).Size();
-        distanceCamera = distanceCamera < 0.001f ? 0.001f : distanceCamera;
+        float distanceRay = difference.Cross(dirToWorld).Size() / dirToWorld.Size(); // component에서 Ray까지의 최단거리
+        float distanceCamera = (Camera->RelativeLocation - componentLocation).Size(); // component에서 camera까지의 거리
+        distanceCamera = distanceCamera < 0.001f ? 0.001f : distanceCamera; 
         if (distanceRay < SceneComponentList[i]->RelativeScale3D.Size() && distanceMin > distanceCamera)
         {
             *bIsPicking = true;
