@@ -1,6 +1,6 @@
 #include "FMatrix.h"
-#include <Utils/Math.h>
-#include <FVector.h>
+#include "Utils/Math.h"
+#include "FVector.h"
 #include <algorithm>
 #include <cmath>
 
@@ -201,6 +201,95 @@ bool FMatrix::MatrixInverse(const FMatrix& src, FMatrix& out)
 
 }
 
+FMatrix FMatrix::MatrixInverse(const FMatrix& src)
+{
+
+	FMatrix tmp;
+	float det[4];
+	FMatrix M;
+
+	//2x2 minor determinant를 미리 계산
+	tmp.m[0][0] = src.m[2][2] * src.m[3][3] - src.m[2][3] * src.m[3][2];
+	tmp.m[0][1] = src.m[1][2] * src.m[3][3] - src.m[1][3] * src.m[3][2];
+	tmp.m[0][2] = src.m[1][2] * src.m[2][3] - src.m[1][3] * src.m[2][2];
+
+	tmp.m[1][0] = src.m[2][2] * src.m[3][3] - src.m[2][3] * src.m[3][2];
+	tmp.m[1][1] = src.m[0][2] * src.m[3][3] - src.m[0][3] * src.m[3][2];
+	tmp.m[1][2] = src.m[0][2] * src.m[2][3] - src.m[0][3] * src.m[2][2];
+
+	tmp.m[2][0] = src.m[1][2] * src.m[3][3] - src.m[1][3] * src.m[3][2];
+	tmp.m[2][1] = src.m[0][2] * src.m[3][3] - src.m[0][3] * src.m[3][2];
+	tmp.m[2][2] = src.m[0][2] * src.m[1][3] - src.m[0][3] * src.m[1][2];
+
+	tmp.m[3][0] = src.m[1][2] * src.m[2][3] - src.m[1][3] * src.m[2][2];
+	tmp.m[3][1] = src.m[0][2] * src.m[2][3] - src.m[0][3] * src.m[2][2];
+	tmp.m[3][2] = src.m[0][2] * src.m[1][3] - src.m[0][3] * src.m[1][2];
+
+	//3x3 minor determinant 계산
+	det[0] = src.m[1][1] * tmp.m[0][0] - src.m[2][1] * tmp.m[0][1] + src.m[3][1] * tmp.m[0][2];
+	det[1] = src.m[0][1] * tmp.m[1][0] - src.m[2][1] * tmp.m[1][1] + src.m[3][1] * tmp.m[1][2];
+	det[2] = src.m[0][1] * tmp.m[2][0] - src.m[1][1] * tmp.m[2][1] + src.m[3][1] * tmp.m[2][2];
+	det[3] = src.m[0][1] * tmp.m[3][0] - src.m[1][1] * tmp.m[3][1] + src.m[2][1] * tmp.m[3][2];
+
+	// Determinant 계산
+	const float determinant = src.m[0][0] * det[0] - src.m[1][0] * det[1] + src.m[2][0] * det[2] - src.m[3][0] * det[3];
+
+	const float RDet = 1.0f / determinant;
+
+	M.m[0][0] = RDet * det[0];
+	M.m[0][1] = -RDet * det[1];
+	M.m[0][2] = RDet * det[2];
+	M.m[0][3] = -RDet * det[3];
+	M.m[1][0] = -RDet * (src.m[1][0] * tmp.m[0][0] - src.m[2][0] * tmp.m[0][1] + src.m[3][0] * tmp.m[0][2]);
+	M.m[1][1] = RDet * (src.m[0][0] * tmp.m[1][0] - src.m[2][0] * tmp.m[1][1] + src.m[3][0] * tmp.m[1][2]);
+	M.m[1][2] = -RDet * (src.m[0][0] * tmp.m[2][0] - src.m[1][0] * tmp.m[2][1] + src.m[3][0] * tmp.m[2][2]);
+	M.m[1][3] = RDet * (src.m[0][0] * tmp.m[3][0] - src.m[1][0] * tmp.m[3][1] + src.m[2][0] * tmp.m[3][2]);
+	M.m[2][0] = RDet * (
+		src.m[1][0] * (src.m[2][1] * src.m[3][3] - src.m[2][3] * src.m[3][1]) -
+		src.m[2][0] * (src.m[1][1] * src.m[3][3] - src.m[1][3] * src.m[3][1]) +
+		src.m[3][0] * (src.m[1][1] * src.m[2][3] - src.m[1][3] * src.m[2][1])
+		);
+	M.m[2][1] = -RDet * (
+		src.m[0][0] * (src.m[2][1] * src.m[3][3] - src.m[2][3] * src.m[3][1]) -
+		src.m[2][0] * (src.m[0][1] * src.m[3][3] - src.m[0][3] * src.m[3][1]) +
+		src.m[3][0] * (src.m[0][1] * src.m[2][3] - src.m[0][3] * src.m[2][1])
+		);
+	M.m[2][2] = RDet * (
+		src.m[0][0] * (src.m[1][1] * src.m[3][3] - src.m[1][3] * src.m[3][1]) -
+		src.m[1][0] * (src.m[0][1] * src.m[3][3] - src.m[0][3] * src.m[3][1]) +
+		src.m[3][0] * (src.m[0][1] * src.m[1][3] - src.m[0][3] * src.m[1][1])
+		);
+	M.m[2][3] = -RDet * (
+		src.m[0][0] * (src.m[1][1] * src.m[2][3] - src.m[1][3] * src.m[2][1]) -
+		src.m[1][0] * (src.m[0][1] * src.m[2][3] - src.m[0][3] * src.m[2][1]) +
+		src.m[2][0] * (src.m[0][1] * src.m[1][3] - src.m[0][3] * src.m[1][1])
+		);
+	M.m[3][0] = -RDet * (
+		src.m[1][0] * (src.m[2][1] * src.m[3][2] - src.m[2][2] * src.m[3][1]) -
+		src.m[2][0] * (src.m[1][1] * src.m[3][2] - src.m[1][2] * src.m[3][1]) +
+		src.m[3][0] * (src.m[1][1] * src.m[2][2] - src.m[1][2] * src.m[2][1])
+		);
+	M.m[3][1] = RDet * (
+		src.m[0][0] * (src.m[2][1] * src.m[3][2] - src.m[2][2] * src.m[3][1]) -
+		src.m[2][0] * (src.m[0][1] * src.m[3][2] - src.m[0][2] * src.m[3][1]) +
+		src.m[3][0] * (src.m[0][1] * src.m[2][2] - src.m[0][2] * src.m[2][1])
+		);
+	M.m[3][2] = -RDet * (
+		src.m[0][0] * (src.m[1][1] * src.m[3][2] - src.m[1][2] * src.m[3][1]) -
+		src.m[1][0] * (src.m[0][1] * src.m[3][2] - src.m[0][2] * src.m[3][1]) +
+		src.m[3][0] * (src.m[0][1] * src.m[1][2] - src.m[0][2] * src.m[1][1])
+		);
+	M.m[3][3] = RDet * (
+		src.m[0][0] * (src.m[1][1] * src.m[2][2] - src.m[1][2] * src.m[2][1]) -
+		src.m[1][0] * (src.m[0][1] * src.m[2][2] - src.m[0][2] * src.m[2][1]) +
+		src.m[2][0] * (src.m[0][1] * src.m[1][2] - src.m[0][2] * src.m[1][1])
+		);
+
+
+	return M;
+
+}
+
 FMatrix FMatrix::Transposed() const
 {
 	FMatrix result;
@@ -227,7 +316,6 @@ void FMatrix::Transpose()
 	}
 }
 
-
 static FMatrix GetModelMatrix(const FVector& Location, const FVector& Rotation, const FVector& Scale)
 {
 	return  FMatrix::Scaling(Scale) *
@@ -244,6 +332,51 @@ static FMatrix GetModelMatrixInverse(const FVector& Location, const FVector& Rot
 		FMatrix::ScaleMatrixInverse(Scale);
 }
 
+FMatrix FMatrix::GetViewMatrix(const FVector& Location, const FVector& Rotation) {
+	FVector ZAxis(cos(Rotation.y) * cos(Rotation.x), sin(Rotation.x), -sin(Rotation.y) * cos(Rotation.x));
+	ZAxis.Normalize();
+	FVector XAxis = FVector(0, 1, 0).Cross(ZAxis);
+	XAxis.Normalize();
+	FVector YAxis = ZAxis.Cross(XAxis);
+	YAxis.Normalize();
+	FMatrix M;
+	M.m[0][0] = XAxis.x;
+	M.m[0][1] = YAxis.x;
+	M.m[0][2] = ZAxis.x;
+	M.m[0][3] = 0.0f;
+	M.m[1][0] = XAxis.y;
+	M.m[1][1] = YAxis.y;
+	M.m[1][2] = ZAxis.y;
+	M.m[1][3] = 0.0f;
+	M.m[2][0] = XAxis.z;
+	M.m[2][1] = YAxis.z;
+	M.m[2][2] = ZAxis.z;
+	M.m[2][3] = 0.0f;
+	M.m[3][0] = -Location.x * XAxis.x - Location.y * XAxis.y - Location.z * XAxis.z;
+	M.m[3][1] = -Location.x * YAxis.x - Location.y * YAxis.y - Location.z * YAxis.z;
+	M.m[3][2] = -Location.x * ZAxis.x - Location.y * ZAxis.y - Location.z * ZAxis.z;
+	M.m[3][3] = 1.0f;
+	return M;
+}
+
+FMatrix FMatrix::GetViewMatrixInverse(const FVector& Location, const FVector& Rotation) {
+	return FMatrix::MatrixInverse(FMatrix::GetViewMatrix(Location, Rotation) );
+}
+
+FMatrix FMatrix::GetProjectionMatrix(float FOV, float AspectRatio, float NearClip, float FarClip) {
+	FMatrix M;
+	M.m[0][0] = 1 / (tan(FOV)) * AspectRatio;
+	M.m[1][1] = 1 / tan(FOV);
+	M.m[2][2] = (FarClip) / (FarClip - NearClip);
+	M.m[2][3] = 1;
+	M.m[3][2] = -(FarClip * NearClip) / (FarClip - NearClip);
+	M.m[3][3] = 0;
+	return M;
+}
+
+FMatrix FMatrix::GetProjectionMatrixInverse(float FOV, float AspectRatio, float NearClip, float FarClip) {
+	return FMatrix::MatrixInverse(GetProjectionMatrixInverse(FOV, AspectRatio, NearClip, FarClip));
+}
 
 static FMatrix TranslationMatrixInverse(const FVector& Other)
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include "USceneComponent.h"
+
 class UCameraComp :
     public USceneComponent
 {

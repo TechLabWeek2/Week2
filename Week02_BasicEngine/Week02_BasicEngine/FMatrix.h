@@ -54,6 +54,8 @@ public:
 	// 역행렬을 계산하고 out에 결과를 저장, 역행렬을 구할 수 없다면 identity 행렬을 반환하고 false를 반환
 	static bool MatrixInverse(const FMatrix& src, FMatrix& out);
 
+	static FMatrix MatrixInverse(const FMatrix& src);
+
 	// Transpose된 행렬을 반환
 	FMatrix Transposed() const;
 
@@ -64,6 +66,14 @@ public:
 	static FMatrix GetModelMatrix(const FVector& Location, const FVector& Rotation, const FVector& Scale);
 
 	static FMatrix GetModelMatrixInverse(const FVector& Location, const FVector& Rotation, const FVector& Scale);
+
+	static FMatrix GetViewMatrix(const FVector& Location, const FVector& Rotation);
+
+	static FMatrix GetViewMatrixInverse(const FVector& Location, const FVector& Rotation);
+
+	static FMatrix GetProjectionMatrix(float FOV, float AspectRatio, float NearClip, float FarClip);
+
+	static FMatrix GetProjectionMatrixInverse(float FOV, float AspectRatio, float NearClip, float FarClip);
 
 	static FMatrix Perspective(float fovY, float aspect, float nearZ, float farZ);
 
