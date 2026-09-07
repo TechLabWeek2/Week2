@@ -94,7 +94,7 @@ void DrawStatWindow()
 }
 
 //Test를 위해서 변수를 넘겨줌
-void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube)
+void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube, UPrimitiveComponent* pickedPrimitivePtr)
 {
     if (ImGui::Begin("Create"))
     {
@@ -105,7 +105,8 @@ void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube)
         static float FOV = 60.f;
         static float CLx = 0, CLy = 0, CLz = 0;
         static float CRx = 0, CRy = 0, CRz = 0;
-        if (ImGui::Button("Spawn", ImVec2(50.0f, 0.0f))) {
+        if (ImGui::Button("Spawn", ImVec2(50.0f, 0.0f))) 
+        {
             UCubeComp* obj = new UCubeComp();
             obj->Vertices = vertexBufferCube;
             obj->NumVertices = numVerticesCube;
@@ -158,8 +159,12 @@ void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube)
 
         ImGui::Separator();
 
-        if (ImGui::Button("Delete", ImVec2(50.0f, 0.0f))) {
-            // 버튼이 클릭되었을 때 실행할 코드
+        if (ImGui::Button("Delete", ImVec2(50.0f, 0.0f))) 
+        {
+            if (pickedPrimitivePtr)
+            {
+                GUObjectArray.RemoveObj(pickedPrimitivePtr);
+            }
         }
 
         ImGui::Separator();
@@ -290,9 +295,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test3->NumVertices = numVerticesCube;
     Test3->RelativeLocation = FVector(0, 0, 1);
 
-    GUObjectArray.RegisterObj(Test1);
-    GUObjectArray.RegisterObj(Test2);
-    GUObjectArray.RegisterObj(Test3);
+    //picking
+    bool bIsPicking = false;
+    UPrimitiveComponent* pickedObjectPtr = nullptr;
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
@@ -328,10 +333,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         static POINT lastMousePos = currentMousePos;
         static bool isDragging = false;
-
-        //picking
-        bool bIsPicking = false;
-        UPrimitiveComponent* pickedObjectPtr = nullptr;
 
         // camera forward
         FVector ZAxis(cos(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x), sin(Camera->RelativeRotation.x), -sin(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x));
@@ -373,7 +374,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
         if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
         {
-            if (!isDragging)
+            if (!isDragging && !io.WantCaptureMouse)
             {
                 isDragging = true;
                 lastMousePos = currentMousePos;
@@ -396,18 +397,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
         else if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
         {
-            // picking
-            RECT rect;
-            GetClientRect(hWnd, &rect);
-            float screenWidth = (float)(rect.right - rect.left);
-            float screenHeight = (float)(rect.bottom - rect.top);
+            if (!io.WantCaptureMouse)
+            {
+                // picking
+                RECT rect;
+                GetClientRect(hWnd, &rect);
+                float screenWidth = (float)(rect.right - rect.left);
+                float screenHeight = (float)(rect.bottom - rect.top);
 
-            GetCursorPos(&currentMousePos);
-            ScreenToClient(hWnd, &currentMousePos);
-            float ndcX = 2.f * (float)currentMousePos.x / screenWidth - 1.f;  // screen xy to NDC xy
-            float ndcY = 1.f - 2.f * (float)currentMousePos.y / screenHeight;
+                GetCursorPos(&currentMousePos);
+                ScreenToClient(hWnd, &currentMousePos);
+                float ndcX = 2.f * (float)currentMousePos.x / screenWidth - 1.f;  // screen xy to NDC xy
+                float ndcY = 1.f - 2.f * (float)currentMousePos.y / screenHeight;
 
-            pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+            }
         }
         else
         {
@@ -445,21 +449,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::NewFrame();
         
         Console.Draw("Console Windows", &is_window_open);
-        DrawCreateWindow(vertexBufferCube, numVerticesCube);
+        DrawCreateWindow(vertexBufferCube, numVerticesCube, pickedObjectPtr);
         DrawStatWindow();
-
-        ImGui::Begin("picking test");
-        if (bIsPicking)
-        {
-            ImGui::Text("%f", pickedObjectPtr->RelativeLocation.x);
-            ImGui::Text("%f", pickedObjectPtr->RelativeLocation.y);
-            ImGui::Text("%f", pickedObjectPtr->RelativeLocation.z);
-        }
-        else
-        {
-            ImGui::Text("No object selected.");
-        }
-        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

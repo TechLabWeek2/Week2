@@ -32,6 +32,7 @@ void UObjectArray::RegisterObj(UObject* NewObj)
 void UObjectArray::RemoveObj(UObject* Obj)
 {
 	if (Obj == nullptr) return;
+	Objects.Remove(Obj);
 	delete Obj;
 }
 
