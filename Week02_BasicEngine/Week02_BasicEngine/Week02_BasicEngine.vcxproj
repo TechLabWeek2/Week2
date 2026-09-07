@@ -169,7 +169,6 @@
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="USphereComp.cpp" />
     <ClCompile Include="Utils\Math.cpp" />
-    <ClCompile Include="FVertexSimple.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h" />
@@ -199,6 +198,7 @@
     <ClInclude Include="USceneComponent.h" />
     <ClInclude Include="USphereComp.h" />
     <ClInclude Include="Utils\Math.h" />
+    <ClInclude Include="FVertexSimple.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ShaderW0.hlsl">

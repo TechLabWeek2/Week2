@@ -54,19 +54,11 @@ USceneComponent* UPicking::GetPickedComponent(float ndcX, float ndcY, UCameraCom
             //////////////////////////////////////
 
             // 로컬 좌표를 월드좌표로 변환해야함
-            FMatrix transformMatrix = SceneComponentList[i]->GetTransformMatrix();
+            FMatrix transformMatrix = SceneComponentList[i]->GetModelMatrix();
             for (uint32 j = 0; j < numVertices; j++)
             {
                 FVector targetVerticesLocal(targetVertices[j].x, targetVertices[j].y, targetVertices[j].z);
                 //FVector targetVerticesWorld = targetVerticesLocal * transformMatrix;
-                //S
-                
-                //R
-                
-                //T
-                //targetVertices[j].x += SceneComponentList[i]->RelativeLocation.x;
-                //targetVertices[j].y += SceneComponentList[i]->RelativeLocation.y;
-                //targetVertices[j].z += SceneComponentList[i]->RelativeLocation.z;
             }
 
             for (uint32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘
