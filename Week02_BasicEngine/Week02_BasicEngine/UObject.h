@@ -17,6 +17,7 @@ public:
     static void* operator new(std::size_t Size);
     static void operator delete(void* Ptr) noexcept;
 
+    //virtual void Update(float deltaTime);
 };
 
 extern uint32 TotalAllocationBytes;

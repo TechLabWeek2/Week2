@@ -3,6 +3,11 @@
 #pragma once
 #include "FMeshResource.h"
 
+struct FVertexSimple
+{
+	float x, y, z;    // Position
+	float r, g, b, a; // Color
+};
 extern FVertexSimple line_vertices[6];
 
 extern FVertexSimple triangle_vertices[3];

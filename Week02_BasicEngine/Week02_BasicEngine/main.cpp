@@ -1,3 +1,4 @@
+#pragma once 
 #include <windows.h>
 #include "URenderer.h"
 #include "Shapes.h"
@@ -8,11 +9,27 @@
 #include "UPicking.h"
 #include "UObject.h"
 #include "UObjectArray.h"
+#include "FGraphicsDevice.h"
+#include "FMeshResource.h"
 
 #define SCREEN_WIDTH 1800
 #define SCREEN_HEIGHT 1200
 
-#pragma once 
+//#if IMGUI_VERSION_NUM >= 19263
+//namespace ImGui { extern IMGUI_API void DemoMarker(const char* file, int line, const char* section); }
+//#define IMGUI_DEMO_MARKER(section)  do { ImGui::DemoMarker("imgui_demo.cpp", __LINE__, section); } while (0)
+//#endif
+////struct FVertexSimple;
+//struct ExampleAppConsole
+//{
+//    char                  InputBuf[256];
+//    ImVector<char*>       Items;
+//    ImVector<const char*> Commands;
+//    ImVector<char*>       History;
+//    int                   HistoryPos;    // -1: new line, 0..History.Size-1 browsing history.
+//    ImGuiTextFilter       Filter;
+//    bool                  AutoScroll;
+//    bool                  ScrollToBottom;
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
@@ -80,7 +97,7 @@ void DrawStatWindow()
 }
 
 //Test를 위해서 변수를 넘겨줌
-void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube, ID3D11Buffer* vertexBufferSphere, uint32 numVerticesSphere, UPrimitiveComponent*& pickedPrimitivePtr)
+void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource, UPrimitiveComponent*& pickedPrimitivePtr)
 {
     ImGui::Begin("Jungle Control Panel");
     ImGui::Text("Hello Jungle World!");
@@ -119,13 +136,11 @@ void DrawCreateWindow(ID3D11Buffer* vertexBufferCube, uint32 numVerticesCube, ID
         {
         case ETypePrimitive::Cube:  //렌더러 정리 끝나면 할것 
             newPrimitive = new UCubeComp();
-            newPrimitive->Vertices = vertexBufferCube;
-            newPrimitive->NumVertices = numVerticesCube;
+            newPrimitive->SetMeshResource(CubeResource);
             break;
         case ETypePrimitive::Sphere:
             newPrimitive = new USphereComp();
-            newPrimitive->Vertices = vertexBufferSphere;
-            newPrimitive->NumVertices = numVerticesCube;
+            newPrimitive->SetMeshResource(SphereResource);
             break;
         }
         newPrimitive->RelativeLocation = FVector(Lx, Ly, Lz);
@@ -243,11 +258,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         CW_USEDEFAULT, CW_USEDEFAULT, SCREEN_WIDTH, SCREEN_HEIGHT,
         nullptr, nullptr, hInstance, nullptr);
 
-    // Renderer Class를 생성합니다.
-    URenderer	renderer;
+    //공통으로 사용할 Graphics Device를 가지게 됩니다.
+    GGraphicsDevice.Initialize(hWnd, SCREEN_WIDTH, SCREEN_WIDTH);
 
-    // D3D11 생성하는 함수를 호출합니다.
-    renderer.Create(hWnd, SCREEN_WIDTH, SCREEN_HEIGHT);
+    // Renderer Class를 생성합니다.
+    URenderer renderer;
+
+    //렌더러 초기화
+    renderer.Init();
+
     // 렌더러 생성 직후에 쉐이더를 생성하는 함수를 호출합니다.
     renderer.CreateShader();
     //생성 함수 추가
@@ -259,17 +278,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui_ImplWin32_Init((void*)hWnd);
     ImGui_ImplDX11_Init(renderer.Device, renderer.DeviceContext);
 
+    //Mesh Resource 만들기.
+    FMeshResource* SphereResource = new FMeshResource();
+    FMeshResource* CubeResource = new FMeshResource();
+    FMeshResource* TriangleResource = new FMeshResource();
+    FMeshResource* LineResource = new FMeshResource();
 
-    // Renderer와 Shader 생성 이후에 버텍스 버퍼를 생성합니다.
-    uint32 numVerticesLine = sizeof(line_vertices) / sizeof(FVertexSimple);
-    uint32 numVerticesTriangle = sizeof(triangle_vertices) / sizeof(FVertexSimple);
-    uint32 numVerticesCube = sizeof(cube_vertices) / sizeof(FVertexSimple);
-    uint32 numVerticesSphere = sizeof(sphere_vertices) / sizeof(FVertexSimple);
+    SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
+    CubeResource->CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
+    TriangleResource->CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
+    LineResource->CreateVertexBuffer(line_vertices, sizeof(line_vertices));
 
-    ID3D11Buffer* vertexBufferLine = renderer.CreateVertexBuffer(line_vertices, sizeof(line_vertices));
-    ID3D11Buffer* vertexBufferTriangle = renderer.CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
-    ID3D11Buffer* vertexBufferCube = renderer.CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
-    ID3D11Buffer* vertexBufferSphere = renderer.CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
+    SphereResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    CubeResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    TriangleResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    LineResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
     bool bIsExit = false;
 
@@ -283,39 +306,45 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     LARGE_INTEGER startTime, endTime;
     double elapsedTime = 0.0;
-    float degree = 100;
     
     //카메라
-    renderer.MainCamera = Camera;
+    UCameraComp* Camera = new UCameraComp();
     Camera->RelativeLocation = { -2.5f, 2.5f,-2.5f };
     Camera->RelativeRotation = { -0.5f,-1.0f, 0 };
-    //Camera->RelativeRotation = { DegreeToRadian(0),DegreeToRadian(0), 0 };
 
     //좌표축
     UAxisGizmo* AxisGizmo = new UAxisGizmo();
 
-    AxisGizmo->Vertices = vertexBufferLine;
-    AxisGizmo->NumVertices = numVerticesLine;
+    AxisGizmo->RelativeScale3D = FVector(1.0f, 1.0f, 1.0f);
+
+    AxisGizmo->SetMeshResource(LineResource);
+
+    AxisGizmo->RelativeLocation = FVector(0, 0, 0);
+    AxisGizmo->RelativeRotation = FVector(0, 0, 0);
+    AxisGizmo->RelativeScale3D = FVector(10.f, 10.f, 10.f);
+
 
     ExampleAppConsole Console;
     bool is_window_open = true;
 
-    UCubeComp* Test1 = new UCubeComp();
-    Test1->Vertices = vertexBufferCube;
-    Test1->NumVertices = numVerticesCube;
-    Test1->RelativeLocation = FVector(1, 0, 0);
-    UCubeComp* Test2 = new UCubeComp();
-    Test2->Vertices = vertexBufferCube;
-    Test2->NumVertices = numVerticesCube;
-    Test2->RelativeLocation = FVector(0, 1, 0);
-    UCubeComp* Test3 = new UCubeComp();
-    Test3->Vertices = vertexBufferCube;
-    Test3->NumVertices = numVerticesCube;
-    Test3->RelativeLocation = FVector(0, 0, 1);
 
     //picking
     bool bIsPicking = false;
     UPrimitiveComponent* pickedObjectPtr = nullptr;
+
+    UCubeComp* Test = new UCubeComp();
+    UCubeComp* Test2 = new UCubeComp();
+    UCubeComp* Test3 = new UCubeComp();
+    UCubeComp* Test4 = new UCubeComp();
+    UCubeComp* Test5 = new UCubeComp();
+    UCubeComp* Test6 = new UCubeComp();
+
+    Test->SetMeshResource(CubeResource);
+    Test2->SetMeshResource(CubeResource);
+    Test3->SetMeshResource(CubeResource);
+    Test4->SetMeshResource(CubeResource);
+    Test5->SetMeshResource(CubeResource);
+    Test6->SetMeshResource(CubeResource);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
@@ -466,27 +495,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             isDragging = false;
             lastMousePos = currentMousePos;
         }
+             
+        Test->RelativeLocation = FVector(1, 0, 0);
+        Test2->RelativeLocation = FVector(-1, 0, 0);
+        Test3->RelativeLocation = FVector(0, 1, 0);
+        Test4->RelativeLocation = FVector(0, -1, 0);
+        Test5->RelativeLocation = FVector(0, 0, 1);
+        Test6->RelativeLocation = FVector(0, 0, -1);
 
-        const float RAD_TO_DEG = 180.0f / 3.14159265359f;
-
-        //카메라 오류
-        for (int i = 1; i < GUObjectArray.GetNum(); i++) {
-            static_cast<UPrimitiveComponent*>(GUObjectArray.GetAllObjects()[i])->Render(&renderer);
-        }
+        
+        //리스트 돌면서 렌더
+        renderer.RenderScene(GUObjectArray.GetAllObjects(), Camera, 0.f);
 
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
         
         Console.Draw("Console Windows", &is_window_open);
-        DrawCreateWindow(vertexBufferCube, numVerticesCube, vertexBufferSphere, numVerticesSphere, pickedObjectPtr);
+        DrawCreateWindow(CubeResource, SphereResource, pickedObjectPtr);
         DrawStatWindow();
 
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-        // 다 그렸으면 버퍼를 교환
-        renderer.SwapBuffer();
+        GGraphicsDevice.SwapBuffer();
 
         do {
             Sleep(0);
@@ -504,8 +536,39 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+
+    //리소스 제거
+    if (SphereResource)
+    {
+        SphereResource->Release();
+        delete SphereResource;
+    }
+
+    if (CubeResource)
+    {
+        CubeResource->Release();
+        delete CubeResource;
+    }
+
+    if (TriangleResource)
+    {
+        TriangleResource->Release();
+        delete TriangleResource;
+    }
+
+    if (LineResource)
+    {
+        LineResource->Release();
+        delete LineResource;
+    }
+    
+    //렌더러들보다 먼저 소멸
+    GUObjectArray.Release();
+
     renderer.ReleaseConstantBuffer();
     renderer.ReleaseShader();
     renderer.Release();
+
+    GGraphicsDevice.Release();
     return 0;
 }

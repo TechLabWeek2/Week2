@@ -6,5 +6,5 @@ class USphereComp :
 public:
     USphereComp();
 
-    virtual void Render(URenderer* Renderer) override;
 };
+

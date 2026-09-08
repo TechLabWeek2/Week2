@@ -16,5 +16,8 @@ public:
 
     FMatrix GetModelMatrix() const;
 
+    //이동, 
+    virtual void Update(float deltaTime);
+
 };
 

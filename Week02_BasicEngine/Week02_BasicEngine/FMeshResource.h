@@ -1,23 +1,30 @@
 #pragma once
 
 #include <d3d11.h>
+#include "Shapes.h"
+#include "Core/Core.h"
 
-struct FVertexSimple
-{
-	float x, y, z;    // Position
-	float r, g, b, a; // Color
-};
+//struct FVertexSimple
+//{
+//	float x, y, z;    // Position
+//	float r, g, b, a; // Color
+//};
+
+class FVertexSimple;
 
 class FMeshResource
 {
-public:
+public:	
 	//VertexBuffer, IndexBuffer 생성
-	void CreateVertexBuffer(FVertexSimple* vertices, UINT byteWidth);
+	//void CreateVertexBuffer(TArray<FVertexSimple>& vertices, UINT VerticesNum);
+	void CreateVertexBuffer(FVertexSimple* vertices, UINT VerticesNum);
+	void SetTopology(D3D11_PRIMITIVE_TOPOLOGY pTopology);
 
-	void Bind();
+	void Release();
 
 	ID3D11Buffer* VertexBuffer;
 	ID3D11Buffer* IndexBuffer;
-
+	UINT numVertices;
+	D3D11_PRIMITIVE_TOPOLOGY Topology;
 };
 
