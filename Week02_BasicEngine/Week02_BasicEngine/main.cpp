@@ -162,7 +162,7 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
     static float Rx = 0, Ry = 0, Rz = 0;
     static float Sx = 0.1f, Sy = 0.1f, Sz = 0.1f;
     static bool IsOrthogonal = false;
-    static float FOV = 80.f;
+    static float FOV = 90.0f;
     static float CLx = 0, CLy = 0, CLz = 0;
     static float CRx = 0, CRy = 0, CRz = 0;
     static int spawnNum = 1;
@@ -741,7 +741,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         FVector YAxis = ZAxis.Cross(XAxis);
         YAxis.Normalize();
 
-        const float cameraSpeed = 0.03f;
+        const float cameraSpeed = 0.04f;
         if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
             Camera->RelativeLocation.x -= XAxis.x * cameraSpeed;
             Camera->RelativeLocation.y -= XAxis.y * cameraSpeed;

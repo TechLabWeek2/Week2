@@ -2,7 +2,7 @@
 #include "FMatrix.h"
 UCameraComp::UCameraComp()
 {
-	FOV = 60.0f;
+	FOV = 90.0f;
 }
 
 UCameraComp::~UCameraComp()
