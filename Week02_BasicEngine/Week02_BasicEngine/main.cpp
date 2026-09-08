@@ -39,6 +39,7 @@
 #include "ImGui/imgui_impl_dx11.h"
 #include "imGui/imgui_impl_win32.h"
 #include "ExampleAppConsole.h"
+#include <FJsonWrapper.h>
 
 UCameraComp* Camera = new UCameraComp();
 
@@ -240,6 +241,187 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
         ImGui::SetNextItemWidth(50.0f);
         ImGui::InputFloat("##CRz_input", &CRz);
     }
+
+
+    ImGui::Separator();
+    ImGui::Separator();
+
+    //Scene 이름을 담는 버퍼
+    static char inputBuffer[256] = "Default";
+    ImGui::InputText("Scene Name", inputBuffer, IM_ARRAYSIZE(inputBuffer));
+
+    //새로운 Scene 생성
+    if (ImGui::Button("New Scene", ImVec2(100.0f, 0.0f)))
+    {
+        if (inputBuffer[0] != '\0')
+        {
+            // ImGui의 UTF-8 입력 → wchar_t
+            wchar_t sceneName[256] = {};
+            int count = MultiByteToWideChar(
+                CP_UTF8, MB_ERR_INVALID_CHARS,
+                inputBuffer, -1,
+                sceneName, 256
+            );
+
+            if (count > 0)
+            {
+                FString path(L"..\\");
+                path.Append(FString(sceneName));
+                path.Append(L".Scene");
+
+                FJsonWrapper::NewScene(std::filesystem::path(*path));
+
+            }
+        }
+    }
+
+    //현재 씬 저장
+    if (ImGui::Button("Save Scene", ImVec2(100.0f, 0.0f)))
+    {
+        if (inputBuffer[0] != '\0')
+        {
+            // ImGui의 UTF-8 입력 → wchar_t
+            wchar_t sceneName[256] = {};
+            int count = MultiByteToWideChar(
+                CP_UTF8, MB_ERR_INVALID_CHARS,
+                inputBuffer, -1,
+                sceneName, 256
+            );
+
+            if (count > 0)
+            {
+                FString path(L"..\\");
+                path.Append(FString(sceneName));
+                path.Append(L".Scene");
+
+                if (FJsonWrapper::SaveScene(std::filesystem::path(*path)))
+                {
+                    inputBuffer[0] = '\0';
+                }
+            }
+        }
+    }
+
+    //여러 씬 중 원하는 씬 로드
+    namespace fs = std::filesystem;
+
+    static fs::path sceneDirectory;
+    static std::vector<fs::path> sceneFiles;
+    static int selectedScene = -1;
+    static bool initialized = false;
+    static std::string sceneMessage;
+
+    auto RefreshSceneFiles = [&]()
+        {
+            sceneFiles.clear();
+            selectedScene = -1;
+            sceneMessage.clear();
+
+            try
+            {
+                sceneDirectory = FJsonWrapper::FindDirectory(L".slnx");
+
+                if (sceneDirectory.empty())
+                {
+                    sceneMessage = "Solution directory not found.";
+                    return;
+                }
+
+                // slnx와 같은 폴더의 Scene 파일만 검색
+                for (const auto& entry : fs::directory_iterator(sceneDirectory))
+                {
+                    if (!entry.is_regular_file())
+                        continue;
+
+                    std::wstring extension = entry.path().extension().wstring();
+
+                    if (_wcsicmp(extension.c_str(), L".Scene") == 0)
+                    {
+                        sceneFiles.push_back(entry.path());
+                    }
+                }
+
+                std::sort(sceneFiles.begin(), sceneFiles.end());
+
+                if (!sceneFiles.empty())
+                    selectedScene = 0;
+            }
+            catch (const std::exception&)
+            {
+                sceneMessage = "Failed to list scene files.";
+            }
+        };
+
+    if (!initialized)
+    {
+        RefreshSceneFiles();
+        initialized = true;
+    }
+
+    if (ImGui::Button("Refresh Scenes"))
+    {
+        RefreshSceneFiles();
+    }
+
+    // ImGui에는 UTF-8 문자열 전달
+    auto GetFileLabel = [](const fs::path& path) -> std::string
+        {
+            const auto utf8 = path.filename().u8string();
+
+            return std::string(
+                reinterpret_cast<const char*>(utf8.data()),
+                utf8.size()
+            );
+        };
+
+    std::string preview = selectedScene >= 0
+        ? GetFileLabel(sceneFiles[selectedScene])
+        : "No scene selected";
+
+    if (ImGui::BeginCombo("Scene Files", preview.c_str()))
+    {
+        for (int i = 0; i < static_cast<int>(sceneFiles.size()); ++i)
+        {
+            const std::string label = GetFileLabel(sceneFiles[i]);
+            const bool selected = (selectedScene == i);
+
+            if (ImGui::Selectable(label.c_str(), selected))
+            {
+                selectedScene = i;
+            }
+
+            if (selected)
+                ImGui::SetItemDefaultFocus();
+        }
+
+        ImGui::EndCombo();
+    }
+
+    ImGui::BeginDisabled(selectedScene < 0);
+
+    if (ImGui::Button("Load Selected Scene"))
+    {
+        // 경로에 이미 .Scene이 포함되어 있으므로 다시 붙이지 않음
+        if (FJsonWrapper::LoadScene(
+            sceneFiles[selectedScene],
+            CubeResource,
+            SphereResource,
+            PlaneResource))
+        {
+            pickedPrimitivePtr = nullptr;
+            sceneMessage = "Scene loaded.";
+        }
+        else
+        {
+            sceneMessage = "Failed to load scene.";
+        }
+    }
+
+    ImGui::EndDisabled();
+
+    ImGui::Separator();
+
+
 
     ImGui::Separator();
 
@@ -680,7 +862,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             lastMousePos = currentMousePos;
         }
              
-        Test->RelativeLocation = FVector(1, 0, 0);
+/*        Test->RelativeLocation = FVector(1, 0, 0);
         Test2->RelativeLocation = FVector(-1, 0, 0);
         Test3->RelativeLocation = FVector(0, 1, 0);
         Test3->RelativeRotation = FVector(0,0, 1.57);
@@ -688,7 +870,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Test5->RelativeLocation = FVector(0, 0, 1);
         Test5->RelativeRotation = FVector(0, -1.57, 0);
         Test6->RelativeLocation = FVector(0, 0, -1);
-        Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
+        Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);*/
 
         
         //리스트 돌면서 렌더

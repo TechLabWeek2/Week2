@@ -9,6 +9,10 @@ public:
     {
         return NextUUID++;
     }
+	static uint32 GetNextUUID()
+	{
+		return NextUUID;
+	}
 
 private:
     static uint32 NextUUID;

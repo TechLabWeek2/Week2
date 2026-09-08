@@ -179,6 +179,7 @@
   <ItemGroup>
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="FEngineLoop.h" />
+    <ClInclude Include="FJsonWrapper.h" />
     <ClInclude Include="FMatrix.h" />
     <ClInclude Include="FGraphicsDevice.h" />
     <ClInclude Include="FMeshResource.h" />
