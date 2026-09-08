@@ -21,4 +21,3 @@ public:
 	UINT numVertices;
 	D3D11_PRIMITIVE_TOPOLOGY Topology;
 };
-

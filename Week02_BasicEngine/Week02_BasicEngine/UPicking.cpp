@@ -77,12 +77,12 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
             }
 
             FMatrix transformMatrix = PrimitiveComponent->GetModelMatrix();
-            for (uint32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘
+            for (int32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘
             {
-                float epslion = 0.001f;
+                float epslion = KINDA_SMALL_NUMBER;
 
                 FVertexSimple currentVertices[3];
-                for (uint32 k = 0; k < 3; k++) // 로컬 좌표를 월드좌표로 변환해야함
+                for (int32 k = 0; k < 3; k++) // 로컬 좌표를 월드좌표로 변환해야함
                 {
                     FVector4 targetVerticesLocal(targetVertices[j + k].x, targetVertices[j + k].y, targetVertices[j + k].z, 1);
                     FVector4 targetVerticesWorld = targetVerticesLocal * transformMatrix;

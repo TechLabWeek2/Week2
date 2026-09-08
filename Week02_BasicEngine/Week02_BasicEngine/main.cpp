@@ -103,7 +103,7 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
     ImGui::Text("Hello Jungle World!");
     ImGui::Text("FPS %d (%d ms)", 999, 999);
     const char* typeNames[] = { "None", "Triangle", "Cube", "Sphere", "XLine", "YLine", "ZLine", "Max" };
-    static ETypePrimitive current = ETypePrimitive::Cube;
+    static ETypePrimitive current = ETypePrimitive::Sphere;
     if (ImGui::BeginCombo("Primitive", typeNames[(int32)current]))
     {
         for (int32 i = 2; i < (int32)ETypePrimitive::XLine; i++)
@@ -483,7 +483,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 }
                 pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
                 if (pickedObjectPtr != nullptr) 
-                { 
+                {
                     pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
                 }
             }
