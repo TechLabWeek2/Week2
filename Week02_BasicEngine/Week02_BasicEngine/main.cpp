@@ -44,6 +44,7 @@
 UINT screenWidth = SCREEN_WIDTH_INIT;
 UINT screenHeight = SCREEN_HEIGHT_INIT;
 bool bStopRender = false;
+bool bResizeWindow = false;
 
 UCameraComp* Camera = new UCameraComp();
 
@@ -66,17 +67,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         break;
     case WM_SIZE:
-        GetClientRect(hWnd, &rect);
-        width = rect.right - rect.left;
-        height = rect.bottom - rect.top;
-        if (width <= 0 || height <= 0)
+        if (wParam == SIZE_MINIMIZED)
         {
             bStopRender = true;
             break;
         }
-        bStopRender = true;
+        else if (wParam == SIZE_MAXIMIZED || (wParam == SIZE_RESTORED && !bStopRender))
+        {
+            GetClientRect(hWnd, &rect);
+            width = rect.right - rect.left;
+            height = rect.bottom - rect.top;
+            screenWidth = width;
+            screenHeight = height;
+            bResizeWindow = true;
+            break;
+        }
         break;
     case WM_ENTERSIZEMOVE:
+        bStopRender = true;
         break;
     case WM_EXITSIZEMOVE:
         if (bStopRender)
@@ -87,7 +95,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             height = rect.bottom - rect.top;
             screenWidth = width;
             screenHeight = height;
-
+            bResizeWindow = true;
         }
         break;
     default:
@@ -135,7 +143,7 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
     static ETypePrimitive current = ETypePrimitive::Sphere;
     if (ImGui::BeginCombo("Primitive", typeNames[(int32)current]))
     {
-        for (int32 i = 1; i < (int32)ETypePrimitive::XLine; i++)
+        for (int32 i = 1; i < (int32)ETypePrimitive::Floor; i++)
         {
             bool selected = ((int32)current == i);
             if (ImGui::Selectable(typeNames[i], selected))
@@ -524,7 +532,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     ImGui_ImplWin32_Init((void*)hWnd);
-    ImGui_ImplDX11_Init(renderer.Device, renderer.DeviceContext);
+    ImGui_ImplDX11_Init(GGraphicsDevice.GetDevice(), GGraphicsDevice.GetDeviceContext());
 
     ////Mesh Resource 만들기.
     //FMeshResource* SphereResource = new FMeshResource();
@@ -677,7 +685,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     GUObjectArray.RemoveObj(Floor);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
-    while (bIsExit == false)
+    while (bIsExit == false && !bStopRender)
     {
         QueryPerformanceCounter(&startTime);
 
@@ -698,6 +706,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 break;
             }
         }
+
+        if (bResizeWindow)
+        {
+            renderer.ResizeWindow(screenWidth, screenHeight, &bStopRender);
+            bResizeWindow = false;
+        }
+
         ////////////////////////////////////////////
         // 매번 실행되는 코드를 여기에 추가합니다.
         // 준비 작업
@@ -903,15 +918,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);*/
 
         
-        ////리스트 돌면서 렌더
-        //if (!bStopRender)
-        //{
-            renderer.RenderScene(GUObjectArray.GetAllObjects(), Camera, 0.f);
-        //}
-        //else
-        //{
-        //    renderer.ResizeWindow(&bStopRender);
-        //}
+        //리스트 돌면서 렌더
+        renderer.RenderScene(GUObjectArray.GetAllObjects(), Camera, 0.f);
 
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();

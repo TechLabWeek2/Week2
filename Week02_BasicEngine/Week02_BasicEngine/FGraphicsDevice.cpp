@@ -178,9 +178,24 @@ D3D11_VIEWPORT FGraphicsDevice::GetViewport() const
 	return ViewportInfo;
 }
 
+void FGraphicsDevice::ResizeViewport(UINT width, UINT height)
+{
+	ViewportInfo.Width = (float)width;
+	ViewportInfo.Height = (float)height;
+}
+
+void FGraphicsDevice::BindViewport(ID3D11DeviceContext* context)
+{
+	context->RSSetViewports(1, &ViewportInfo);
+}
+
 ID3D11Texture2D* FGraphicsDevice::GetRenderTarget() const
 {
 	return FrameBuffer;
+}
+void FGraphicsDevice::SetRenderTarget(ID3D11Texture2D* frameBuffer)
+{
+	FrameBuffer = frameBuffer;
 }
 
 ID3D11RenderTargetView* FGraphicsDevice::GetRenderTargetView() const
@@ -188,12 +203,26 @@ ID3D11RenderTargetView* FGraphicsDevice::GetRenderTargetView() const
 	return FrameBufferRTV;
 }
 
+void FGraphicsDevice::SetRenderTargetView(ID3D11RenderTargetView* rtv)
+{
+	FrameBufferRTV = rtv;
+}
+
+
 ID3D11Texture2D* FGraphicsDevice::GetDepthStencilBuffer() const
 {
 	return DepthStencilBuffer;
+}
+void FGraphicsDevice::SetDepthStencilBuffer(ID3D11Texture2D* dsb)
+{
+	DepthStencilBuffer = dsb;
 }
 
 ID3D11DepthStencilView* FGraphicsDevice::GetDepthStencilView() const
 {
 	return DepthStencilView;
+}
+void FGraphicsDevice::SetDepthStencilView(ID3D11DepthStencilView* dsv)
+{
+	DepthStencilView = dsv;
 }

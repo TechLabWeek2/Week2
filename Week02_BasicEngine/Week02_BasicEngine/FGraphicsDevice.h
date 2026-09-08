@@ -42,12 +42,18 @@ public:
 	ID3D11DeviceContext* GetDeviceContext()const;
 	IDXGISwapChain* GetSwapChain()const;
 	D3D11_VIEWPORT GetViewport()const;
+	void ResizeViewport(UINT width, UINT height);
+	void BindViewport(ID3D11DeviceContext* context);
 
 	ID3D11Texture2D* GetRenderTarget()const;
+	void SetRenderTarget(ID3D11Texture2D*);
 	ID3D11RenderTargetView* GetRenderTargetView()const;
+	void SetRenderTargetView(ID3D11RenderTargetView*);
 
 	ID3D11Texture2D* GetDepthStencilBuffer() const;
+	void SetDepthStencilBuffer(ID3D11Texture2D*);
 	ID3D11DepthStencilView* GetDepthStencilView() const;
+	void SetDepthStencilView(ID3D11DepthStencilView*);
 
 private:
 	ID3D11Device* Device = nullptr; // GPU와 통신하기 위한 Direct3D 장치

@@ -17,7 +17,7 @@ void URenderer::CreateConstantBuffer() {
 	constantbufferdesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	constantbufferdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-	HRESULT hr = Device->CreateBuffer(&constantbufferdesc, nullptr, &ConstantBuffer);
+	HRESULT hr = GGraphicsDevice.GetDevice()->CreateBuffer(&constantbufferdesc, nullptr, &ConstantBuffer);
 	if (FAILED(hr))
 	{
 		assert(false);
@@ -40,7 +40,7 @@ void URenderer::UpdateConstant(FMatrix Matrix, bool bIsSelected)
 	{
 		D3D11_MAPPED_SUBRESOURCE constantbufferMSR;
 
-		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
+		GGraphicsDevice.GetDeviceContext()->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
 
 		FConstants* constants = (FConstants*)constantbufferMSR.pData;
 		{
@@ -53,7 +53,7 @@ void URenderer::UpdateConstant(FMatrix Matrix, bool bIsSelected)
 			constants->Padding[2] = 0.0f;
 		}
 
-		DeviceContext->Unmap(ConstantBuffer, 0);
+		GGraphicsDevice.GetDeviceContext()->Unmap(ConstantBuffer, 0);
 	}
 }
 
@@ -74,7 +74,7 @@ void URenderer::CreateShader()
 		assert(false);
 	}
 
-	hr = Device->CreateVertexShader(vertexshaderCSO->GetBufferPointer(), vertexshaderCSO->GetBufferSize(), nullptr, &SimpleVertexShader);
+	hr = GGraphicsDevice.GetDevice()->CreateVertexShader(vertexshaderCSO->GetBufferPointer(), vertexshaderCSO->GetBufferSize(), nullptr, &SimpleVertexShader);
 
 	if (FAILED(hr))
 	{
@@ -87,7 +87,7 @@ void URenderer::CreateShader()
 		assert(false);
 	}
 
-	hr = Device->CreatePixelShader(pixelshaderCSO->GetBufferPointer(), pixelshaderCSO->GetBufferSize(), nullptr, &SimplePixelShader);
+	hr = GGraphicsDevice.GetDevice()->CreatePixelShader(pixelshaderCSO->GetBufferPointer(), pixelshaderCSO->GetBufferSize(), nullptr, &SimplePixelShader);
 	if (FAILED(hr))
 	{
 		assert(false);
@@ -99,7 +99,7 @@ void URenderer::CreateShader()
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	hr = Device->CreateInputLayout(layout, ARRAYSIZE(layout), vertexshaderCSO->GetBufferPointer(), vertexshaderCSO->GetBufferSize(), &SimpleInputLayout);
+	hr = GGraphicsDevice.GetDevice()->CreateInputLayout(layout, ARRAYSIZE(layout), vertexshaderCSO->GetBufferPointer(), vertexshaderCSO->GetBufferSize(), &SimpleInputLayout);
 	if (FAILED(hr))
 	{
 		assert(false);
@@ -139,7 +139,7 @@ void URenderer::CreateRasterizerState()
 	rasterizerdesc.FillMode = D3D11_FILL_SOLID; // 채우기 모드
 	rasterizerdesc.CullMode = D3D11_CULL_BACK; // 백 페이스 컬링
 
-	HRESULT hr = Device->CreateRasterizerState(&rasterizerdesc, &RasterizerState_Solid);
+	HRESULT hr = GGraphicsDevice.GetDevice()->CreateRasterizerState(&rasterizerdesc, &RasterizerState_Solid);
 	if (FAILED(hr))
 	{
 		assert(false);
@@ -147,7 +147,7 @@ void URenderer::CreateRasterizerState()
 
 	rasterizerdesc.FillMode = D3D11_FILL_WIREFRAME;
 	rasterizerdesc.CullMode = D3D11_CULL_BACK; // 백 페이스 컬링
-	hr = Device->CreateRasterizerState(&rasterizerdesc, &RasterizerState_WireFrame);
+	hr = GGraphicsDevice.GetDevice()->CreateRasterizerState(&rasterizerdesc, &RasterizerState_WireFrame);
 	if (FAILED(hr))
 	{
 		assert(false);
@@ -155,7 +155,7 @@ void URenderer::CreateRasterizerState()
 
 	rasterizerdesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerdesc.CullMode = D3D11_CULL_FRONT; // 백 페이스 컬링
-	hr = Device->CreateRasterizerState(&rasterizerdesc, &RasterizerState_FrontCulling);
+	hr = GGraphicsDevice.GetDevice()->CreateRasterizerState(&rasterizerdesc, &RasterizerState_FrontCulling);
 	if (FAILED(hr))
 	{
 		assert(false);
@@ -178,7 +178,7 @@ void URenderer::Release()
 	RasterizerState_Solid->Release();
 
 	// 렌더 타겟을 초기화
-	DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+	GGraphicsDevice.GetDeviceContext()->OMSetRenderTargets(0, nullptr, nullptr);
 
 	ReleaseDepthStencilState();
 }
@@ -186,29 +186,30 @@ void URenderer::Release()
 //D3D11 렌더링에 필요한 준비 작업을 위한 Prepare 함수
 void URenderer::Prepare()
 {
-	DeviceContext->ClearRenderTargetView(FrameBufferRTV, ClearColor);
+	GGraphicsDevice.GetDeviceContext()->ClearRenderTargetView(GGraphicsDevice.GetRenderTargetView(), ClearColor);
 
-	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	DeviceContext->RSSetViewports(1, &ViewportInfo);
-	DeviceContext->RSSetState(RasterizerState_Solid);
+	GGraphicsDevice.BindViewport(GGraphicsDevice.GetDeviceContext());
+	GGraphicsDevice.GetDeviceContext()->RSSetState(RasterizerState_Solid);
 
-	DeviceContext->OMSetRenderTargets(1, &FrameBufferRTV, DepthStencilView);
-	DeviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
-	DeviceContext->OMSetDepthStencilState(DepthStencilState, 1);
-	DeviceContext->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH, 1.f, 0);
+	ID3D11RenderTargetView* tempRTV = GGraphicsDevice.GetRenderTargetView();
+	GGraphicsDevice.GetDeviceContext()->OMSetRenderTargets(1, &tempRTV, GGraphicsDevice.GetDepthStencilView());
+	GGraphicsDevice.GetDeviceContext()->OMSetBlendState(nullptr, nullptr, 0xffffffff);
+	GGraphicsDevice.GetDeviceContext()->OMSetDepthStencilState(DepthStencilState, 1);
+	GGraphicsDevice.GetDeviceContext()->ClearDepthStencilView(GGraphicsDevice.GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.f, 0);
 }
 
 //Simple Shader 사용을 위한 PrepareShader 함수
 void URenderer::PrepareShader()
 {
-	DeviceContext->VSSetShader(SimpleVertexShader, nullptr, 0);
-	DeviceContext->PSSetShader(SimplePixelShader, nullptr, 0);
-	DeviceContext->IASetInputLayout(SimpleInputLayout);
+	GGraphicsDevice.GetDeviceContext()->VSSetShader(SimpleVertexShader, nullptr, 0);
+	GGraphicsDevice.GetDeviceContext()->PSSetShader(SimplePixelShader, nullptr, 0);
+	GGraphicsDevice.GetDeviceContext()->IASetInputLayout(SimpleInputLayout);
 
 	//버텍스 쉐이더에 상수 버퍼 설정
 	if (ConstantBuffer) {
-		DeviceContext->VSSetConstantBuffers(0, 1, &ConstantBuffer);
+		GGraphicsDevice.GetDeviceContext()->VSSetConstantBuffers(0, 1, &ConstantBuffer);
 	}
 }
 
@@ -216,9 +217,9 @@ void URenderer::PrepareShader()
 void URenderer::RenderPrimitive(ID3D11Buffer* pBuffer, UINT numVertices)
 {
 	UINT offset = 0;
-	DeviceContext->IASetVertexBuffers(0, 1, &pBuffer, &Stride, &offset);
+	GGraphicsDevice.GetDeviceContext()->IASetVertexBuffers(0, 1, &pBuffer, &Stride, &offset);
 
-	DeviceContext->Draw(numVertices, 0);
+	GGraphicsDevice.GetDeviceContext()->Draw(numVertices, 0);
 }
 
 //버텍스 버퍼 생성
@@ -233,7 +234,7 @@ ID3D11Buffer* URenderer::CreateVertexBuffer(FVertexSimple* vertices, UINT byteWi
 
 	ID3D11Buffer* vertexBuffer;
 
-	Device->CreateBuffer(&vertexbufferdesc, &vertexbufferSRD, &vertexBuffer);
+	GGraphicsDevice.GetDevice()->CreateBuffer(&vertexbufferdesc, &vertexbufferSRD, &vertexBuffer);
 
 	return vertexBuffer;
 }
@@ -250,7 +251,7 @@ void URenderer::CreateDepthStencilState()
 	depthstencildesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthstencildesc.StencilEnable = false;
 
-	HRESULT hr = Device->CreateDepthStencilState(&depthstencildesc, &DepthStencilState);
+	HRESULT hr = GGraphicsDevice.GetDevice()->CreateDepthStencilState(&depthstencildesc, &DepthStencilState);
 	if (FAILED(hr))
 	{
 		assert(false);
@@ -282,9 +283,9 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 		UPrimitiveComponent* PrimitiveComponent = dynamic_cast<UPrimitiveComponent*>(Objects[i]);
 		if (PrimitiveComponent && PrimitiveComponent->bIsActive)
 		{
-			DeviceContext->RSSetState(FindRasterizerState(PrimitiveComponent->GetRasterizerState()));
+			GGraphicsDevice.GetDeviceContext()->RSSetState(FindRasterizerState(PrimitiveComponent->GetRasterizerState()));
 			UpdateConstant(PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix(), PrimitiveComponent->bIsSelected);
-			DeviceContext->IASetPrimitiveTopology(PrimitiveComponent->GetMeshResource()->GetTopology());
+			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(PrimitiveComponent->GetMeshResource()->GetTopology());
 			RenderPrimitive(PrimitiveComponent->GetMeshResource()->GetVertexBuffer(), PrimitiveComponent->GetMeshResource()->GetNumVertices());
 		}
 	}
@@ -293,18 +294,18 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 
 void URenderer::Init()
 {
-	Device = GGraphicsDevice.GetDevice();
-	DeviceContext = GGraphicsDevice.GetDeviceContext();
-	SwapChain = GGraphicsDevice.GetSwapChain();
-	ViewportInfo = GGraphicsDevice.GetViewport();
+	//Device = GGraphicsDevice.GetDevice();
+	//DeviceContext = GGraphicsDevice.GetDeviceContext();
+	//SwapChain = GGraphicsDevice.GetSwapChain();
+	//ViewportInfo = GGraphicsDevice.GetViewport();
 
-	FrameBuffer = GGraphicsDevice.GetRenderTarget();
-	FrameBufferRTV = GGraphicsDevice.GetRenderTargetView();
+	//FrameBuffer = GGraphicsDevice.GetRenderTarget();
+	//FrameBufferRTV = GGraphicsDevice.GetRenderTargetView();
 
 	CreateRasterizerState();
 
-	DepthStencilBuffer = GGraphicsDevice.GetDepthStencilBuffer();
-	DepthStencilView = GGraphicsDevice.GetDepthStencilView();
+	//DepthStencilBuffer = GGraphicsDevice.GetDepthStencilBuffer();
+	//DepthStencilView = GGraphicsDevice.GetDepthStencilView();
 
 	CreateDepthStencilState();
 }
@@ -328,22 +329,62 @@ ID3D11RasterizerState* URenderer::FindRasterizerState(RasterizerState StateType)
 	return nullptr;
 }
 
-void URenderer::ResizeWindow(bool* bStopRender)
+void URenderer::ResizeWindow(long newScreenWidth, long newScreenHeight, bool* bStopRender)
 {
-	
+	ReleaseWindow();
+	RecreateWindow(newScreenWidth, newScreenHeight);
 }
 
 void URenderer::ReleaseWindow()
 {
-	if (FrameBufferRTV)
+	GGraphicsDevice.GetDeviceContext()->OMSetRenderTargets(0, nullptr, nullptr);
+	if (GGraphicsDevice.GetRenderTargetView())
 	{
-		FrameBufferRTV->Release();
-		FrameBufferRTV = nullptr;
+		GGraphicsDevice.GetRenderTargetView()->Release();
+		GGraphicsDevice.SetRenderTargetView(nullptr);
 	}
-	//if (Depth)
+	if (GGraphicsDevice.GetDepthStencilView())
+	{
+		GGraphicsDevice.GetDepthStencilView()->Release();
+		GGraphicsDevice.SetDepthStencilView(nullptr);
+	}
+	if (GGraphicsDevice.GetDepthStencilBuffer())
+	{
+		GGraphicsDevice.GetDepthStencilBuffer()->Release();
+		GGraphicsDevice.SetDepthStencilBuffer(nullptr);
+	}
+	if (GGraphicsDevice.GetRenderTarget())
+	{
+		GGraphicsDevice.GetRenderTarget()->Release();
+		GGraphicsDevice.SetRenderTarget(nullptr);
+	}
 }
 
-void URenderer::RecreateWindow()
+void URenderer::RecreateWindow(long newScreenWidth, long newScreenHeight)
 {
+	HRESULT hr = GGraphicsDevice.GetSwapChain()->ResizeBuffers(2, newScreenWidth, newScreenHeight, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
 
+	ID3D11Texture2D* newBuffer = nullptr;
+	HRESULT hr_ = GGraphicsDevice.GetSwapChain()->GetBuffer(0, IID_PPV_ARGS(&newBuffer));
+	if (FAILED(hr_))
+	{
+		assert(false);
+	}
+	GGraphicsDevice.SetRenderTarget(newBuffer);
+
+	ID3D11RenderTargetView* newRTV;
+	D3D11_RENDER_TARGET_VIEW_DESC framebufferRTVdesc = {};
+	framebufferRTVdesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB; 
+	framebufferRTVdesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D; 
+	GGraphicsDevice.GetDevice()->CreateRenderTargetView(newBuffer, &framebufferRTVdesc, &newRTV);
+	GGraphicsDevice.SetRenderTargetView(newRTV);
+
+	GGraphicsDevice.CreateDepthStencilBuffer(newScreenWidth, newScreenHeight);
+
+	GGraphicsDevice.ResizeViewport(newScreenWidth, newScreenHeight);
+	GGraphicsDevice.BindViewport(GGraphicsDevice.GetDeviceContext());
 }
