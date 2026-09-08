@@ -34,29 +34,6 @@ void URenderer::ReleaseConstantBuffer()
 }
 
 //상수 버퍼를 갱신하는 함수
-void URenderer::UpdateConstant(FMatrix Matrix, bool bIsSelected)
-{
-	if (ConstantBuffer)
-	{
-		D3D11_MAPPED_SUBRESOURCE constantbufferMSR;
-
-		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
-
-		FConstants* constants = (FConstants*)constantbufferMSR.pData;
-		{
-			constants->MVP = Matrix;
-
-			// HighLightIntensity를 bIsSelected 값에 따라 설정
-			constants->HightLightIntensity = bIsSelected ? 2.0f : 1.0f; 
-			constants->Padding[0] = 0.0f;
-			constants->Padding[1] = 0.0f;
-			constants->Padding[2] = 0.0f;
-		}
-
-		DeviceContext->Unmap(ConstantBuffer, 0);
-	}
-}
-
 void URenderer::UpdateConstant(FConstants& ConstantData)
 {
 	if (ConstantBuffer)
@@ -291,7 +268,7 @@ void URenderer::ReleaseDepthStencilState()
 	}
 }
 
-void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* Camera, float AspectRatio)
+void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* Camera)
 {
 	if (Objects.IsEmpty()) return;
 
@@ -324,7 +301,7 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 			RenderPrimitive(PrimitiveComponent->GetMeshResource()->GetVertexBuffer(), PrimitiveComponent->GetMeshResource()->GetNumVertices());
 		}
 	}
-
+	 
 }
 
 void URenderer::Init()
@@ -390,26 +367,10 @@ void URenderer::CreateBlendState()
 {
 	assert(Device);
 	if (!Device) return;
-	{
-		BOOL AlphaToCoverageEnable;
-		BOOL IndependentBlendEnable;
-		D3D11_RENDER_TARGET_BLEND_DESC RenderTarget[8];
-	}
-	//D3D11_RENDER_TARGET_BLEND_DESC
-	{
-	BOOL BlendEnable;
-	D3D11_BLEND SrcBlend;
-	D3D11_BLEND DestBlend;
-	D3D11_BLEND_OP BlendOp;
-	D3D11_BLEND SrcBlendAlpha;
-	D3D11_BLEND DestBlendAlpha;
-	D3D11_BLEND_OP BlendOpAlpha;
-	UINT8 RenderTargetWriteMask;
-	}
 
 	//불투명
 	D3D11_BLEND_DESC OpaqueDesc = {};
-	OpaqueDesc.RenderTarget[0].BlendEnable = false;
+	OpaqueDesc.RenderTarget[0].BlendEnable = FALSE;
 	OpaqueDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	HRESULT hr = Device->CreateBlendState(&OpaqueDesc, &BlendState_Opaque);
 	if (FAILED(hr))
@@ -419,18 +380,19 @@ void URenderer::CreateBlendState()
 
 	//반투명
 	D3D11_BLEND_DESC AlphaDesc = {};
-	AlphaDesc.RenderTarget[0].BlendEnable = true;
+	AlphaDesc.RenderTarget[0].BlendEnable = TRUE;
 	AlphaDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	AlphaDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;  // 기존 화면색 * (1-알파)
 	AlphaDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;         // 둘을 더함
 	AlphaDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
 	AlphaDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	AlphaDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;	
+	AlphaDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-	hr = Device->CreateBlendState(&OpaqueDesc, &BlendState_Alpha);
+	hr = Device->CreateBlendState(&AlphaDesc, &BlendState_Alpha);
 	if (FAILED(hr))
 	{
-		assert(false);
+		assert(false);  
 	}
 }
 

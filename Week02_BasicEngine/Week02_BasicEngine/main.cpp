@@ -660,7 +660,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test6->RelativeLocation = FVector(0, 0, -1);
     Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
 
-    TArray<float> Red = { 1.f, 0.f, 0.f, 1.f };
+    TArray<float> Red = { 1.f, 0.f, 0.f, 1.0f };
     TArray<float> Green = { 0.f, 1.f, 0.f, 1.f };
     TArray<float> Blue = { 0.f, 0.f, 1.f, 1.f };
     XGizmo->SetModelColor(Red);
@@ -763,10 +763,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
         }
         if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
-            Camera->RelativeLocation.y += cameraSpeed;
+            Camera->RelativeLocation.y -= cameraSpeed;
         }
         if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
-            Camera->RelativeLocation.y -= cameraSpeed;
+            Camera->RelativeLocation.y += cameraSpeed;
         }
         if (GetAsyncKeyState(VK_SPACE) & 0x0001) {
             switch (XGizmo->Type) {
@@ -913,11 +913,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             lastMousePos = currentMousePos;
             pickedGizmoPtr = nullptr;
         }
+
+        //오브젝트 순회하면서 Update 호출
+        TArray<UObject*>& AllObj = GUObjectArray.GetAllObjects();
+        for (int i = 0; i < AllObj.Num(); i++)
+        {
+            if (AllObj[i] == nullptr) continue;
+
+            //UPrimitiveComponent만 Render하도록
+            UPrimitiveComponent* PrimitiveComponent = dynamic_cast<UPrimitiveComponent*>(AllObj[i]);
+            if (PrimitiveComponent && PrimitiveComponent->bIsActive)
+            {
+                PrimitiveComponent->Update(elapsedTime);
+            }
+        }
         
         ////리스트 돌면서 렌더
         //if (!bStopRender)
         //{
-            renderer.RenderScene(GUObjectArray.GetAllObjects(), Camera, 0.f);
+            renderer.RenderScene(GUObjectArray.GetAllObjects(), Camera);
         //}
         //else
         //{

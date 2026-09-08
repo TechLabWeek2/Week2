@@ -27,5 +27,4 @@ FMatrix USceneComponent::GetModelMatrix() const
 
 void USceneComponent::Update(float deltaTime)
 {
-	std::wcout << FString(L"SceneComponent Update") << std::endl;
 }
