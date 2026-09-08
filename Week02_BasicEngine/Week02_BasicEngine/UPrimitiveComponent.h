@@ -42,7 +42,13 @@ public:
 		static UClass Class("UPrimitiveComponent", USceneComponent::StaticClass());
 		return &Class;
 	}
+
+	RasterizerState GetRasterizerState()const;
+	void SetRasterizerState(RasterizerState StateType);
+
 private:
     //메시 데이터
     FMeshResource* MeshResource = nullptr;
+
+	RasterizerState RasterizerStateType = RasterizerState::Solid;
 };

@@ -11,7 +11,7 @@ class FMeshResource
 public:
 	//VertexBuffer, IndexBuffer 생성
 	void CreateVertexBuffer();
-	void SetTopology(D3D11_PRIMITIVE_TOPOLOGY pTopology);
+
 	D3D11_PRIMITIVE_TOPOLOGY GetTopology()const;
 
 	void Release();
@@ -33,8 +33,6 @@ public:
 private:
 	//Vertices 등이 담긴 메시 데이터
 	ResourceData MeshResourceData;
-	//TArray<FVertexSimple> Vertices;
-	//D3D11_PRIMITIVE_TOPOLOGY Topology;
 	UINT numVertices;
 	ID3D11Buffer* VertexBuffer;
 	ID3D11Buffer* IndexBuffer;
