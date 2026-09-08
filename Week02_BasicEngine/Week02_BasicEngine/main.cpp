@@ -645,9 +645,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     UCubeComp* Test5 = new UCubeComp();
     USphereComp* Test6 = new USphereComp(); 
     UPlaneComp* Test7 = new UPlaneComp();
-    UGizmo* XGizmo = new UGizmo();
-    UGizmo* YGizmo = new UGizmo();
-    UGizmo* ZGizmo = new UGizmo();
+    UGizmo* XGizmo = new UGizmo(ETypeAxis::XAxis);
+    UGizmo* YGizmo = new UGizmo(ETypeAxis::YAxis);
+    UGizmo* ZGizmo = new UGizmo(ETypeAxis::ZAxis);
 
     Test->SetMeshResource(&CubeResourceData);
     Test2->SetMeshResource(&CubeResourceData);
@@ -672,6 +672,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     YGizmo->RelativeRotation = FVector(0, 0, 1.57);
     ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
 
+    Test->RelativeLocation = FVector(1, 0, 0);
+    Test2->RelativeLocation = FVector(-1, 0, 0);
+    Test3->RelativeLocation = FVector(0, 1, 0);
+    Test3->RelativeRotation = FVector(0, 0, 1.57);
+    Test4->RelativeLocation = FVector(0, -1, 0);
+    Test5->RelativeLocation = FVector(0, 0, 1);
+    Test5->RelativeRotation = FVector(0, -1.57, 0);
+    Test6->RelativeLocation = FVector(0, 0, -1);
+    Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
     UFloorComp* Floor = new UFloorComp();
     Floor->ConstructFloor(&Floor1ResourceData, &Floor2ResourceData);
     GUObjectArray.RemoveObj(Floor);
@@ -772,35 +781,35 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
         if (GetAsyncKeyState(VK_SPACE) & 0x0001) {
             switch (XGizmo->Type) {
-            case UTypeTransform::Location:
+            case ETypeTransform::Location:
                 XGizmo->SetMeshResource(&RotationGizmoResourceData);
                 YGizmo->SetMeshResource(&RotationGizmoResourceData);
                 ZGizmo->SetMeshResource(&RotationGizmoResourceData);
-                XGizmo->Type = UTypeTransform::Rotation;
-                YGizmo->Type = UTypeTransform::Rotation;
-                ZGizmo->Type = UTypeTransform::Rotation;
+                XGizmo->Type = ETypeTransform::Rotation;
+                YGizmo->Type = ETypeTransform::Rotation;
+                ZGizmo->Type = ETypeTransform::Rotation;
                 XGizmo->RelativeRotation = FVector(0, 1.57, 0);
                 YGizmo->RelativeRotation = FVector(1.57, 0, 0);
                 ZGizmo->RelativeRotation = FVector(0, 0, 0);
                 break;
-            case UTypeTransform::Rotation:
+            case ETypeTransform::Rotation:
                 XGizmo->SetMeshResource(&ScaleGizmoResourceData);
                 YGizmo->SetMeshResource(&ScaleGizmoResourceData);
                 ZGizmo->SetMeshResource(&ScaleGizmoResourceData);
-                XGizmo->Type = UTypeTransform::Scale;
-                YGizmo->Type = UTypeTransform::Scale;
-                ZGizmo->Type = UTypeTransform::Scale;
+                XGizmo->Type = ETypeTransform::Scale;
+                YGizmo->Type = ETypeTransform::Scale;
+                ZGizmo->Type = ETypeTransform::Scale;
                 XGizmo->RelativeRotation = FVector(0, 0, 0);
                 YGizmo->RelativeRotation = FVector(0, 0, 1.57);
                 ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
                 break;
-            case UTypeTransform::Scale:
+            case ETypeTransform::Scale:
                 XGizmo->SetMeshResource(&LocationGizmoResourceData);
                 YGizmo->SetMeshResource(&LocationGizmoResourceData);
                 ZGizmo->SetMeshResource(&LocationGizmoResourceData);
-                XGizmo->Type = UTypeTransform::Location;
-                YGizmo->Type = UTypeTransform::Location;
-                ZGizmo->Type = UTypeTransform::Location;
+                XGizmo->Type = ETypeTransform::Location;
+                YGizmo->Type = ETypeTransform::Location;
+                ZGizmo->Type = ETypeTransform::Location;
                 XGizmo->RelativeRotation = FVector(0, 0, 0);
                 YGizmo->RelativeRotation = FVector(0, 0, 1.57);
                 ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
@@ -830,7 +839,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
             lastMousePos = currentMousePos;
         }
-        else if (isLeftMousePressed)
+        else if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000))
         {
             if (!io.WantCaptureMouse)
             {
@@ -845,43 +854,66 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 float ndcX = 2.f * (float)currentMousePos.x / screenWidth - 1.f;  // screen xy to NDC xy
                 float ndcY = 1.f - 2.f * (float)currentMousePos.y / screenHeight;
 
-                if (pickedObjectPtr != nullptr)
-                {
-                    pickedGizmoPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
-                    if (pickedGizmoPtr == nullptr) {
-                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                        pickedObjectPtr = nullptr;
-                        XGizmo->bIsActive = false;
-                        YGizmo->bIsActive = false;
-                        ZGizmo->bIsActive = false;
+                if (pickedGizmoPtr) {
+                    if (!isDragging && !io.WantCaptureMouse)
+                    {
+                        isDragging = true;
+                        lastMousePos = currentMousePos;
                     }
-                    else if (pickedGizmoPtr->IsA(UGizmo::StaticClass())) {
-                        pickedGizmoPtr->bIsSelected = !pickedGizmoPtr->bIsSelected;
-                    }else{
-                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
 
-                        pickedObjectPtr = pickedGizmoPtr;
-                        pickedGizmoPtr = nullptr;
-                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                        XGizmo->bIsActive = true;
-                        YGizmo->bIsActive = true;
-                        ZGizmo->bIsActive = true;
-                        XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                        YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                        ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                    }
+                    float sensitivity = 0.002f;
+                    float deltaX = (float)(currentMousePos.x - lastMousePos.x) * sensitivity;
+                    float deltaY = (float)(currentMousePos.y - lastMousePos.y) * sensitivity;
+
+                    FVector MouseMove = XAxis * deltaX + YAxis * deltaY;
+                    static_cast<UGizmo*>(pickedGizmoPtr)->Update(pickedObjectPtr, MouseMove);
+                    XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                    YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                    ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+
+                    lastMousePos = currentMousePos;
                 }
-                else {
-                    pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+
+                if (!isDragging) {
                     if (pickedObjectPtr != nullptr)
                     {
-                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                        XGizmo->bIsActive = true;
-                        YGizmo->bIsActive = true;
-                        ZGizmo->bIsActive = true;
-                        XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                        YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                        ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        pickedGizmoPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                        if (pickedGizmoPtr == nullptr) {
+                            pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                            pickedObjectPtr = nullptr;
+                            XGizmo->bIsActive = false;
+                            YGizmo->bIsActive = false;
+                            ZGizmo->bIsActive = false;
+                        }
+                        else if (pickedGizmoPtr->IsA(UGizmo::StaticClass())) {
+                            pickedGizmoPtr->bIsSelected = !pickedGizmoPtr->bIsSelected;
+                        }
+                        else {
+                            pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+
+                            pickedObjectPtr = pickedGizmoPtr;
+                            pickedGizmoPtr = nullptr;
+                            pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                            XGizmo->bIsActive = true;
+                            YGizmo->bIsActive = true;
+                            ZGizmo->bIsActive = true;
+                            XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                            YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                            ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        }
+                    }
+                    else {
+                        pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                        if (pickedObjectPtr != nullptr)
+                        {
+                            pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                            XGizmo->bIsActive = true;
+                            YGizmo->bIsActive = true;
+                            ZGizmo->bIsActive = true;
+                            XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                            YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                            ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        }
                     }
                 }
             }
@@ -890,18 +922,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
             isDragging = false;
             lastMousePos = currentMousePos;
+            pickedGizmoPtr = nullptr;
         }
-             
-/*        Test->RelativeLocation = FVector(1, 0, 0);
-        Test2->RelativeLocation = FVector(-1, 0, 0);
-        Test3->RelativeLocation = FVector(0, 1, 0);
-        Test3->RelativeRotation = FVector(0,0, 1.57);
-        Test4->RelativeLocation = FVector(0, -1, 0);
-        Test5->RelativeLocation = FVector(0, 0, 1);
-        Test5->RelativeRotation = FVector(0, -1.57, 0);
-        Test6->RelativeLocation = FVector(0, 0, -1);
-        Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);*/
-
         
         ////리스트 돌면서 렌더
         //if (!bStopRender)
