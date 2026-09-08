@@ -108,4 +108,10 @@ public:
     void RenderScene(const TArray<UObject*> Objects, const UCameraComp* Camera, float AspectRatio);
 
     void Init();
+
+    void ResizeWindow(bool* bStopRender);
+
+    void ReleaseWindow();
+
+    void RecreateWindow();
 };

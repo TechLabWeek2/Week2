@@ -291,3 +291,23 @@ void URenderer::Init()
 
 	CreateDepthStencilState();
 }
+
+void URenderer::ResizeWindow(bool* bStopRender)
+{
+	
+}
+
+void URenderer::ReleaseWindow()
+{
+	if (FrameBufferRTV)
+	{
+		FrameBufferRTV->Release();
+		FrameBufferRTV = nullptr;
+	}
+	//if (Depth)
+}
+
+void URenderer::RecreateWindow()
+{
+
+}

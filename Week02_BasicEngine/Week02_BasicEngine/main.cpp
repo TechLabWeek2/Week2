@@ -15,8 +15,8 @@
 #include "UGizmo.h"
 #include "UFloorComp.h"
 
-#define SCREEN_WIDTH 1800
-#define SCREEN_HEIGHT 1200
+#define SCREEN_WIDTH_INIT 1800
+#define SCREEN_HEIGHT_INIT 1200
 
 //#if IMGUI_VERSION_NUM >= 19263
 //namespace ImGui { extern IMGUI_API void DemoMarker(const char* file, int line, const char* section); }
@@ -40,12 +40,11 @@
 #include "imGui/imgui_impl_win32.h"
 #include "ExampleAppConsole.h"
 
-UCameraComp* Camera = new UCameraComp();
+UINT screenWidth = SCREEN_WIDTH_INIT;
+UINT screenHeight = SCREEN_HEIGHT_INIT;
+bool bStopRender = false;
 
-//enum ETypeLine {
-//    ETL_LB,
-//    OTHER
-//};
+UCameraComp* Camera = new UCameraComp();
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -56,12 +55,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         return true;
     }
-
+    RECT rect;
+    long width;
+    long height;
     switch (message)
     {
     case WM_DESTROY:
         // Signal that the app should quit
         PostQuitMessage(0);
+        break;
+    case WM_SIZE:
+        GetClientRect(hWnd, &rect);
+        width = rect.right - rect.left;
+        height = rect.bottom - rect.top;
+        if (width <= 0 || height <= 0)
+        {
+            bStopRender = true;
+            break;
+        }
+        bStopRender = true;
+        break;
+    case WM_ENTERSIZEMOVE:
+        break;
+    case WM_EXITSIZEMOVE:
+        if (bStopRender)
+        {
+            bStopRender = false;
+            GetClientRect(hWnd, &rect);
+            width = rect.right - rect.left;
+            height = rect.bottom - rect.top;
+            screenWidth = width;
+            screenHeight = height;
+
+        }
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -295,11 +321,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // 1024 x 1024 크기에 윈도우 생성
     HWND hWnd = CreateWindowExW(0, WindowClass, Title, WS_POPUP | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, SCREEN_WIDTH, SCREEN_HEIGHT,
+        CW_USEDEFAULT, CW_USEDEFAULT, screenWidth, screenHeight,
         nullptr, nullptr, hInstance, nullptr);
 
     //공통으로 사용할 Graphics Device를 가지게 됩니다.
-    GGraphicsDevice.Initialize(hWnd, SCREEN_WIDTH, SCREEN_WIDTH);
+    GGraphicsDevice.Initialize(hWnd, screenWidth, screenHeight);
 
     // Renderer Class를 생성합니다.
     URenderer renderer;
@@ -677,8 +703,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
 
         
-        //리스트 돌면서 렌더
-        renderer.RenderScene(GUObjectArray.GetAllObjects(), Camera, 0.f);
+        ////리스트 돌면서 렌더
+        //if (!bStopRender)
+        //{
+            renderer.RenderScene(GUObjectArray.GetAllObjects(), Camera, 0.f);
+        //}
+        //else
+        //{
+        //    renderer.ResizeWindow(&bStopRender);
+        //}
 
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
