@@ -28,3 +28,8 @@ FMatrix USceneComponent::GetModelMatrix() const
 void USceneComponent::Update(float deltaTime)
 {
 }
+
+const FVector& USceneComponent::GetLocation() const
+{
+	return RelativeLocation;
+}

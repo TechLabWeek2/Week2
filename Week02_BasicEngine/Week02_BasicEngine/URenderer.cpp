@@ -273,36 +273,73 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 {
 	if (Objects.IsEmpty()) return;
 
-	/*for (UObject* Obj : GUObjectArray.GetAllObjects())
+	TArray<UPrimitiveComponent*> OpaqueList;
+	TArray<UPrimitiveComponent*> AlphaList;
+
+	//불투명과 반투명으로 나눔
+	for (UObject* Obj : Objects)
 	{
+		UPrimitiveComponent* PrimitiveComponent = dynamic_cast<UPrimitiveComponent*>(Obj);
+		if (PrimitiveComponent == nullptr) continue;
 
-	}*/
-
-	for (int i = 0; i < Objects.Num(); i++)
-	{
-		if (Objects[i] == nullptr) continue;
-
-		//UPrimitiveComponent만 Render하도록
-		UPrimitiveComponent* PrimitiveComponent = dynamic_cast<UPrimitiveComponent*>(Objects[i]);
-		if (PrimitiveComponent && PrimitiveComponent->bIsActive)
+		if (PrimitiveComponent->GetBlendMode() == BlendMode::Opaque)
 		{
-			GGraphicsDevice.GetDeviceContext()->RSSetState(FindRasterizerState(PrimitiveComponent->GetRasterizerState()));
-			GGraphicsDevice.GetDeviceContext()->OMSetBlendState(FindBlendState(PrimitiveComponent->GetBlendMode()), nullptr, 0xffffffff);
-			FConstants TempConstantData = {};
-			TempConstantData.MVP = PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
-			TempConstantData.HightLightIntensity = PrimitiveComponent->bIsSelected ? 2.0 : 1.0;
-			TempConstantData.Color[0] = PrimitiveComponent->GetModelColor()[0];
-			TempConstantData.Color[1] = PrimitiveComponent->GetModelColor()[1];
-			TempConstantData.Color[2] = PrimitiveComponent->GetModelColor()[2];
-			TempConstantData.Color[3] = PrimitiveComponent->GetModelColor()[3];
-			TempConstantData.UseColor = PrimitiveComponent->GetUseColorFlag();
-			UpdateConstant(TempConstantData);
-			//UpdateConstant(PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix(), PrimitiveComponent->bIsSelected);
-			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(PrimitiveComponent->GetMeshResource()->GetTopology());
-			RenderPrimitive(PrimitiveComponent->GetMeshResource()->GetVertexBuffer(), PrimitiveComponent->GetMeshResource()->GetNumVertices());
+			OpaqueList.Add(PrimitiveComponent);
+		}
+		else
+		{
+			AlphaList.Add(PrimitiveComponent);
 		}
 	}
-	 
+
+	//불투명 그리기
+	for (UPrimitiveComponent* Obj : OpaqueList)
+	{
+		if (Obj->bIsActive)
+		{
+			GGraphicsDevice.GetDeviceContext()->RSSetState(FindRasterizerState(Obj->GetRasterizerState()));
+			GGraphicsDevice.GetDeviceContext()->OMSetBlendState(FindBlendState(Obj->GetBlendMode()), nullptr, 0xffffffff);
+
+			FConstants TempConstantData = {};
+			TempConstantData.MVP = Obj->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
+			TempConstantData.HightLightIntensity = Obj->bIsSelected ? 2.0 : 1.0;
+			TempConstantData.Color[0] = Obj->GetModelColor()[0];
+			TempConstantData.Color[1] = Obj->GetModelColor()[1];
+			TempConstantData.Color[2] = Obj->GetModelColor()[2];
+			TempConstantData.Color[3] = Obj->GetModelColor()[3];
+			TempConstantData.UseColor = Obj->GetUseColorFlag();
+			UpdateConstant(TempConstantData);
+
+			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(Obj->GetMeshResource()->GetTopology());
+			RenderPrimitive(Obj->GetMeshResource()->GetVertexBuffer(), Obj->GetMeshResource()->GetNumVertices());
+		}
+	}
+
+	//거리 정렬
+	SortTranslucentByDistance(AlphaList, Camera->GetLocation());
+
+	//반투명 렌더
+	for (UPrimitiveComponent* Obj : AlphaList)
+	{
+		if (Obj->bIsActive)
+		{
+			GGraphicsDevice.GetDeviceContext()->RSSetState(FindRasterizerState(Obj->GetRasterizerState()));
+			GGraphicsDevice.GetDeviceContext()->OMSetBlendState(FindBlendState(Obj->GetBlendMode()), nullptr, 0xffffffff);
+
+			FConstants TempConstantData = {};
+			TempConstantData.MVP = Obj->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
+			TempConstantData.HightLightIntensity = Obj->bIsSelected ? 2.0 : 1.0;
+			TempConstantData.Color[0] = Obj->GetModelColor()[0];
+			TempConstantData.Color[1] = Obj->GetModelColor()[1];
+			TempConstantData.Color[2] = Obj->GetModelColor()[2];
+			TempConstantData.Color[3] = Obj->GetModelColor()[3];
+			TempConstantData.UseColor = Obj->GetUseColorFlag();
+			UpdateConstant(TempConstantData);
+
+			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(Obj->GetMeshResource()->GetTopology());
+			RenderPrimitive(Obj->GetMeshResource()->GetVertexBuffer(), Obj->GetMeshResource()->GetNumVertices());
+		}
+	}	 
 }
 
 void URenderer::Init()
@@ -451,4 +488,15 @@ ID3D11BlendState* URenderer::FindBlendState(BlendMode BlendStateMode) const
 			break;
 	}
 	return nullptr;
+}
+
+void URenderer::SortTranslucentByDistance(TArray<UPrimitiveComponent*>& AlphaList, const FVector& CameraLoc)
+{
+	std::sort(AlphaList.begin(), AlphaList.end(),
+			  [&CameraLoc](UPrimitiveComponent* A, UPrimitiveComponent* B)
+			  {
+				  float DisA = (A->GetLocation() - CameraLoc).SizeSquared();
+				  float DisB = (B->GetLocation() - CameraLoc).SizeSquared();
+				  return DisA > DisB;
+			  });
 }
