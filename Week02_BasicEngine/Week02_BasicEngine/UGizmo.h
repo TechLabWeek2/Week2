@@ -27,5 +27,7 @@ public:
         return &Class;
     }
 
-    void Update(UPrimitiveComponent* Obj, FVector MouseMove);
+    void Update(UPrimitiveComponent* Obj);
+
+    void ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove);
 };

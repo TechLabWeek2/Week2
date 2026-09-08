@@ -783,7 +783,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
             Camera->RelativeLocation.y += cameraSpeed;
         }
-        if (GetAsyncKeyState(VK_SPACE) & 0x0001) {
+        if (pickedObjectPtr && GetAsyncKeyState(VK_SPACE) & 0x0001) {
             switch (XGizmo->Type) {
             case ETypeTransform::Location:
                 XGizmo->SetMeshResource(&RotationGizmoResourceData);
@@ -792,9 +792,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 XGizmo->Type = ETypeTransform::Rotation;
                 YGizmo->Type = ETypeTransform::Rotation;
                 ZGizmo->Type = ETypeTransform::Rotation;
-                XGizmo->RelativeRotation = FVector(0, 1.57, 0);
-                YGizmo->RelativeRotation = FVector(1.57, 0, 0);
-                ZGizmo->RelativeRotation = FVector(0, 0, 0);
                 break;
             case ETypeTransform::Rotation:
                 XGizmo->SetMeshResource(&ScaleGizmoResourceData);
@@ -803,9 +800,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 XGizmo->Type = ETypeTransform::Scale;
                 YGizmo->Type = ETypeTransform::Scale;
                 ZGizmo->Type = ETypeTransform::Scale;
-                XGizmo->RelativeRotation = FVector(0, 0, 0);
-                YGizmo->RelativeRotation = FVector(0, 0, 1.57);
-                ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
                 break;
             case ETypeTransform::Scale:
                 XGizmo->SetMeshResource(&LocationGizmoResourceData);
@@ -814,11 +808,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 XGizmo->Type = ETypeTransform::Location;
                 YGizmo->Type = ETypeTransform::Location;
                 ZGizmo->Type = ETypeTransform::Location;
-                XGizmo->RelativeRotation = FVector(0, 0, 0);
-                YGizmo->RelativeRotation = FVector(0, 0, 1.57);
-                ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
                 break;
             }
+            XGizmo->Update(pickedObjectPtr);
+            YGizmo->Update(pickedObjectPtr);
+            ZGizmo->Update(pickedObjectPtr);
         }
         if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
         {
@@ -876,14 +870,62 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     }
 
                     float sensitivity = 0.002f;
-                    float deltaX = (float)(currentMousePos.x - lastMousePos.x) * sensitivity;
-                    float deltaY = (float)(currentMousePos.y - lastMousePos.y) * sensitivity;
+                    float deltaX = (float)(currentMousePos.x - lastMousePos.x);
+                    float deltaY = (float)(currentMousePos.y - lastMousePos.y);
 
-                    FVector MouseMove = XAxis * deltaX + YAxis * deltaY;
-                    static_cast<UGizmo*>(pickedGizmoPtr)->Update(pickedObjectPtr, MouseMove);
-                    XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                    YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                    ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                    FVector GizmoAxis;
+
+                    switch (static_cast<UGizmo*>(pickedGizmoPtr)->Axis)
+                    {
+                    case ETypeAxis::XAxis:
+                        GizmoAxis = FVector(1, 0, 0);
+                        break;
+
+                    case ETypeAxis::YAxis:
+                        GizmoAxis = FVector(0, 1, 0);
+                        break;
+
+                    case ETypeAxis::ZAxis:
+                        GizmoAxis = FVector(0, 0, 1);
+                        break;
+                    }
+
+                    float GizmoLength = 1.f; //기즈모를 같은 크기로 했을 때 이 변수를 기즈모 길이로 수정
+
+                    FVector ObjectLocation = pickedObjectPtr->RelativeLocation;
+                    FMatrix VP = Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
+                    FVector StartNDC = VP.WorldToNDC(ObjectLocation, VP);
+                    FVector EndNDC = VP.WorldToNDC(ObjectLocation + GizmoAxis * GizmoLength, VP);
+
+                    FVector GizmoDirection = EndNDC - StartNDC;
+                    GizmoDirection.z = 0;
+
+                    GizmoDirection.Normalize();
+
+                    float AxisScreenLength =
+                        GizmoDirection.Length();
+
+                    if (AxisScreenLength > 0.00001f)
+                    {
+                        GizmoDirection.Normalize();
+
+                        // 마우스 이동량을 NDC로 변환
+                        FVector MouseDeltaNDC( deltaX * 2.0f / Width, -deltaY * 2.0f / Height );
+
+                        // 마우스 이동을 Gizmo 화면 방향으로 투영
+                        float MouseAxisMovement =  MouseDeltaNDC.Dot(GizmoDirection);
+
+                        // NDC 이동량 → 월드 이동량
+                        float WorldMoveAmount = MouseAxisMovement / AxisScreenLength;
+
+                        // 선택된 월드 축으로만 이동
+                        FVector WorldMove = GizmoAxis * WorldMoveAmount;
+
+                        static_cast<UGizmo*>(pickedGizmoPtr)->ObjUpdate(pickedObjectPtr, WorldMove);
+                    }
+                    XGizmo->Update(pickedObjectPtr);
+                    YGizmo->Update(pickedObjectPtr);
+                    ZGizmo->Update(pickedObjectPtr);
 
                     lastMousePos = currentMousePos;
                 }

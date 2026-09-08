@@ -428,6 +428,19 @@ void FMatrix::Transpose()
 	}
 }
 
+FVector FMatrix::WorldToNDC(const FVector& P, FMatrix VP)
+{
+	float clipX = P.x * VP.m[0][0] + P.y * VP.m[1][0] + P.z * VP.m[2][0] + VP.m[3][0];
+
+	float clipY = P.x * VP.m[0][1] + P.y * VP.m[1][1] + P.z * VP.m[2][1] + VP.m[3][1];
+
+	float clipZ = P.x * VP.m[0][2] + P.y * VP.m[1][2] + P.z * VP.m[2][2] + VP.m[3][2];
+
+	float clipW = P.x * VP.m[0][3] + P.y * VP.m[1][3] + P.z * VP.m[2][3] + VP.m[3][3];
+
+	return FVector(clipX / clipW, clipY / clipW, clipZ / clipW);
+}
+
 static FMatrix GetModelMatrix(const FVector& Location, const FVector& Rotation, const FVector& Scale)
 {
 	return  FMatrix::Scaling(Scale) *
