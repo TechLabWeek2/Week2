@@ -77,7 +77,6 @@ public:
     void ReleaseConstantBuffer();
 
     //상수 버퍼를 갱신하는 함수
-    void UpdateConstant(FMatrix Matrix, bool bIsSelected);
     void UpdateConstant(FConstants& ConstantData);
 
     void CreateShader();
@@ -114,7 +113,7 @@ public:
     void ReleaseDepthStencilState();
 
     //GUObjectArray 순회하며 render 호출
-    void RenderScene(const TArray<UObject*> Objects, const UCameraComp* Camera, float AspectRatio);
+    void RenderScene(const TArray<UObject*> Objects, const UCameraComp* Camera);
 
     //초기화
     void Init();
@@ -132,5 +131,6 @@ public:
     void CreateBlendState();
 
     //enum에 따라 BlendState 선택
-    ID3D11BlendState* FindBlendState(BlendMode BlendStateMode)const;
+    ID3D11BlendState* FindBlendState(BlendMode BlendStateMode)const;    
+
 };

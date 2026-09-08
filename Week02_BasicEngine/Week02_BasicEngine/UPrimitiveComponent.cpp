@@ -9,7 +9,6 @@ UPrimitiveComponent::UPrimitiveComponent()
 void UPrimitiveComponent::Update(float deltaTime)
 {
 	Super::Update(deltaTime);
-	std::wcout << FString(L"PrimitiveComponent Update") << std::endl;
 }
 
 FMeshResource* UPrimitiveComponent::GetMeshResource() const
