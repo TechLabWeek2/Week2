@@ -18,6 +18,7 @@
 #include "FTriangleResource.h"
 #include "FPlaneResource.h"
 #include "UGizmo.h"
+#include "UFloorComp.h"
 
 #define SCREEN_WIDTH 1800
 #define SCREEN_HEIGHT 1200
@@ -56,7 +57,6 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam
 // 각종 메시지를 처리할 함수
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-
     if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
     {
         return true;
@@ -132,7 +132,7 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
     static float Rx = 0, Ry = 0, Rz = 0;
     static float Sx = 0.1f, Sy = 0.1f, Sz = 0.1f;
     static bool IsOrthogonal = false;
-    static float FOV = 60.f;
+    static float FOV = 80.f;
     static float CLx = 0, CLy = 0, CLz = 0;
     static float CRx = 0, CRy = 0, CRz = 0;
     static int spawnNum = 1;
@@ -323,13 +323,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui_ImplWin32_Init((void*)hWnd);
     ImGui_ImplDX11_Init(renderer.Device, renderer.DeviceContext);
 
-    //PlaneResource->CreateVertexBuffer(plane_vertices, sizeof(plane_vertices));
-    //리소스 생성
-    FCubeResource CubeResource;
-    FSphereResource SphereResource;
-    FLineResource LineResource;
-    FTriangleResource TriangleResource;
-    FPlaneResource PlaneResource;
+    //Mesh Resource 만들기.
+    FMeshResource* SphereResource = new FMeshResource();
+    FMeshResource* CubeResource = new FMeshResource();
+    FMeshResource* TriangleResource = new FMeshResource();
+    FMeshResource* LineResource = new FMeshResource();
+    FMeshResource* PlaneResource = new FMeshResource();
+    FMeshResource* Floor1Resource = new FMeshResource();
+    FMeshResource* Floor2Resource = new FMeshResource();
+    FMeshResource* LocationXGizmoResource = new FMeshResource();
+    FMeshResource* LocationYGizmoResource = new FMeshResource();
+    FMeshResource* LocationZGizmoResource = new FMeshResource();
+    FMeshResource* RotationXGizmoResource = new FMeshResource();
+    FMeshResource* RotationYGizmoResource = new FMeshResource();
+    FMeshResource* RotationZGizmoResource = new FMeshResource();
+    FMeshResource* ScaleXGizmoResource = new FMeshResource();
+    FMeshResource* ScaleYGizmoResource = new FMeshResource();
+    FMeshResource* ScaleZGizmoResource = new FMeshResource();
 
     CubeResource.Initialize();
     SphereResource.Initialize();
@@ -358,6 +368,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     //CreateRotationGizmo(rotation_gizmo_x_vertices, 1.0f, 0.0f, 0.0f);
     //CreateRotationGizmo(rotation_gizmo_y_vertices, 0.0f, 1.0f, 0.0f);
     //CreateRotationGizmo(rotation_gizmo_z_vertices, 0.0f, 0.0f, 1.0f);
+    SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
+    CubeResource->CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
+    TriangleResource->CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
+    LineResource->CreateVertexBuffer(line_vertices, sizeof(line_vertices));
+    PlaneResource->CreateVertexBuffer(plane_vertices, sizeof(plane_vertices));
+    LocationXGizmoResource->CreateVertexBuffer(location_gizmo_x_vertices, sizeof(location_gizmo_x_vertices));
+    LocationYGizmoResource->CreateVertexBuffer(location_gizmo_y_vertices, sizeof(location_gizmo_y_vertices));
+    LocationZGizmoResource->CreateVertexBuffer(location_gizmo_z_vertices, sizeof(location_gizmo_z_vertices));
+    Floor1Resource->CreateVertexBuffer(floor1_vertices, sizeof(floor1_vertices));
+    Floor2Resource->CreateVertexBuffer(floor2_vertices, sizeof(floor2_vertices));
 
     //SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
     //CubeResource->CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
@@ -390,6 +410,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     //ScaleXGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //ScaleYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //ScaleZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    SphereResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    CubeResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    TriangleResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    LineResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    PlaneResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    LocationXGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    LocationYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    LocationZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    RotationXGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    RotationYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    RotationZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ScaleXGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ScaleYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ScaleZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    Floor1Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    Floor2Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
     bool bIsExit = false;
 
@@ -427,6 +463,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     //picking
     bool bIsPicking = false;
     UPrimitiveComponent* pickedObjectPtr = nullptr;
+    UPrimitiveComponent* pickedGizmoPtr = nullptr;
 
     UCubeComp* Test = new UCubeComp();
     UCubeComp* Test2 = new UCubeComp();
@@ -464,6 +501,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     XGizmo->RelativeRotation = FVector(0, 0, 0);
     YGizmo->RelativeRotation = FVector(0, 0, 1.57);
     ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
+
+    UFloorComp* Floor = new UFloorComp();
+    Floor->ConstructFloor(Floor1Resource, Floor2Resource);
+    GUObjectArray.RemoveObj(Floor);
+
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
     {
@@ -635,21 +677,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                 if (pickedObjectPtr != nullptr)
                 {
-                    pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                    XGizmo->bIsActive = false;
-                    YGizmo->bIsActive = false;
-                    ZGizmo->bIsActive = false;
+                    pickedGizmoPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                    if (pickedGizmoPtr == nullptr) {
+                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                        pickedObjectPtr = nullptr;
+                        XGizmo->bIsActive = false;
+                        YGizmo->bIsActive = false;
+                        ZGizmo->bIsActive = false;
+                    }
+                    else if (pickedGizmoPtr->IsA(UGizmo::StaticClass())) {
+                        pickedGizmoPtr->bIsSelected = !pickedGizmoPtr->bIsSelected;
+                    }else{
+                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+
+                        pickedObjectPtr = pickedGizmoPtr;
+                        pickedGizmoPtr = nullptr;
+                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                        XGizmo->bIsActive = true;
+                        YGizmo->bIsActive = true;
+                        ZGizmo->bIsActive = true;
+                        XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                    }
                 }
-                pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
-                if (pickedObjectPtr != nullptr) 
-                {
-                    pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                    XGizmo->bIsActive = true;
-                    YGizmo->bIsActive = true;
-                    ZGizmo->bIsActive = true;
-                    XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                    YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                    ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                else {
+                    pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                    if (pickedObjectPtr != nullptr)
+                    {
+                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                        XGizmo->bIsActive = true;
+                        YGizmo->bIsActive = true;
+                        ZGizmo->bIsActive = true;
+                        XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                    }
                 }
             }
         }

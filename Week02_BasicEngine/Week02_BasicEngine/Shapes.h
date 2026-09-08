@@ -17,6 +17,10 @@ extern TArray<FVertexSimple> triangle_vertices;
 extern TArray<FVertexSimple> plane_vertices;
 
 extern TArray<FVertexSimple> cube_vertices;
+extern FVertexSimple floor1_vertices[12];
+extern FVertexSimple floor2_vertices[12];
+
+extern FVertexSimple cube_vertices[36];
 
 extern TArray<FVertexSimple> sphere_vertices;
 extern FVertexSimple sphere_vertices[2400];

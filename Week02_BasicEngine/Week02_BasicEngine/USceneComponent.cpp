@@ -5,6 +5,7 @@
 
 USceneComponent::USceneComponent()
 {
+	Class = StaticClass();
 	RelativeLocation = FVector(0.0f, 0.0f, 0.0f);
 	RelativeRotation = FVector(0.0f, 0.0f, 0.0f);
 	RelativeScale3D = FVector(0.1f, 0.1f, 0.1f);

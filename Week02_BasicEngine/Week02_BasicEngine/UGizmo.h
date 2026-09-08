@@ -15,5 +15,9 @@ public:
     UTypeTransform Type;
 public:
     UGizmo();
-
+    static UClass* StaticClass()
+    {
+        static UClass Class("USphere", UPrimitiveComponent::StaticClass());
+        return &Class;
+    }
 };
