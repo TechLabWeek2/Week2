@@ -636,10 +636,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     Test->SetMeshResource(&CubeResourceData);
     Test2->SetMeshResource(&CubeResourceData);
-    Test3->SetMeshResource(&CubeResourceData);
+    Test3->SetMeshResource(&SphereResourceData);
     Test4->SetMeshResource(&CubeResourceData);
     Test5->SetMeshResource(&CubeResourceData);
-    Test6->SetMeshResource(&CubeResourceData);
+    Test6->SetMeshResource(&SphereResourceData);
     Test7->SetMeshResource(&PlaneResourceData);
 
     Test->SetRasterizerState(RasterizerState::WireFrame);
