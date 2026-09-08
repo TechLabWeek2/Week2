@@ -21,3 +21,13 @@ void UPrimitiveComponent::SetMeshResource(FMeshResource* pMeshResource)
 {
 	MeshResource = pMeshResource;
 }
+
+RasterizerState UPrimitiveComponent::GetRasterizerState() const
+{
+	return RasterizerStateType;
+}
+
+void UPrimitiveComponent::SetRasterizerState(RasterizerState StateType)
+{
+	RasterizerStateType = StateType;
+}

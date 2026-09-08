@@ -631,6 +631,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test6->SetMeshResource(&CubeResourceData);
     Test7->SetMeshResource(&PlaneResourceData);
 
+    Test->SetRasterizerState(RasterizerState::WireFrame);
+    Test3->SetRasterizerState(RasterizerState::WireFrame);
+    Test5->SetRasterizerState(RasterizerState::FrontCulling);
+
     XGizmo->SetMeshResource(&LocationGizmoResourceData);
     YGizmo->SetMeshResource(&LocationGizmoResourceData);
     ZGizmo->SetMeshResource(&LocationGizmoResourceData);

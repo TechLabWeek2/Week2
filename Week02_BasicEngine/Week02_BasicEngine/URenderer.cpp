@@ -139,7 +139,23 @@ void URenderer::CreateRasterizerState()
 	rasterizerdesc.FillMode = D3D11_FILL_SOLID; // 채우기 모드
 	rasterizerdesc.CullMode = D3D11_CULL_BACK; // 백 페이스 컬링
 
-	HRESULT hr = Device->CreateRasterizerState(&rasterizerdesc, &RasterizerState);
+	HRESULT hr = Device->CreateRasterizerState(&rasterizerdesc, &RasterizerState_Solid);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
+	rasterizerdesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerdesc.CullMode = D3D11_CULL_BACK; // 백 페이스 컬링
+	hr = Device->CreateRasterizerState(&rasterizerdesc, &RasterizerState_WireFrame);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
+	rasterizerdesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerdesc.CullMode = D3D11_CULL_FRONT; // 백 페이스 컬링
+	hr = Device->CreateRasterizerState(&rasterizerdesc, &RasterizerState_FrontCulling);
 	if (FAILED(hr))
 	{
 		assert(false);
@@ -149,17 +165,17 @@ void URenderer::CreateRasterizerState()
 // 래스터라이저 상태를 해제하는 함수
 void URenderer::ReleaseRasterizerState()
 {
-	if (RasterizerState)
+	if (RasterizerState_Solid)
 	{
-		RasterizerState->Release();
-		RasterizerState = nullptr;
+		RasterizerState_Solid->Release();
+		RasterizerState_Solid = nullptr;
 	}
 }
 
 // 렌더러에 사용된 모든 리소스를 해제하는 함수
 void URenderer::Release()
 {
-	RasterizerState->Release();
+	RasterizerState_Solid->Release();
 
 	// 렌더 타겟을 초기화
 	DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
@@ -175,7 +191,7 @@ void URenderer::Prepare()
 	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	DeviceContext->RSSetViewports(1, &ViewportInfo);
-	DeviceContext->RSSetState(RasterizerState);
+	DeviceContext->RSSetState(RasterizerState_Solid);
 
 	DeviceContext->OMSetRenderTargets(1, &FrameBufferRTV, DepthStencilView);
 	DeviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
@@ -266,6 +282,7 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 		UPrimitiveComponent* PrimitiveComponent = dynamic_cast<UPrimitiveComponent*>(Objects[i]);
 		if (PrimitiveComponent && PrimitiveComponent->bIsActive)
 		{
+			DeviceContext->RSSetState(FindRasterizerState(PrimitiveComponent->GetRasterizerState()));
 			UpdateConstant(PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix(), PrimitiveComponent->bIsSelected);
 			DeviceContext->IASetPrimitiveTopology(PrimitiveComponent->GetMeshResource()->GetTopology());
 			RenderPrimitive(PrimitiveComponent->GetMeshResource()->GetVertexBuffer(), PrimitiveComponent->GetMeshResource()->GetNumVertices());
@@ -290,4 +307,23 @@ void URenderer::Init()
 	DepthStencilView = GGraphicsDevice.GetDepthStencilView();
 
 	CreateDepthStencilState();
+}
+
+ID3D11RasterizerState* URenderer::FindRasterizerState(RasterizerState StateType)const 
+{
+	switch (StateType)
+	{
+		case Solid:
+			return RasterizerState_Solid;
+			break;
+		case WireFrame:
+			return RasterizerState_WireFrame;
+			break;
+		case FrontCulling:
+			return RasterizerState_FrontCulling;
+			break;
+		default:
+			break;
+	}
+	return nullptr;
 }
