@@ -3,6 +3,7 @@
 UPrimitiveComponent::UPrimitiveComponent()
 	: primitiveType(ETypePrimitive::None)
 {
+	Class = StaticClass();
 }
 
 void UPrimitiveComponent::Update(float deltaTime)

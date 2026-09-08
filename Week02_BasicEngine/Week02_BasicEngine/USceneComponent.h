@@ -19,5 +19,9 @@ public:
     //이동, 
     virtual void Update(float deltaTime);
 
+    static UClass* StaticClass() {
+        static UClass Class("USceneComponent", UObject::StaticClass());
+        return &Class;
+    }
 };
 

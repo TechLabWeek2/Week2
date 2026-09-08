@@ -2,6 +2,7 @@
 
 UCubeComp::UCubeComp()
 {
+	Class = StaticClass();
 	primitiveType = ETypePrimitive::Cube;
 }
 

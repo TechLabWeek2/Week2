@@ -161,6 +161,7 @@
     <ClCompile Include="MeshData.cpp" />
     <ClCompile Include="UAxisGizmo.cpp" />
     <ClCompile Include="UCameraComp.cpp" />
+    <ClCompile Include="UClass.cpp" />
     <ClCompile Include="UCubeComp.cpp" />
     <ClCompile Include="UEngineStatics.cpp" />
     <ClCompile Include="UGizmo.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="UAxisGizmo.h" />
     <ClInclude Include="UCameraComp.h" />
+    <ClInclude Include="UClass.h" />
     <ClInclude Include="UCubeComp.h" />
     <ClInclude Include="UEngineStatics.h" />
     <ClInclude Include="UGizmo.h" />

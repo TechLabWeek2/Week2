@@ -12,6 +12,7 @@ enum class ETypePrimitive : uint8
 	XLine,
 	YLine,
 	ZLine,
+	Gizmo,
 	Max
 };
 
@@ -37,6 +38,10 @@ public:
     FMeshResource* GetMeshResource() const;
     void SetMeshResource(FMeshResource* pMeshResource);
 
+	static UClass* StaticClass() {
+		static UClass Class("UPrimitiveComponent", USceneComponent::StaticClass());
+		return &Class;
+	}
 private:
     //메시 데이터
     FMeshResource* MeshResource = nullptr;

@@ -415,6 +415,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     //picking
     bool bIsPicking = false;
     UPrimitiveComponent* pickedObjectPtr = nullptr;
+    UPrimitiveComponent* pickedGizmoPtr = nullptr;
 
     UCubeComp* Test = new UCubeComp();
     UCubeComp* Test2 = new UCubeComp();
@@ -620,21 +621,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                 if (pickedObjectPtr != nullptr)
                 {
-                    pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                    XGizmo->bIsActive = false;
-                    YGizmo->bIsActive = false;
-                    ZGizmo->bIsActive = false;
+                    pickedGizmoPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                    if (pickedGizmoPtr == nullptr) {
+                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                        pickedObjectPtr = nullptr;
+                        XGizmo->bIsActive = false;
+                        YGizmo->bIsActive = false;
+                        ZGizmo->bIsActive = false;
+                    }
+                    else if (pickedGizmoPtr->IsA(UGizmo::StaticClass())) {
+                        pickedGizmoPtr->bIsSelected = !pickedGizmoPtr->bIsSelected;
+                    }else{
+                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+
+                        pickedObjectPtr = pickedGizmoPtr;
+                        pickedGizmoPtr = nullptr;
+                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                        XGizmo->bIsActive = true;
+                        YGizmo->bIsActive = true;
+                        ZGizmo->bIsActive = true;
+                        XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                    }
                 }
-                pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
-                if (pickedObjectPtr != nullptr) 
-                {
-                    pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                    XGizmo->bIsActive = true;
-                    YGizmo->bIsActive = true;
-                    ZGizmo->bIsActive = true;
-                    XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                    YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                    ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                else {
+                    pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                    if (pickedObjectPtr != nullptr)
+                    {
+                        pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                        XGizmo->bIsActive = true;
+                        YGizmo->bIsActive = true;
+                        ZGizmo->bIsActive = true;
+                        XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                        ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                    }
                 }
             }
         }
