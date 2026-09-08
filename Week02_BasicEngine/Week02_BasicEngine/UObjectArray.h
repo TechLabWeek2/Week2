@@ -32,6 +32,9 @@ public:
 	//UObject의 개수를 반환합니다.
 	int32 GetNum()const;
 
+	TArray<int32> GetGizmoIndex() {
+		return GizmoIndex;
+	}
 	//소멸
 	void Release();
 
@@ -40,6 +43,7 @@ private:
 	TArray<UObject*> Objects;
 	//인덱싱 가능한 번호를 저장합니다.
 	TArray<int32> AvailableIndices;
+	TArray<int32> GizmoIndex;
 };
 
 //전역 인스턴스

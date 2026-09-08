@@ -163,6 +163,7 @@
     <ClCompile Include="UCameraComp.cpp" />
     <ClCompile Include="UCubeComp.cpp" />
     <ClCompile Include="UEngineStatics.cpp" />
+    <ClCompile Include="UGizmo.cpp" />
     <ClCompile Include="UFloorComp.cpp" />
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UPicking.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="UCameraComp.h" />
     <ClInclude Include="UCubeComp.h" />
     <ClInclude Include="UEngineStatics.h" />
+    <ClInclude Include="UGizmo.h" />
     <ClInclude Include="UFloorComp.h" />
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UPicking.h" />

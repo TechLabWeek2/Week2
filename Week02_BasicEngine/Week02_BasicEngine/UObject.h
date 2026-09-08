@@ -8,6 +8,8 @@ public:
 	//전역 배열 인덱스
     uint32 InternalIndex;
 
+    bool bIsActive = true;
+
     UObject();
     virtual ~UObject();
 

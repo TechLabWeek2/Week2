@@ -31,11 +31,13 @@ UObject::~UObject()
 	//GUObjectArray에 자기자신 제거
 	//GUObjectArray.UnregisterObject(this);
 }
-
+//UObject* Obj = new UObject();
 
 void* UObject::operator new(std::size_t Size)
 {
 	const std::size_t TotalSize = Size + sizeof(FAllocationHeader);
+
+	std::cout << "size : " << Size << std::endl;
 
 	if (TotalSize > std::numeric_limits<uint32>::max())
 	{
@@ -63,7 +65,7 @@ void UObject::operator delete(void* Ptr) noexcept
 	}
 
 	FAllocationHeader* Header = static_cast<FAllocationHeader*>(Ptr) - 1;
-	TotalAllocationBytes -= Header->Size + static_cast<uint32>(sizeof(FAllocationHeader));;
+	TotalAllocationBytes -= Header->Size + static_cast<uint32>(sizeof(FAllocationHeader));
 	TotalAllocationCount--;
 	Header->~FAllocationHeader();
 	::operator delete(Header);	
