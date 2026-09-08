@@ -1,19 +1,20 @@
 // © 2024 KRAFTON, Inc. ALL RIGHTS RESERVED.
 
 #pragma once
-#include "FMeshResource.h"
+//#include "FMeshResource.h"
+#include "TArray.h"
 
 struct FVertexSimple
 {
 	float x, y, z;    // Position
 	float r, g, b, a; // Color
 };
-extern FVertexSimple line_vertices[6];
+extern TArray<FVertexSimple> line_vertices;
 
-extern FVertexSimple triangle_vertices[3];
+extern TArray<FVertexSimple> triangle_vertices;
 
-extern FVertexSimple plane_vertices[12];
+extern TArray<FVertexSimple> plane_vertices;
 
-extern FVertexSimple cube_vertices[36];
+extern TArray<FVertexSimple> cube_vertices;
 
-extern FVertexSimple sphere_vertices[2400];
+extern TArray<FVertexSimple> sphere_vertices;

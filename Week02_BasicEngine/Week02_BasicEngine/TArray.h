@@ -1,5 +1,7 @@
 #pragma once
 #include "CoreType.h"
+#include <initializer_list>
+#include <algorithm>
 
 #define DATA_MAX_INIT 10
 
@@ -57,7 +59,11 @@ public:
 		}
 	}
 
-	//TArray(std::initializer_list<T> InitList) : data(InitList) {}
+	TArray(std::initializer_list<T> InitList) 
+		: data(new T[InitList.size()]), dataNum((int32)InitList.size()), dataMax((int32)InitList.size())
+	{
+		std::copy(InitList.begin(), InitList.end(), data);
+	}
 	 
 	TArray& operator= (const TArray& otherArray) // = : 깊은 복사 
 	{

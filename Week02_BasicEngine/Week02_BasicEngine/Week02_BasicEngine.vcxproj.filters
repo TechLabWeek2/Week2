@@ -102,6 +102,27 @@
     <ClCompile Include="UEngineStatics.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
+    <ClCompile Include="ExampleAppConsole.h">
+      <Filter>Header File</Filter>
+    </ClCompile>
+    <ClCompile Include="FEngineLoop.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshData.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="FSphereResource.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="FCubeResource.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="FLineResource.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="FTriangleResource.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -185,7 +206,19 @@
     <ClInclude Include="UEngineStatics.h">
       <Filter>Header File</Filter>
     </ClInclude>
-    <ClInclude Include="FVertexSimple.h">
+    <ClInclude Include="FEngineLoop.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FSphereResource.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FCubeResource.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FLineResource.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FTriangleResource.h">
       <Filter>Header File</Filter>
     </ClInclude>
   </ItemGroup>

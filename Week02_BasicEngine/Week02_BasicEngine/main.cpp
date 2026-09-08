@@ -12,6 +12,11 @@
 #include "UObjectArray.h"
 #include "FGraphicsDevice.h"
 #include "FMeshResource.h"
+#include "FCubeResource.h"
+#include "FSphereResource.h"
+#include "FLineResource.h"
+#include "FTriangleResource.h"
+#include "FPlaneResource.h"
 
 #define SCREEN_WIDTH 1800
 #define SCREEN_HEIGHT 1200
@@ -282,24 +287,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui_ImplWin32_Init((void*)hWnd);
     ImGui_ImplDX11_Init(renderer.Device, renderer.DeviceContext);
 
-    //Mesh Resource 만들기.
-    FMeshResource* SphereResource = new FMeshResource();
-    FMeshResource* CubeResource = new FMeshResource();
-    FMeshResource* TriangleResource = new FMeshResource();
-    FMeshResource* LineResource = new FMeshResource();
-    FMeshResource* PlaneResource = new FMeshResource();
+    //PlaneResource->CreateVertexBuffer(plane_vertices, sizeof(plane_vertices));
+    //리소스 생성
+    FCubeResource CubeResource;
+    FSphereResource SphereResource;
+    FLineResource LineResource;
+    FTriangleResource TriangleResource;
+    FPlaneResource PlaneResource;
 
-    SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
-    CubeResource->CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
-    TriangleResource->CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
-    LineResource->CreateVertexBuffer(line_vertices, sizeof(line_vertices));
-    PlaneResource->CreateVertexBuffer(plane_vertices, sizeof(plane_vertices));
-
-    SphereResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    CubeResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    TriangleResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    LineResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-    PlaneResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    CubeResource.Initialize();
+    SphereResource.Initialize();
+    LineResource.Initialize();
+    TriangleResource.Initialize();
+    PlaneResource.Initialize();
 
     bool bIsExit = false;
 
@@ -323,7 +323,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     AxisGizmo->RelativeScale3D = FVector(1.0f, 1.0f, 1.0f);
 
-    AxisGizmo->SetMeshResource(LineResource);
+    AxisGizmo->SetMeshResource(static_cast<FMeshResource*>(&LineResource));
 
     AxisGizmo->RelativeLocation = FVector(0, 0, 0);
     AxisGizmo->RelativeRotation = FVector(0, 0, 0);
@@ -346,13 +346,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     USphereComp* Test6 = new USphereComp(); 
     UPlaneComp* Test7 = new UPlaneComp();
 
-    Test->SetMeshResource(CubeResource);
-    Test2->SetMeshResource(CubeResource);
-    Test3->SetMeshResource(SphereResource);
-    Test4->SetMeshResource(CubeResource);
-    Test5->SetMeshResource(CubeResource);
-    Test6->SetMeshResource(SphereResource);
-    Test7->SetMeshResource(PlaneResource);
+    Test->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
+    Test2->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
+    Test3->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
+    Test4->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
+    Test5->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
+    Test6->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
+    Test7->SetMeshResource(static_cast<FMeshResource*>(&PlaneResource));
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
@@ -520,7 +520,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::NewFrame();
         
         Console.Draw("Console Windows", &is_window_open);
-        DrawCreateWindow(CubeResource, SphereResource, PlaneResource, pickedObjectPtr);
+        DrawCreateWindow(&CubeResource, &SphereResource, &PlaneResource, pickedObjectPtr);
         DrawStatWindow();
 
         ImGui::Render();
@@ -546,7 +546,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui::DestroyContext();
 
     //리소스 제거
-    if (SphereResource)
+    /*if (SphereResource)
     {
         SphereResource->Release();
         delete SphereResource;
@@ -568,7 +568,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         LineResource->Release();
         delete LineResource;
-    }
+    }*/
     
     //렌더러들보다 먼저 소멸
     GUObjectArray.Release();
