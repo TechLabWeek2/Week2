@@ -6,7 +6,7 @@ class UCameraComp :
 {
 public:
     float FOV = 90.0f;
-    float AspectRatio = 10.f / 10.f;
+    float AspectRatio = 1024.f / 1024.f;
     float NearClip = 0.1f;
     float FarClip = 1000.0f;
     float ZoomLevel = 1.f;

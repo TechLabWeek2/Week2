@@ -35,7 +35,7 @@ PS_INPUT mainVS(VS_INPUT input)
     
     //output.color = lerp(input.color, HightLightIntensity, 0.5); // 하이라이트 효과
     output.color.rgb = output.color.rgb * HightLightIntensity; // 하이라이트 효과
-    output.color.a = 0.8f;
+    //output.color.a = 0.8f;
     
     return output;
 }

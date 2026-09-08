@@ -46,38 +46,38 @@ ResourceData PlaneResource =
 
 ResourceData Floor1Resource =
 { {
-	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Top vertex (red)
-	{  1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Bottom-right vertex (green)
-	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f },  // Bottom-left vertex (blue)
-	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Top vertex (red)
-	{ -1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Bottom-right vertex (green)
-	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f },  // Bottom-left vertex (blue)
+	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f }, // Top vertex (red)
+	{  1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f }, // Bottom-right vertex (green)
+	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f },  // Bottom-left vertex (blue)
+	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f }, // Top vertex (red)
+	{ -1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f }, // Bottom-right vertex (green)
+	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f },  // Bottom-left vertex (blue)
 
-	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f },  // Bottom-left vertex (blue)
-	{ -1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Bottom-right vertex (green)
-	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Top vertex (red)
-	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f },  // Bottom-left vertex (blue)
-	{  1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Bottom-right vertex (green)
-	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Top vertex (red)
+	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f },  // Bottom-left vertex (blue)
+	{ -1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f }, // Bottom-right vertex (green)
+	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f }, // Top vertex (red)
+	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f },  // Bottom-left vertex (blue)
+	{  1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f }, // Bottom-right vertex (green)
+	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.1f }, // Top vertex (red)
 }, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
 };
 
 
 ResourceData Floor2Resource =
 { {
-	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Top vertex (red)
-	{  1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Bottom-right vertex (green)
-	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f },  // Bottom-left vertex (blue)
-	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Top vertex (red)
-	{ -1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Bottom-right vertex (green)
-	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f },  // Bottom-left vertex (blue)
+	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f }, // Top vertex (red)
+	{  1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f }, // Bottom-right vertex (green)
+	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f },  // Bottom-left vertex (blue)
+	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f }, // Top vertex (red)
+	{ -1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f }, // Bottom-right vertex (green)
+	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f },  // Bottom-left vertex (blue)
 
-	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f },  // Bottom-left vertex (blue)
-	{ -1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Bottom-right vertex (green)
-	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Top vertex (red)
-	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f },  // Bottom-left vertex (blue)
-	{  1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Bottom-right vertex (green)
-	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Top vertex (red)
+	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f },  // Bottom-left vertex (blue)
+	{ -1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f }, // Bottom-right vertex (green)
+	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f }, // Top vertex (red)
+	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f },  // Bottom-left vertex (blue)
+	{  1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f }, // Bottom-right vertex (green)
+	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.1f }, // Top vertex (red)
 }, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
 };
 
