@@ -13,10 +13,12 @@ struct PS_INPUT
 
 cbuffer constants : register(b0)
 {
-    row_major float4x4 World;
+    row_major float4x4 MVP;
     
     float HightLightIntensity;
-    float3 Padding;
+    float2 Padding;
+    bool UseColor;
+    float4 Color;
 }
 
 PS_INPUT mainVS(VS_INPUT input)
@@ -24,12 +26,15 @@ PS_INPUT mainVS(VS_INPUT input)
     PS_INPUT output;
     
     
-    output.position = mul(input.position, World);
+    output.position = mul(input.position, MVP);
+    //output.color = input.color * Color;
+    output.color = UseColor? Color : input.color;
+    //output.color = input.color;
     
     // Pass the color to the pixel shader
     
     //output.color = lerp(input.color, HightLightIntensity, 0.5); // 하이라이트 효과
-    output.color = input.color * HightLightIntensity; // 하이라이트 효과
+    output.color.rgb = output.color.rgb * HightLightIntensity; // 하이라이트 효과
     
     return output;
 }

@@ -12,3 +12,9 @@ enum RasterizerState
 	WireFrame,
 	FrontCulling
 };
+
+enum BlendMode
+{
+	Opaque,
+	Alpha
+};

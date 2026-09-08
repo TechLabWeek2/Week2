@@ -44,7 +44,7 @@ void URenderer::UpdateConstant(FMatrix Matrix, bool bIsSelected)
 
 		FConstants* constants = (FConstants*)constantbufferMSR.pData;
 		{
-			constants->World = Matrix;
+			constants->MVP = Matrix;
 
 			// HighLightIntensity를 bIsSelected 값에 따라 설정
 			constants->HightLightIntensity = bIsSelected ? 2.0f : 1.0f; 
@@ -54,6 +54,32 @@ void URenderer::UpdateConstant(FMatrix Matrix, bool bIsSelected)
 		}
 
 		DeviceContext->Unmap(ConstantBuffer, 0);
+	}
+}
+
+void URenderer::UpdateConstant(FConstants& ConstantData)
+{
+	if (ConstantBuffer)
+	{
+		D3D11_MAPPED_SUBRESOURCE constantbufferMSR;
+
+		DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &constantbufferMSR); // update constant buffer every frame
+
+		FConstants* constants = (FConstants*)constantbufferMSR.pData;
+		{
+			constants->MVP = ConstantData.MVP;
+
+			// HighLightIntensity를 bIsSelected 값에 따라 설정
+			constants->HightLightIntensity = ConstantData.HightLightIntensity; 
+			constants->UseColor = ConstantData.UseColor;
+
+			constants->Color[0] = ConstantData.Color[0];
+			constants->Color[1] = ConstantData.Color[1];
+			constants->Color[2] = ConstantData.Color[2];
+			constants->Color[3] = ConstantData.Color[3];
+		}
+
+		DeviceContext->Unmap(ConstantBuffer, 0); 
 	}
 }
 
@@ -191,10 +217,10 @@ void URenderer::Prepare()
 	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	DeviceContext->RSSetViewports(1, &ViewportInfo);
-	DeviceContext->RSSetState(RasterizerState_Solid);
+	//DeviceContext->RSSetState(RasterizerState_Solid);
 
 	DeviceContext->OMSetRenderTargets(1, &FrameBufferRTV, DepthStencilView);
-	DeviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
+	//DeviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
 	DeviceContext->OMSetDepthStencilState(DepthStencilState, 1);
 	DeviceContext->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH, 1.f, 0);
 }
@@ -283,7 +309,17 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 		if (PrimitiveComponent && PrimitiveComponent->bIsActive)
 		{
 			DeviceContext->RSSetState(FindRasterizerState(PrimitiveComponent->GetRasterizerState()));
-			UpdateConstant(PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix(), PrimitiveComponent->bIsSelected);
+			DeviceContext->OMSetBlendState(FindBlendState(PrimitiveComponent->GetBlendMode()), nullptr, 0xffffffff);
+			FConstants TempConstantData = {};
+			TempConstantData.MVP = PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
+			TempConstantData.HightLightIntensity = PrimitiveComponent->bIsSelected ? 2.0 : 1.0;
+			TempConstantData.Color[0] = PrimitiveComponent->GetModelColor()[0];
+			TempConstantData.Color[1] = PrimitiveComponent->GetModelColor()[1];
+			TempConstantData.Color[2] = PrimitiveComponent->GetModelColor()[2];
+			TempConstantData.Color[3] = PrimitiveComponent->GetModelColor()[3];
+			TempConstantData.UseColor = PrimitiveComponent->GetUseColorFlag();
+			UpdateConstant(TempConstantData);
+			//UpdateConstant(PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix(), PrimitiveComponent->bIsSelected);
 			DeviceContext->IASetPrimitiveTopology(PrimitiveComponent->GetMeshResource()->GetTopology());
 			RenderPrimitive(PrimitiveComponent->GetMeshResource()->GetVertexBuffer(), PrimitiveComponent->GetMeshResource()->GetNumVertices());
 		}
@@ -307,6 +343,8 @@ void URenderer::Init()
 	DepthStencilView = GGraphicsDevice.GetDepthStencilView();
 
 	CreateDepthStencilState();
+	
+	CreateBlendState();
 }
 
 ID3D11RasterizerState* URenderer::FindRasterizerState(RasterizerState StateType)const 
@@ -346,4 +384,68 @@ void URenderer::ReleaseWindow()
 void URenderer::RecreateWindow()
 {
 
+}
+
+void URenderer::CreateBlendState()
+{
+	assert(Device);
+	if (!Device) return;
+	{
+		BOOL AlphaToCoverageEnable;
+		BOOL IndependentBlendEnable;
+		D3D11_RENDER_TARGET_BLEND_DESC RenderTarget[8];
+	}
+	//D3D11_RENDER_TARGET_BLEND_DESC
+	{
+	BOOL BlendEnable;
+	D3D11_BLEND SrcBlend;
+	D3D11_BLEND DestBlend;
+	D3D11_BLEND_OP BlendOp;
+	D3D11_BLEND SrcBlendAlpha;
+	D3D11_BLEND DestBlendAlpha;
+	D3D11_BLEND_OP BlendOpAlpha;
+	UINT8 RenderTargetWriteMask;
+	}
+
+	//불투명
+	D3D11_BLEND_DESC OpaqueDesc = {};
+	OpaqueDesc.RenderTarget[0].BlendEnable = false;
+	OpaqueDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	HRESULT hr = Device->CreateBlendState(&OpaqueDesc, &BlendState_Opaque);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
+	//반투명
+	D3D11_BLEND_DESC AlphaDesc = {};
+	AlphaDesc.RenderTarget[0].BlendEnable = true;
+	AlphaDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	AlphaDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;  // 기존 화면색 * (1-알파)
+	AlphaDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;         // 둘을 더함
+	AlphaDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	AlphaDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	AlphaDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;	
+
+	hr = Device->CreateBlendState(&OpaqueDesc, &BlendState_Alpha);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+}
+
+ID3D11BlendState* URenderer::FindBlendState(BlendMode BlendStateMode) const
+{
+	switch (BlendStateMode)
+	{
+		case Opaque:
+			return BlendState_Opaque;
+			break;
+		case Alpha:
+			return BlendState_Alpha;
+			break;
+		default:
+			break;
+	}
+	return nullptr;
 }

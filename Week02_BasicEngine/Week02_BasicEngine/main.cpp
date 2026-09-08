@@ -527,29 +527,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui_ImplDX11_Init(renderer.Device, renderer.DeviceContext);
 
     ////Mesh Resource 만들기.
-    //FMeshResource* SphereResource = new FMeshResource();
-    //FMeshResource* CubeResource = new FMeshResource();
-    //FMeshResource* TriangleResource = new FMeshResource();
-    //FMeshResource* LineResource = new FMeshResource();
-    //FMeshResource* PlaneResource = new FMeshResource();
-    //FMeshResource* Floor1Resource = new FMeshResource();
-    //FMeshResource* Floor2Resource = new FMeshResource();
-    //FMeshResource* LocationXGizmoResource = new FMeshResource();
-    //FMeshResource* LocationYGizmoResource = new FMeshResource();
-    //FMeshResource* LocationZGizmoResource = new FMeshResource();
-    //FMeshResource* RotationXGizmoResource = new FMeshResource();
-    //FMeshResource* RotationYGizmoResource = new FMeshResource();
-    //FMeshResource* RotationZGizmoResource = new FMeshResource();
-    //FMeshResource* ScaleXGizmoResource = new FMeshResource();
-    //FMeshResource* ScaleYGizmoResource = new FMeshResource();
-    //FMeshResource* ScaleZGizmoResource = new FMeshResource();
-    //PlaneResource->CreateVertexBuffer(plane_vertices, sizeof(plane_vertices));
-    //리소스 생성
-    /*FCubeResource CubeResource;
-    FSphereResource SphereResource;
-    FLineResource LineResource;
-    FTriangleResource TriangleResource;
-    FPlaneResource PlaneResource;*/
 
     //생성
     FMeshResource CubeResourceData;
@@ -629,7 +606,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     AxisGizmo->RelativeScale3D = FVector(10.f, 10.f, 10.f);
 
 
-    ExampleAppConsole Console;
+    //ExampleAppConsole Console;
     bool is_window_open = true;
 
 
@@ -672,6 +649,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     YGizmo->RelativeRotation = FVector(0, 0, 1.57);
     ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
 
+
     Test->RelativeLocation = FVector(1, 0, 0);
     Test2->RelativeLocation = FVector(-1, 0, 0);
     Test3->RelativeLocation = FVector(0, 1, 0);
@@ -681,12 +659,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test5->RelativeRotation = FVector(0, -1.57, 0);
     Test6->RelativeLocation = FVector(0, 0, -1);
     Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
+
+    TArray<float> Red = { 1.f, 0.f, 0.f, 1.f };
+    TArray<float> Green = { 0.f, 1.f, 0.f, 1.f };
+    TArray<float> Blue = { 0.f, 0.f, 1.f, 1.f };
+    XGizmo->SetModelColor(Red);
+    YGizmo->SetModelColor(Green);
+    ZGizmo->SetModelColor(Blue);
+    XGizmo->SetUseColorFlag(true);
+    YGizmo->SetUseColorFlag(true);
+    ZGizmo->SetUseColorFlag(true);
+
     UFloorComp* Floor = new UFloorComp();
-    Floor->ConstructFloor(&Floor1ResourceData, &Floor2ResourceData);
+    Floor->ConstructFloor(&Floor1ResourceData, &Floor2ResourceData); 
     GUObjectArray.RemoveObj(Floor);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
-    while (bIsExit == false)
+    while (bIsExit == false) 
     {
         QueryPerformanceCounter(&startTime);
 
@@ -848,7 +837,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 GetClientRect(hWnd, &rect);
                 float screenWidth = (float)(rect.right - rect.left);
                 float screenHeight = (float)(rect.bottom - rect.top);
-
+                 
                 GetCursorPos(&currentMousePos);
                 ScreenToClient(hWnd, &currentMousePos);
                 float ndcX = 2.f * (float)currentMousePos.x / screenWidth - 1.f;  // screen xy to NDC xy
@@ -964,32 +953,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
-
-    //리소스 제거
-    /*if (SphereResource)
-    {
-        SphereResource->Release();
-        delete SphereResource;
-    }
-
-    if (CubeResource)
-    {
-        CubeResource->Release();
-        delete CubeResource;
-    }
-
-    if (TriangleResource)
-    {
-        TriangleResource->Release();
-        delete TriangleResource;
-    }
-
-    if (LineResource)
-    {
-        LineResource->Release();
-        delete LineResource;
-    }*/
-    
+        
     //렌더러들보다 먼저 소멸
     GUObjectArray.Release();
 

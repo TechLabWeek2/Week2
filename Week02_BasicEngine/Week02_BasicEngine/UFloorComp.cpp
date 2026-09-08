@@ -28,6 +28,8 @@ void UFloorComp::ConstructFloor(FMeshResource* floor1, FMeshResource* floor2)
             floorPlaneList[i + j]->RelativeScale3D = FVector(.1f, .1f, .1f);
             floorPlaneList[i + j]->RelativeLocation = FVector((float)i * .2f - 5.f, 0.f, (float)j * .2f - 5.f);
             floorPlaneList[i + j]->RelativeRotation = FVector(DegreeToRadian(90), 0.f, 0.f);
+
+            floorPlaneList[i + j]->SetBlendMode(BlendMode::Alpha);
         }
     }
 }

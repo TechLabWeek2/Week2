@@ -2,6 +2,7 @@
 #include <assert.h>
 
 FGraphicsDevice GGraphicsDevice;
+ExampleAppConsole Console;
 
 void FGraphicsDevice::Initialize(HWND hWindow, UINT screenWidth, UINT screenHeight)
 {
