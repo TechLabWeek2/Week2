@@ -376,8 +376,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ScaleXGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ScaleYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ScaleZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    Floor1Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    Floor2Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    Floor1Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    Floor2Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
     bool bIsExit = false;
 
