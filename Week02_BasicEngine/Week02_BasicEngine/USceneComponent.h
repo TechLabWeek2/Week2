@@ -23,5 +23,7 @@ public:
         static UClass Class("USceneComponent", UObject::StaticClass());
         return &Class;
     }
+
+    const FVector& GetLocation()const;
 };
 

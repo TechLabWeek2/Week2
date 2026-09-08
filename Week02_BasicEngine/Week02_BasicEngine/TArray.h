@@ -109,6 +109,13 @@ public:
 		return data[Index];
 	}
 
+	T* begin() { return data; }
+
+	T* end() { return data + Num(); }
+
+	const T* begin() const { return data; }
+	const T* end() const { return data + Num(); }
+
 	int32 Num () const // data의 Item 개수를 반환
 	{
 		return dataNum;

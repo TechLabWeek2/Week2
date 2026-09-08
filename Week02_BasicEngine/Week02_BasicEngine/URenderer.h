@@ -32,6 +32,7 @@ class ID3D11Buffer;
 class ID3D11DepthStencilView;
 class ID3D11DepthStencilState;
 class D3D11_VIEWPORT;
+class UPrimitiveComponent;
 
 struct alignas(16) FConstants {
     FMatrix MVP;
@@ -131,6 +132,9 @@ public:
     void CreateBlendState();
 
     //enum에 따라 BlendState 선택
-    ID3D11BlendState* FindBlendState(BlendMode BlendStateMode)const;    
+    ID3D11BlendState* FindBlendState(BlendMode BlendStateMode)const;
+
+    //반투명 정렬 함수
+    void SortTranslucentByDistance(TArray<UPrimitiveComponent*>& AlphaList, const FVector& CameraLoc);
 
 };
