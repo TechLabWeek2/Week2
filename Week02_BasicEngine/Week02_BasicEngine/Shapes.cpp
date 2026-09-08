@@ -4821,16 +4821,6 @@ ResourceData SphereResource =
 ResourceData LocationGizmoResource;
 ResourceData RotationGizmoResource;
 
-//ResourceData LocationGizmoResource =
-//{
-//	location_gizmo_vertices, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
-//};
-//
-//ResourceData RotationGizmoResource =
-//{
-//	rotation_gizmo_vertices, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
-//};
-
 ResourceData ScaleGizmoResource =
 {
 	{

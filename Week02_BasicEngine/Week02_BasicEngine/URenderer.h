@@ -34,10 +34,12 @@ class ID3D11DepthStencilState;
 class D3D11_VIEWPORT;
 
 struct alignas(16) FConstants {
-    FMatrix World;
+    FMatrix MVP;
 
-	float HightLightIntensity;
-	float Padding[3]; // 16바이트 정렬을 위해 패딩 추가
+	float HightLightIntensity = 1.f;
+	float Padding[2]; // 16바이트 정렬을 위해 패딩 추가
+    bool UseColor = false;
+    float Color[4] = { 1.f, 1.f, 1.f, 1.f };
 };
 
 class URenderer
@@ -66,12 +68,17 @@ public:
     FLOAT ClearColor[4] = { 0.68f, 0.85f, 0.90f, 1.0f }; // 화면을 초기화(clear)할 때 사용할 색상 (하늘색, RGBA)
     //D3D11_VIEWPORT ViewportInfo; // 렌더링 영역을 정의하는 뷰포트 정보
 
+    //불투명용, 반투명용 BlendState
+    ID3D11BlendState* BlendState_Opaque = nullptr;
+    ID3D11BlendState* BlendState_Alpha = nullptr;
+
     void CreateConstantBuffer();
 
     void ReleaseConstantBuffer();
 
     //상수 버퍼를 갱신하는 함수
     void UpdateConstant(FMatrix Matrix, bool bIsSelected);
+    void UpdateConstant(FConstants& ConstantData);
 
     void CreateShader();
 
@@ -109,8 +116,10 @@ public:
     //GUObjectArray 순회하며 render 호출
     void RenderScene(const TArray<UObject*> Objects, const UCameraComp* Camera, float AspectRatio);
 
+    //초기화
     void Init();
 
+    //enum에 따라 RasterizerState 선택
     ID3D11RasterizerState* FindRasterizerState(RasterizerState StateType)const;
 
     void ResizeWindow(long newScreenWidth, long newScreenHeight, bool* bStopRender);
@@ -118,4 +127,10 @@ public:
     void ReleaseWindow();
 
     void RecreateWindow(long newScreenWidth, long newScreenHeight);
+
+    //BlendState 만들기
+    void CreateBlendState();
+
+    //enum에 따라 BlendState 선택
+    ID3D11BlendState* FindBlendState(BlendMode BlendStateMode)const;
 };

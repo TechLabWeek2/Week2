@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <d3d11.h>
 #include "Core/Core.h"
+#include "ExampleAppConsole.h"
 
 class ID3D11Device;
 class ID3D11DeviceContext;
@@ -70,3 +71,4 @@ private:
 };
 
 extern FGraphicsDevice GGraphicsDevice;
+extern ExampleAppConsole Console;

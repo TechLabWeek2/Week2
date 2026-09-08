@@ -23,7 +23,10 @@ public:
 	//FVector right;
 	//FVector up;
 	//FVector dirToWorld;
-
+	FVector DragStartLocation;
+	FVector DragStartIntersection;
+	FVector DragAxis;
+	FVector DragPlaneNormal;
 public:
 	static UPrimitiveComponent* GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, const TArray<UObject*> &PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking);
 };

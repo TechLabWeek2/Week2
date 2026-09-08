@@ -46,9 +46,25 @@ public:
 	RasterizerState GetRasterizerState()const;
 	void SetRasterizerState(RasterizerState StateType);
 
+	BlendMode GetBlendMode()const;
+	void SetBlendMode(BlendMode NewBlendMode);
+
+	const float* GetModelColor() const;
+	void SetModelColor(const float NewColor[4]);
+	void SetModelColor(const TArray<float>& NewColor);
+
+	bool GetUseColorFlag()const;
+	void SetUseColorFlag(bool pUseColorFlag);
+
 private:
     //메시 데이터
     FMeshResource* MeshResource = nullptr;
 
 	RasterizerState RasterizerStateType = RasterizerState::Solid;
+
+	BlendMode BlendModeState = BlendMode::Opaque;
+
+	float ModelColor[4] = { 1.f, 1.f, 1.f, 1.f };
+
+	bool UseColor = false;
 };
