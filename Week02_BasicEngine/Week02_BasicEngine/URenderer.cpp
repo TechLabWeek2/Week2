@@ -267,8 +267,8 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 		if (PrimitiveComponent && PrimitiveComponent->bIsActive)
 		{
 			UpdateConstant(PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix(), PrimitiveComponent->bIsSelected);
-			DeviceContext->IASetPrimitiveTopology(PrimitiveComponent->GetMeshResource()->Topology);
-			RenderPrimitive(PrimitiveComponent->GetMeshResource()->VertexBuffer, PrimitiveComponent->GetMeshResource()->numVertices);
+			DeviceContext->IASetPrimitiveTopology(PrimitiveComponent->GetMeshResource()->GetTopology());
+			RenderPrimitive(PrimitiveComponent->GetMeshResource()->GetVertexBuffer(), PrimitiveComponent->GetMeshResource()->GetNumVertices());
 		}
 	}
 

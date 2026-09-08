@@ -60,27 +60,9 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
         float distanceRay = difference.Cross(rayVector).Size() / rayVector.Size(); // component에서 Ray까지의 최단거리
         if (distanceRay < PrimitiveComponent->RelativeScale3D.Size() * sqrt(3)) // Sphere Boundary 체크로 1차 거르기
         {
-            const FVertexSimple* targetVertices = nullptr;
             int32 numVertices = 0;
-            switch (PrimitiveComponent->primitiveType) // 각각의 맞는 xxxxx_vertices[]를 로드
-            {
-            case ETypePrimitive::Sphere:
-                targetVertices = sphere_vertices;
-                numVertices = sizeof(sphere_vertices) / sizeof(FVertexSimple);
-                break;
-            case ETypePrimitive::Cube:
-                targetVertices = cube_vertices;
-                numVertices = sizeof(cube_vertices) / sizeof(FVertexSimple);
-                break;
-            case ETypePrimitive::Plane:
-                targetVertices = plane_vertices;
-                numVertices = sizeof(plane_vertices) / sizeof(FVertexSimple);
-            case ETypePrimitive::Gizmo:
-                targetVertices = location_gizmo_x_vertices;
-                numVertices = sizeof(location_gizmo_x_vertices) / sizeof(FVertexSimple);
-            default:
-                break;
-            }
+            const TArray<FVertexSimple>& targetVertices = PrimitiveComponent->GetMeshResource()->GetVertices();
+            numVertices = PrimitiveComponent->GetMeshResource()->GetNumVertices();
 
             FMatrix transformMatrix = PrimitiveComponent->GetModelMatrix();
             for (int32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘

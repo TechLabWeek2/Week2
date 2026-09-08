@@ -1,29 +1,29 @@
 #include "FMeshResource.h"
 #include "FGraphicsDevice.h"
 
-//void FMeshResource::CreateVertexBuffer(TArray<FVertexSimple>& vertices, UINT VerticesNum)
-void FMeshResource::CreateVertexBuffer(FVertexSimple* vertices, UINT VerticesNum)
+void FMeshResource::CreateVertexBuffer()
 {
-	//UINT VerticesCount = sizeof(*vertices);
-	/*UINT SimpleCount = sizeof(FVertexSimple);
-	numVertices = VerticesCount / SimpleCount;*/
-	numVertices = VerticesNum;
-	//numVertices = vertices.Num();
+	//numVertices = sizeof(Vertices);
+	numVertices = MeshResourceData.Vertices.Num();
 
-	D3D11_BUFFER_DESC vertexbufferdesc = {};
-	//vertexbufferdesc.ByteWidth = sizeof(FVertexSimple);
-	vertexbufferdesc.ByteWidth = VerticesNum;
-	vertexbufferdesc.Usage = D3D11_USAGE_IMMUTABLE; // will never be updated;
-	vertexbufferdesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	//D3D11_BUFFER_DESC vertexbufferdesc = {};
+	//vertexbufferdesc.ByteWidth = numVertices;
+	//vertexbufferdesc.Usage = D3D11_USAGE_IMMUTABLE; // will never be updated;
+	//vertexbufferdesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
-	D3D11_SUBRESOURCE_DATA vertexbufferSRD = { vertices};
+	D3D11_BUFFER_DESC vertexbufferdesc = GetBufferDesc();
+	D3D11_SUBRESOURCE_DATA vertexbufferSRD = { MeshResourceData.Vertices.Data()};
 
-	GGraphicsDevice.GetDevice()->CreateBuffer(&vertexbufferdesc, &vertexbufferSRD, &VertexBuffer);
+	HRESULT hr = GGraphicsDevice.GetDevice()->CreateBuffer(&vertexbufferdesc, &vertexbufferSRD, &VertexBuffer);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
 }
 
 void FMeshResource::SetTopology(D3D11_PRIMITIVE_TOPOLOGY pTopology)
 {
-	Topology = pTopology;
+	//Topology = pTopology;
 }
 
 void FMeshResource::Release()
@@ -38,5 +38,45 @@ void FMeshResource::Release()
 		IndexBuffer->Release();
 		IndexBuffer = nullptr;
 	}
+}
+
+D3D11_BUFFER_DESC FMeshResource::GetBufferDesc() const
+{
+	D3D11_BUFFER_DESC vertexbufferdesc = {};
+	vertexbufferdesc.ByteWidth = numVertices * sizeof(FVertexSimple);
+	vertexbufferdesc.Usage = D3D11_USAGE_IMMUTABLE; // will never be updated;
+	vertexbufferdesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+	return vertexbufferdesc;
+}
+
+void FMeshResource::Initialize()
+{
+	CreateVertexBuffer();
+}
+
+void FMeshResource::SetMeshResourceData(ResourceData& pData)
+{
+	MeshResourceData = pData;
+}
+
+ID3D11Buffer* FMeshResource::GetVertexBuffer() const
+{
+	return VertexBuffer;
+}
+
+UINT FMeshResource::GetNumVertices() const
+{
+	return numVertices;
+}
+
+const TArray<FVertexSimple>& FMeshResource::GetVertices() const
+{
+	return MeshResourceData.Vertices;
+}
+
+D3D11_PRIMITIVE_TOPOLOGY FMeshResource::GetTopology() const
+{
+	return MeshResourceData.Topology;
 }
 
