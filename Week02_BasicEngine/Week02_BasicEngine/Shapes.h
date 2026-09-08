@@ -26,7 +26,8 @@ extern ResourceData LocationGizmoResource;
 extern ResourceData RotationGizmoResource;
 extern ResourceData ScaleGizmoResource;
 
-extern ResourceData FloorResource;
+extern ResourceData Floor1Resource;
+extern ResourceData Floor2Resource;
 
 void CreateLocationGizmo(FVertexSimple* vertices, float r, float g, float b);
 

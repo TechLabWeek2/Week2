@@ -400,8 +400,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     RotationGizmoResourceData.SetMeshResourceData(RotationGizmoResource);
     ScaleGizmoResourceData.SetMeshResourceData(ScaleGizmoResource);
 
-    Floor1ResourceData.SetMeshResourceData(FloorResource);
-    Floor2ResourceData.SetMeshResourceData(FloorResource);
+    Floor1ResourceData.SetMeshResourceData(Floor1Resource);
+    Floor2ResourceData.SetMeshResourceData(Floor2Resource);
 
 
     //초기화

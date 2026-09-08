@@ -53,6 +53,10 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
         PrimitiveComponent = static_cast<UPrimitiveComponent*>(ObjectList[i]);
         FVector componentLocation(PrimitiveComponent->RelativeLocation.x, PrimitiveComponent->RelativeLocation.y, PrimitiveComponent->RelativeLocation.z);
         FVector difference = componentLocation - rayOrigin; // camera -> component 벡터
+        if (!(PrimitiveComponent->primitiveType == ETypePrimitive::Plane || PrimitiveComponent->primitiveType == ETypePrimitive::Cube || PrimitiveComponent->primitiveType == ETypePrimitive::Sphere))
+        {
+            continue;
+        }
         if (difference.Dot(rayVector) < 0) // 오브젝트가 카메라 뒤에 있으면 무시
         {
             continue;

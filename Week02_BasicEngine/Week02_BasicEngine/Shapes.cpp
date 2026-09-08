@@ -44,7 +44,7 @@ ResourceData PlaneResource =
 }, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
 };
 
-ResourceData FloorResource =
+ResourceData Floor1Resource =
 { {
 	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Top vertex (red)
 	{  1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Bottom-right vertex (green)
@@ -63,25 +63,8 @@ ResourceData FloorResource =
 };
 
 
-FVertexSimple floor1_vertices[] =
-{
-	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Top vertex (red)
-	{  1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Bottom-right vertex (green)
-	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f },  // Bottom-left vertex (blue)
-	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Top vertex (red)
-	{ -1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Bottom-right vertex (green)
-	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f },  // Bottom-left vertex (blue)
-
-	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f },  // Bottom-left vertex (blue)
-	{ -1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Bottom-right vertex (green)
-	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Top vertex (red)
-	{ -1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f },  // Bottom-left vertex (blue)
-	{  1.0f, -1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Bottom-right vertex (green)
-	{  1.0f,  1.0f, 0.0f,  0.4f, 0.4f, 0.4f, 0.3f }, // Top vertex (red)
-};
-
-FVertexSimple floor2_vertices[] =
-{
+ResourceData Floor2Resource =
+{ {
 	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Top vertex (red)
 	{  1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Bottom-right vertex (green)
 	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f },  // Bottom-left vertex (blue)
@@ -95,6 +78,7 @@ FVertexSimple floor2_vertices[] =
 	{ -1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f },  // Bottom-left vertex (blue)
 	{  1.0f, -1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Bottom-right vertex (green)
 	{  1.0f,  1.0f, 0.0f,  0.3f, 0.3f, 0.3f, 0.3f }, // Top vertex (red)
+}, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
 };
 
 ResourceData CubeResource =
