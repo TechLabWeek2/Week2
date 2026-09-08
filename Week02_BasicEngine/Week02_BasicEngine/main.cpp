@@ -588,7 +588,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     bool bIsExit = false;
 
     //FPS 제한을 위한 설정
-    const int targetFPS = 30;
+    const int targetFPS = 60;
     const double targetFrameTime = 1000.0 / targetFPS; //한 프레임의 목표 시간(밀리초 단위)
 
     //고성능 타이머 초기화
