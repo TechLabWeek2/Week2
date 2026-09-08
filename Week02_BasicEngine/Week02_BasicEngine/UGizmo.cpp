@@ -9,47 +9,58 @@ UGizmo::UGizmo(ETypeAxis axis)
 	Axis = axis;
 }
 
-void UGizmo::Update(UPrimitiveComponent* Obj, FVector MouseMove)
+void UGizmo::Update(UPrimitiveComponent* Obj)
 {
-    switch (Axis) {
-    case ETypeAxis::XAxis:
-        switch (Type) {
-        case ETypeTransform::Location:
-            Obj->RelativeLocation.x += MouseMove.x;
+    this->RelativeLocation = Obj->RelativeLocation;
+    switch (Type) {
+    case ETypeTransform::Location:
+    case ETypeTransform::Rotation:
+        switch (Axis)
+        {
+        case XAxis:
+            RelativeRotation = FVector(0, 0, 0);
             break;
-        case ETypeTransform::Rotation:
-            Obj->RelativeRotation.x += MouseMove.x;
+        case YAxis:
+            RelativeRotation = FVector(0, 0, 1.57);
             break;
-        case ETypeTransform::Scale:
-            Obj->RelativeScale3D.x += MouseMove.x;
+        case ZAxis:
+            RelativeRotation = FVector(0, -1.57, 0);
             break;
-        }
-        break;
-    case ETypeAxis::YAxis:
-        switch (Type) {
-        case ETypeTransform::Location:
-            Obj->RelativeLocation.y += MouseMove.y;
-            break;
-        case ETypeTransform::Rotation:
-            Obj->RelativeRotation.y += MouseMove.y;
-            break;
-        case ETypeTransform::Scale:
-            Obj->RelativeScale3D.y += MouseMove.y;
+        default:
             break;
         }
         break;
-    case ETypeAxis::ZAxis:
-        switch (Type) {
-        case ETypeTransform::Location:
-            Obj->RelativeLocation.z += MouseMove.z;
+    case ETypeTransform::Scale:
+        switch (Axis)
+        {
+        case XAxis:
+            RelativeRotation = Obj->RelativeRotation;
             break;
-        case ETypeTransform::Rotation:
-            Obj->RelativeRotation.z += MouseMove.z;
+        case YAxis:
+            RelativeRotation = Obj->RelativeRotation + FVector(0, 0, 1.57);
             break;
-        case ETypeTransform::Scale:
-            Obj->RelativeScale3D.z += MouseMove.z;
+        case ZAxis:
+            RelativeRotation = FVector(0, 1.57, 0) + Obj->RelativeRotation;
+            break;
+        default:
             break;
         }
+        break;
+    }
+
+}
+
+void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove)
+{
+    switch (Type) {
+    case ETypeTransform::Location:
+        Obj->RelativeLocation += MouseMove;
+        break;
+    case ETypeTransform::Rotation:
+        Obj->RelativeRotation += MouseMove;
+        break;
+    case ETypeTransform::Scale:
+        Obj->RelativeScale3D += MouseMove;
         break;
     }
 }

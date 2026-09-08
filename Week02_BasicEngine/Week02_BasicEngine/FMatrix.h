@@ -78,6 +78,7 @@ public:
 	//현재 자기 자신을 직접 Transpose
 	void Transpose();
 
+	FVector WorldToNDC(const FVector& P, FMatrix VP);
 
 	static FMatrix GetModelMatrix(const FVector& Location, const FVector& Rotation, const FVector& Scale);
 
