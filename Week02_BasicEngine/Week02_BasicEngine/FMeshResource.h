@@ -4,13 +4,7 @@
 #include "Shapes.h"
 #include "Core/Core.h"
 
-//struct FVertexSimple
-//{
-//	float x, y, z;    // Position
-//	float r, g, b, a; // Color
-//};
-
-class FVertexSimple;
+struct FVertexSimple;
 
 class FMeshResource
 {

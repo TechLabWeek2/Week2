@@ -39,10 +39,10 @@
 
 UCameraComp* Camera = new UCameraComp();
 
-enum ETypeLine {
-    ETL_LB,
-    OTHER
-};
+//enum ETypeLine {
+//    ETL_LB,
+//    OTHER
+//};
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -308,7 +308,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     double elapsedTime = 0.0;
     
     //카메라
-    UCameraComp* Camera = new UCameraComp();
     Camera->RelativeLocation = { -2.5f, 2.5f,-2.5f };
     Camera->RelativeRotation = { -0.5f,-1.0f, 0 };
 
@@ -334,17 +333,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     UCubeComp* Test = new UCubeComp();
     UCubeComp* Test2 = new UCubeComp();
-    UCubeComp* Test3 = new UCubeComp();
+    USphereComp* Test3 = new USphereComp();
     UCubeComp* Test4 = new UCubeComp();
     UCubeComp* Test5 = new UCubeComp();
-    UCubeComp* Test6 = new UCubeComp();
+    USphereComp* Test6 = new USphereComp(); 
 
     Test->SetMeshResource(CubeResource);
     Test2->SetMeshResource(CubeResource);
-    Test3->SetMeshResource(CubeResource);
+    Test3->SetMeshResource(SphereResource);
     Test4->SetMeshResource(CubeResource);
     Test5->SetMeshResource(CubeResource);
-    Test6->SetMeshResource(CubeResource);
+    Test6->SetMeshResource(SphereResource);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
@@ -373,7 +372,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // 준비 작업
         renderer.Prepare();
         renderer.PrepareShader();
-
 
         POINT currentMousePos;
         GetCursorPos(&currentMousePos); // 현재 마우스 스크린 좌표 획득
