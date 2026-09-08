@@ -9,6 +9,7 @@ struct FVertexSimple
 {
 	float x, y, z;    // Position
 	float r, g, b, a; // Color
+	float u, v = 0.f;
 };
 
 struct ResourceData

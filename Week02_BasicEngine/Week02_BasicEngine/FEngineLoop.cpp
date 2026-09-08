@@ -14,7 +14,7 @@ void FEngineLoop::Init(HWND hWindow, UINT screenWidth, UINT screenHeight)
 	//MainCamera = new UCameraComp();
 
 
-}
+}        
 
 void FEngineLoop::Update(float deltaTime)
 {

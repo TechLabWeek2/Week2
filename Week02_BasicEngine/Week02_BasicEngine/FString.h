@@ -33,6 +33,8 @@ public:
 	FString(const ElementType* InStr);
 	FString(const FString& Other) = default;		//복사 생성자
 	FString(FString&& Other) noexcept = default;	//이동 생성자
+	FString& operator=(const FString& Other) = default;
+	FString& operator=(FString&& Other) noexcept = default;
 	~FString() = default;
 
 private:
@@ -69,7 +71,7 @@ public:
 	{
 		assert((IsValidIndex(Index), "String index out of bounds: Index %i from a string with a length of %i", Index, Len()));
 		return Data[Index];
-	}
+	}	
 
 	FString operator+(const FString& Other) const
 	{

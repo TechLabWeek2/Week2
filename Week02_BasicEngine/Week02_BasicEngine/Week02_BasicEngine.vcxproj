@@ -147,6 +147,7 @@
     <ClCompile Include="FMatrix.cpp" />
     <ClCompile Include="FGraphicsDevice.cpp" />
     <ClCompile Include="FMeshResource.cpp" />
+    <ClCompile Include="FShaderResource.cpp" />
     <ClCompile Include="FVector.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="FMatrix.h" />
     <ClInclude Include="FGraphicsDevice.h" />
     <ClInclude Include="FMeshResource.h" />
+    <ClInclude Include="FShaderResource.h" />
     <ClInclude Include="FVector.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -211,6 +213,13 @@
     <ClInclude Include="Utils\Math.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="CheckPattern.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="ShaderW0.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>

@@ -68,3 +68,13 @@ void UPrimitiveComponent::SetUseColorFlag(bool pUseColorFlag)
 {
 	UseColor = pUseColorFlag;
 }
+
+FShaderResource* UPrimitiveComponent::GetShaderResource() const
+{
+	return ShaderResource;
+}
+
+void UPrimitiveComponent::SetShaderResource(FShaderResource* pShaderResource)
+{
+	ShaderResource = pShaderResource;
+}

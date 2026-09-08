@@ -111,16 +111,16 @@
     <ClCompile Include="MeshData.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
-    <ClCompile Include="FSphereResource.cpp">
+    <ClCompile Include="UClass.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
-    <ClCompile Include="FCubeResource.cpp">
+    <ClCompile Include="UGizmo.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
-    <ClCompile Include="FLineResource.cpp">
+    <ClCompile Include="UFloorComp.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
-    <ClCompile Include="FTriangleResource.cpp">
+    <ClCompile Include="FShaderResource.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
   </ItemGroup>
@@ -209,21 +209,27 @@
     <ClInclude Include="FEngineLoop.h">
       <Filter>Header File</Filter>
     </ClInclude>
-    <ClInclude Include="FSphereResource.h">
+    <ClInclude Include="FJsonWrapper.h">
       <Filter>Header File</Filter>
     </ClInclude>
-    <ClInclude Include="FCubeResource.h">
+    <ClInclude Include="UClass.h">
       <Filter>Header File</Filter>
     </ClInclude>
-    <ClInclude Include="FLineResource.h">
+    <ClInclude Include="UGizmo.h">
       <Filter>Header File</Filter>
     </ClInclude>
-    <ClInclude Include="FTriangleResource.h">
+    <ClInclude Include="UFloorComp.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FShaderResource.h">
       <Filter>Header File</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ShaderW0.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="CheckPattern.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

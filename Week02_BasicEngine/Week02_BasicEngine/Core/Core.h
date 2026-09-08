@@ -10,11 +10,12 @@ enum RasterizerState
 {
 	Solid,
 	WireFrame,
-	FrontCulling
+	FrontCulling,
+	Solid_Culling_None
 };
 
 enum BlendMode
 {
 	Opaque,
 	Alpha
-};
+}; 

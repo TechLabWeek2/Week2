@@ -5,6 +5,7 @@
 #include "UPrimitiveComponent.h"
 #include "FMeshResource.h"
 #include "d3dcompiler.h"
+#include "FShaderResource.h"
 
 
 void URenderer::CreateConstantBuffer() {
@@ -54,6 +55,8 @@ void URenderer::UpdateConstant(FConstants& ConstantData)
 			constants->Color[1] = ConstantData.Color[1];
 			constants->Color[2] = ConstantData.Color[2];
 			constants->Color[3] = ConstantData.Color[3];
+
+			constants->PatternNum = ConstantData.PatternNum;
 		}
 
 		GGraphicsDevice.GetDeviceContext()->Unmap(ConstantBuffer, 0);
@@ -85,6 +88,7 @@ void URenderer::CreateShader()
 	}
 
 	hr = D3DCompileFromFile(L"ShaderW0.hlsl", nullptr, nullptr, "mainPS", "ps_5_0", 0, 0, &pixelshaderCSO, nullptr);
+	//hr = D3DCompileFromFile(L"CheckPattern.hlsl", nullptr, nullptr, "mainPS", "ps_5_0", 0, 0, &pixelshaderCSO, nullptr);
 	if (FAILED(hr))
 	{
 		assert(false);
@@ -93,13 +97,14 @@ void URenderer::CreateShader()
 	hr = GGraphicsDevice.GetDevice()->CreatePixelShader(pixelshaderCSO->GetBufferPointer(), pixelshaderCSO->GetBufferSize(), nullptr, &SimplePixelShader);
 	if (FAILED(hr))
 	{
-		assert(false);
+		assert(false); 
 	}
 
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	hr = GGraphicsDevice.GetDevice()->CreateInputLayout(layout, ARRAYSIZE(layout), vertexshaderCSO->GetBufferPointer(), vertexshaderCSO->GetBufferSize(), &SimpleInputLayout);
@@ -163,6 +168,15 @@ void URenderer::CreateRasterizerState()
 	{
 		assert(false);
 	}
+
+	rasterizerdesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerdesc.CullMode = D3D11_CULL_NONE; // 백 페이스 컬링
+	hr = GGraphicsDevice.GetDevice()->CreateRasterizerState(&rasterizerdesc, &RasterizerState_Solid_CullingNone);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
 }
 
 // 래스터라이저 상태를 해제하는 함수
@@ -184,6 +198,8 @@ void URenderer::Release()
 	GGraphicsDevice.GetDeviceContext()->OMSetRenderTargets(0, nullptr, nullptr);
 
 	ReleaseDepthStencilState();
+
+	ReleaseBlendState();
 }
 
 //D3D11 렌더링에 필요한 준비 작업을 위한 Prepare 함수
@@ -297,6 +313,13 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 	{
 		if (Obj->bIsActive)
 		{
+			GGraphicsDevice.GetDeviceContext()->VSSetShader(Obj->GetShaderResource()->GetVertexShader(), nullptr, 0);
+			GGraphicsDevice.GetDeviceContext()->PSSetShader(Obj->GetShaderResource()->GetPixelShader(), nullptr, 0);
+			GGraphicsDevice.GetDeviceContext()->IASetInputLayout(Obj->GetShaderResource()->GetInputLayout());  
+
+			GGraphicsDevice.GetDeviceContext()->VSSetConstantBuffers(0, 1, &ConstantBuffer);
+			GGraphicsDevice.GetDeviceContext()->PSSetConstantBuffers(0, 1, &ConstantBuffer);
+
 			GGraphicsDevice.GetDeviceContext()->RSSetState(FindRasterizerState(Obj->GetRasterizerState()));
 			GGraphicsDevice.GetDeviceContext()->OMSetBlendState(FindBlendState(Obj->GetBlendMode()), nullptr, 0xffffffff);
 
@@ -308,6 +331,7 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 			TempConstantData.Color[2] = Obj->GetModelColor()[2];
 			TempConstantData.Color[3] = Obj->GetModelColor()[3];
 			TempConstantData.UseColor = Obj->GetUseColorFlag();
+			TempConstantData.PatternNum = 20;
 			UpdateConstant(TempConstantData);
 
 			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(Obj->GetMeshResource()->GetTopology());
@@ -323,6 +347,13 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 	{
 		if (Obj->bIsActive)
 		{
+			GGraphicsDevice.GetDeviceContext()->VSSetShader(Obj->GetShaderResource()->GetVertexShader(), nullptr, 0);
+			GGraphicsDevice.GetDeviceContext()->PSSetShader(Obj->GetShaderResource()->GetPixelShader(), nullptr, 0);
+			GGraphicsDevice.GetDeviceContext()->IASetInputLayout(Obj->GetShaderResource()->GetInputLayout());
+
+			GGraphicsDevice.GetDeviceContext()->VSSetConstantBuffers(0, 1, &ConstantBuffer);
+			GGraphicsDevice.GetDeviceContext()->PSSetConstantBuffers(0, 1, &ConstantBuffer);
+
 			GGraphicsDevice.GetDeviceContext()->RSSetState(FindRasterizerState(Obj->GetRasterizerState()));
 			GGraphicsDevice.GetDeviceContext()->OMSetBlendState(FindBlendState(Obj->GetBlendMode()), nullptr, 0xffffffff);
 
@@ -334,6 +365,7 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 			TempConstantData.Color[2] = Obj->GetModelColor()[2];
 			TempConstantData.Color[3] = Obj->GetModelColor()[3];
 			TempConstantData.UseColor = Obj->GetUseColorFlag();
+			TempConstantData.PatternNum = 20;
 			UpdateConstant(TempConstantData);
 
 			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(Obj->GetMeshResource()->GetTopology());
@@ -374,6 +406,9 @@ ID3D11RasterizerState* URenderer::FindRasterizerState(RasterizerState StateType)
 			break;
 		case FrontCulling:
 			return RasterizerState_FrontCulling;
+			break;
+		case Solid_Culling_None:
+			return RasterizerState_Solid_CullingNone;
 			break;
 		default:
 			break;
@@ -471,6 +506,21 @@ void URenderer::CreateBlendState()
 	if (FAILED(hr))
 	{
 		assert(false);  
+	}
+}
+
+void URenderer::ReleaseBlendState()
+{
+	if (BlendState_Opaque)
+	{
+		BlendState_Opaque->Release();
+		BlendState_Opaque = nullptr;
+	}
+
+	if (BlendState_Alpha)
+	{
+		BlendState_Alpha->Release();
+		BlendState_Alpha = nullptr;
 	}
 }
 

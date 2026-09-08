@@ -14,6 +14,7 @@
 #include "FMeshResource.h"
 #include "UGizmo.h"
 #include "UFloorComp.h"
+#include "FShaderResource.h"
 
 #define SCREEN_WIDTH_INIT 1800
 #define SCREEN_HEIGHT_INIT 1200
@@ -585,6 +586,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Floor1ResourceData.Initialize();
     Floor2ResourceData.Initialize();
 
+    //Shader Resource
+    DefaultShader.SetVertexShaderName(L"ShaderW0.hlsl");
+    DefaultShader.SetPixelShaderName(L"ShaderW0.hlsl");
+
+    TArray <D3D11_INPUT_ELEMENT_DESC> DefaultLayout =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+    DefaultShader.SetInputLayoutDesc(DefaultLayout);
+
+    //Shader 데이터 생성
+    DefaultShader.CreateShaderResource();
+
+    //체크무늬 셰이더
+    CheckerShader.SetVertexShaderName(L"ShaderW0.hlsl");
+    CheckerShader.SetPixelShaderName(L"CheckPattern.hlsl");
+
+    TArray <D3D11_INPUT_ELEMENT_DESC> CheckerLayout =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+    CheckerShader.SetInputLayoutDesc(CheckerLayout);
+
+    //Shader 데이터 생성
+    CheckerShader.CreateShaderResource();
+
+
     bool bIsExit = false;
 
     //FPS 제한을 위한 설정
@@ -608,6 +640,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     AxisGizmo->RelativeScale3D = FVector(1.0f, 1.0f, 1.0f);
 
     AxisGizmo->SetMeshResource(&LineResourceData);
+    AxisGizmo->SetShaderResource(&DefaultShader);
 
     AxisGizmo->RelativeLocation = FVector(0, 0, 0);
     AxisGizmo->RelativeRotation = FVector(0, 0, 0);
@@ -642,6 +675,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test6->SetMeshResource(&SphereResourceData);
     Test7->SetMeshResource(&PlaneResourceData);
 
+    Test->SetShaderResource(&DefaultShader);
+    Test2->SetShaderResource(&DefaultShader);
+    Test3->SetShaderResource(&DefaultShader);
+    Test4->SetShaderResource(&DefaultShader);
+    Test5->SetShaderResource(&DefaultShader);
+    Test6->SetShaderResource(&DefaultShader);
+    Test7->SetShaderResource(&DefaultShader);
+
     Test->SetRasterizerState(RasterizerState::WireFrame);
     Test3->SetRasterizerState(RasterizerState::WireFrame);
     Test5->SetRasterizerState(RasterizerState::FrontCulling);
@@ -649,6 +690,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     XGizmo->SetMeshResource(&LocationGizmoResourceData);
     YGizmo->SetMeshResource(&LocationGizmoResourceData);
     ZGizmo->SetMeshResource(&LocationGizmoResourceData);
+
+    XGizmo->SetShaderResource(&DefaultShader);
+    YGizmo->SetShaderResource(&DefaultShader);
+    ZGizmo->SetShaderResource(&DefaultShader);
 
     XGizmo->RelativeScale3D = FVector(1, 1, 1);
     YGizmo->RelativeScale3D = FVector(1, 1, 1);
@@ -679,8 +724,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ZGizmo->SetUseColorFlag(true);
 
     UFloorComp* Floor = new UFloorComp();
-    Floor->ConstructFloor(&Floor1ResourceData, &Floor2ResourceData); 
-    GUObjectArray.RemoveObj(Floor);
+
+    Floor->primitiveType = ETypePrimitive::Floor;
+    Floor->SetMeshResource(&Floor1ResourceData);
+    Floor->SetShaderResource(&CheckerShader);
+
+    Floor->SetRasterizerState(RasterizerState::Solid_Culling_None);
+
+    Floor->RelativeScale3D = FVector(5.f, 5.f, 5.f);
+    Floor->RelativeRotation = FVector(DegreeToRadian(90), 0.f, 0.f);
+    Floor->RelativeLocation = FVector(0.f, 0.f, -1.0f);
+
+    Floor->SetBlendMode(BlendMode::Alpha);
+    Floor->SetUseColorFlag(true);
+    TArray<float> Black = { 0.f, 0.f, 0.f, 1.f };
+    Floor->SetModelColor(Black);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false && !bStopRender)
@@ -715,7 +773,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // 매번 실행되는 코드를 여기에 추가합니다.
         // 준비 작업
         renderer.Prepare();
-        renderer.PrepareShader();
+        //renderer.PrepareShader();
 
         POINT currentMousePos;
         GetCursorPos(&currentMousePos); // 현재 마우스 스크린 좌표 획득

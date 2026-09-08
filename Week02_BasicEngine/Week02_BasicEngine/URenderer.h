@@ -38,8 +38,9 @@ struct alignas(16) FConstants {
     FMatrix MVP;
 
 	float HightLightIntensity = 1.f;
-	float Padding[2]; // 16바이트 정렬을 위해 패딩 추가
     bool UseColor = false;
+    float PatternNum = 10.f;
+	float Padding; // 16바이트 정렬을 위해 패딩 추가
     float Color[4] = { 1.f, 1.f, 1.f, 1.f };
 };
 
@@ -61,6 +62,7 @@ public:
     ID3D11RasterizerState* RasterizerState_Solid = nullptr; // 래스터라이저 상태(컬링, 채우기 모드 등 정의)
     ID3D11RasterizerState* RasterizerState_WireFrame = nullptr; // 와이어프레임 래스터라이저 상태
     ID3D11RasterizerState* RasterizerState_FrontCulling = nullptr; // 래스터라이저 상태
+    ID3D11RasterizerState* RasterizerState_Solid_CullingNone = nullptr; // 래스터라이저 상태
     ID3D11Buffer* ConstantBuffer = nullptr; // 쉐이더에 데이터를 전달하기 위한 상수 버퍼
     //ID3D11Texture2D* DepthStencilBuffer = nullptr; // 깊이, 스텐실 버퍼
     //ID3D11DepthStencilView* DepthStencilView = nullptr; // 깊이 버퍼 연결 인터페이스
@@ -130,6 +132,8 @@ public:
 
     //BlendState 만들기
     void CreateBlendState();
+
+    void ReleaseBlendState();
 
     //enum에 따라 BlendState 선택
     ID3D11BlendState* FindBlendState(BlendMode BlendStateMode)const;

@@ -19,6 +19,7 @@ enum class ETypePrimitive : uint8
 
 class FMeshResource;
 class URenderer;
+class FShaderResource;
 
 class UPrimitiveComponent :
     public USceneComponent
@@ -56,9 +57,13 @@ public:
 	bool GetUseColorFlag()const;
 	void SetUseColorFlag(bool pUseColorFlag);
 
+	FShaderResource* GetShaderResource()const;
+	void SetShaderResource(FShaderResource* pShaderResource);
+
 private:
     //메시 데이터
     FMeshResource* MeshResource = nullptr;
+	FShaderResource* ShaderResource = nullptr;
 
 	RasterizerState RasterizerStateType = RasterizerState::Solid;
 

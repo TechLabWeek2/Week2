@@ -33,8 +33,8 @@ public:
 private:
 	//Vertices 등이 담긴 메시 데이터
 	ResourceData MeshResourceData;
-	UINT numVertices;
-	ID3D11Buffer* VertexBuffer;
-	ID3D11Buffer* IndexBuffer;
+	UINT numVertices = 0;
+	ID3D11Buffer* VertexBuffer = nullptr;
+	ID3D11Buffer* IndexBuffer = nullptr;
 };
 
