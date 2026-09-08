@@ -21,11 +21,6 @@ void FMeshResource::CreateVertexBuffer()
 	}
 }
 
-void FMeshResource::SetTopology(D3D11_PRIMITIVE_TOPOLOGY pTopology)
-{
-	//Topology = pTopology;
-}
-
 void FMeshResource::Release()
 {
 	if (VertexBuffer)

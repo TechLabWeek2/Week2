@@ -55,7 +55,9 @@ public:
     // 렌더링에 필요한 리소스 및 상태를 관리하기 위한 변수들
     ID3D11Texture2D* FrameBuffer = nullptr; // 화면 출력용 텍스처
     ID3D11RenderTargetView* FrameBufferRTV = nullptr; // 텍스처를 렌더 타겟으로 사용하는 뷰
-    ID3D11RasterizerState* RasterizerState = nullptr; // 래스터라이저 상태(컬링, 채우기 모드 등 정의)
+    ID3D11RasterizerState* RasterizerState_Solid = nullptr; // 래스터라이저 상태(컬링, 채우기 모드 등 정의)
+    ID3D11RasterizerState* RasterizerState_WireFrame = nullptr; // 와이어프레임 래스터라이저 상태
+    ID3D11RasterizerState* RasterizerState_FrontCulling = nullptr; // 래스터라이저 상태
     ID3D11Buffer* ConstantBuffer = nullptr; // 쉐이더에 데이터를 전달하기 위한 상수 버퍼
     ID3D11Texture2D* DepthStencilBuffer = nullptr; // 깊이, 스텐실 버퍼
     ID3D11DepthStencilView* DepthStencilView = nullptr; // 깊이 버퍼 연결 인터페이스
@@ -108,6 +110,8 @@ public:
     void RenderScene(const TArray<UObject*> Objects, const UCameraComp* Camera, float AspectRatio);
 
     void Init();
+
+    ID3D11RasterizerState* FindRasterizerState(RasterizerState StateType)const;
 
     void ResizeWindow(bool* bStopRender);
 
