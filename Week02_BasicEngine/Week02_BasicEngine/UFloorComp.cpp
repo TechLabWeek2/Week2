@@ -3,8 +3,8 @@
 UFloorComp::UFloorComp()
 {
 	primitiveType = ETypePrimitive::Floor;
-	floorSizeX = 150;
-	floorSizeY = 150;
+	floorSizeX = 50;
+	floorSizeY = 50;
     floorPlaneList = nullptr;
 }
 
