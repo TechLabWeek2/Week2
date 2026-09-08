@@ -139,7 +139,7 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
     ImGui::Begin("Jungle Control Panel");
     ImGui::Text("Hello Jungle World!");
     ImGui::Text("FPS %d (%d ms)", 999, 999);
-    const char* typeNames[] = { "None", "Plane", "Cube", "Sphere", "XLine", "YLine", "ZLine", "Max" };
+    const char* typeNames[] = { "None", "Plane", "Cube", "Sphere", "Floor", "XLine", "YLine", "ZLine", "Max" };
     static ETypePrimitive current = ETypePrimitive::Sphere;
     if (ImGui::BeginCombo("Primitive", typeNames[(int32)current]))
     {
@@ -171,7 +171,7 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
         UPrimitiveComponent* newPrimitive = nullptr;
         switch (current)
         {
-        case ETypePrimitive::Cube:  //렌더러 정리 끝나면 할것 
+        case ETypePrimitive::Cube:
             newPrimitive = new UCubeComp();
             newPrimitive->SetMeshResource(CubeResource);
             break;
@@ -831,7 +831,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             float deltaX = (float)(currentMousePos.x - lastMousePos.x);
             float deltaY = (float)(currentMousePos.y - lastMousePos.y);
 
-            float sensitivity = 0.002f;
+            const float sensitivity = 0.002f;
 
             float angleX = deltaX * sensitivity;
             float angleY = -deltaY * sensitivity;
@@ -840,6 +840,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             Camera->RelativeRotation.y += angleX;
             // 상하
             Camera->RelativeRotation.x += angleY;
+
+            // 상하 각도 제한
+            if (Camera->RelativeRotation.x <= DegreeToRadian(-89.f))
+            {
+                Camera->RelativeRotation.x = DegreeToRadian(-89.f);
+            }
+            else if (Camera->RelativeRotation.x >= DegreeToRadian(89.f))
+            {
+                Camera->RelativeRotation.x = DegreeToRadian(89.f);
+            }
 
             lastMousePos = currentMousePos;
         }

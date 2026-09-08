@@ -14,3 +14,4 @@ inline T Abs(const T A)
 }
 
 float DegreeToRadian(float degree);
+float RadianToDegree(float radian);
