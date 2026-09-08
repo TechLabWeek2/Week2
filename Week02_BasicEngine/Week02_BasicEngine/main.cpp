@@ -12,6 +12,7 @@
 #include "UObjectArray.h"
 #include "FGraphicsDevice.h"
 #include "FMeshResource.h"
+#include "UFloorComp.h"
 
 #define SCREEN_WIDTH 1800
 #define SCREEN_HEIGHT 1200
@@ -50,7 +51,6 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam
 // 각종 메시지를 처리할 함수
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-
     if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
     {
         return true;
@@ -126,7 +126,7 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
     static float Rx = 0, Ry = 0, Rz = 0;
     static float Sx = 0.1f, Sy = 0.1f, Sz = 0.1f;
     static bool IsOrthogonal = false;
-    static float FOV = 60.f;
+    static float FOV = 80.f;
     static float CLx = 0, CLy = 0, CLz = 0;
     static float CRx = 0, CRy = 0, CRz = 0;
     static int spawnNum = 1;
@@ -288,18 +288,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     FMeshResource* TriangleResource = new FMeshResource();
     FMeshResource* LineResource = new FMeshResource();
     FMeshResource* PlaneResource = new FMeshResource();
+    FMeshResource* Floor1Resource = new FMeshResource();
+    FMeshResource* Floor2Resource = new FMeshResource();
 
     SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
     CubeResource->CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
     TriangleResource->CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
     LineResource->CreateVertexBuffer(line_vertices, sizeof(line_vertices));
     PlaneResource->CreateVertexBuffer(plane_vertices, sizeof(plane_vertices));
+    Floor1Resource->CreateVertexBuffer(floor1_vertices, sizeof(floor1_vertices));
+    Floor2Resource->CreateVertexBuffer(floor2_vertices, sizeof(floor2_vertices));
 
     SphereResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     CubeResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     TriangleResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     LineResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     PlaneResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    Floor1Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    Floor2Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     bool bIsExit = false;
 
@@ -353,6 +359,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test5->SetMeshResource(CubeResource);
     Test6->SetMeshResource(SphereResource);
     Test7->SetMeshResource(PlaneResource);
+
+    UFloorComp* Floor = new UFloorComp();
+    Floor->ConstructFloor(Floor1Resource, Floor2Resource);
+    GUObjectArray.RemoveObj(Floor);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)

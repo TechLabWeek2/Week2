@@ -8,6 +8,7 @@ enum class ETypePrimitive : uint8
 	Plane,
 	Cube,
 	Sphere,
+	Floor,
 	XLine,
 	YLine,
 	ZLine,
