@@ -13,6 +13,7 @@
 #include "UEngineStatics.h"
 #include "FMeshResource.h"
 #include "UObjectArray.h"
+#include "Core/Core.h"
 
 
 class FJsonWrapper
@@ -89,6 +90,41 @@ public:
 			throw std::invalid_argument("Invalid primitive type.");
 		}
 
+		if(value->GetRasterizerState() == RasterizerState::Solid)
+		{
+			data["RasterizerState"] = "RasterizerState::Solid";
+		}
+		else if(value->GetRasterizerState() == RasterizerState::WireFrame)
+		{
+			data["RasterizerState"] = "RasterizerState::WireFrame";
+		}
+		else if(value->GetRasterizerState() == RasterizerState::FrontCulling)
+		{
+			data["RasterizerState"] = "RasterizerState::FrontCulling";
+		}
+		else
+		{
+			throw std::invalid_argument("Invalid RasterizerState type.");
+		}
+
+
+		if (value->GetBlendMode() == BlendMode::Opaque)
+		{
+			data["BlendMode"] = "BlendMode::Opaque";
+		}
+		else if (value->GetBlendMode() == BlendMode::Alpha)
+		{
+			data["BlendMode"] = "BlendMode::Alpha";
+		}
+		else
+		{
+			throw std::invalid_argument("Invalid BlendMode type.");
+		}
+
+		const float* modelColor = value->GetModelColor();
+		data["ModelColor"] = json::Array(modelColor[0], modelColor[1], modelColor[2], modelColor[3]);
+		data["UseColor"] = value->GetUseColorFlag();
+
 		return data;
 	}
 
@@ -100,7 +136,24 @@ public:
 		
 		//나중에 FString으로 바꿀수 있으면
 		std::string typeString = data.at("Type").ToString();
+		std::string typeRasterizer = data.at("RasterizerState").ToString();
+		std::string typeBlend = data.at("BlendMode").ToString();
 		ETypePrimitive type = FromString(typeString);
+		RasterizerState RasterizerStateType = RasterizerStateFromString(typeRasterizer);
+		BlendMode BlendModeState = BlendModeFromString(typeBlend);
+
+
+		TArray<float> modelColor = { 1.f, 1.f, 1.f, 1.f };
+		bool useColor = false;
+
+		const Json& color = data.at("ModelColor");
+		for (int i = 0; i < 4; ++i)
+		{
+			modelColor[i] = GetNumber(color.at(i));
+		}
+
+		const Json& flag = data.at("UseColor");
+		useColor = flag.ToBool();
 
 		FMeshResource* MeshResource = nullptr;
 
@@ -131,7 +184,11 @@ public:
 		NewPrimitive->RelativeLocation = location;
 		NewPrimitive->RelativeRotation = rotation;
 		NewPrimitive->RelativeScale3D = scale;
+		NewPrimitive->SetRasterizerState(RasterizerStateType);
+		NewPrimitive->SetBlendMode(BlendModeState);
 		NewPrimitive->SetMeshResource(MeshResource);
+		NewPrimitive->SetModelColor(modelColor);
+		NewPrimitive->SetUseColorFlag(useColor);
 			
 		return NewPrimitive;
 	}
@@ -288,7 +345,7 @@ public:
 			}
 	}
 
-	static ETypePrimitive FromString(const std::string& typeString)
+	static ETypePrimitive FromString(const std::string typeString)
 	{
 		if (typeString == "ETypePrimitive::None")     return ETypePrimitive::None;
 		if (typeString == "ETypePrimitive::Plane") return ETypePrimitive::Plane;
@@ -301,6 +358,21 @@ public:
 		if (typeString == "ETypePrimitive::Gizmo")    return ETypePrimitive::Gizmo;
 		if (typeString == "ETypePrimitive::Max")      return ETypePrimitive::Max;
 		throw std::invalid_argument("Invalid primitive type string: " + typeString);
+	}
+	
+	static RasterizerState RasterizerStateFromString(const std::string& stateString)
+	{
+		if (stateString == "RasterizerState::Solid")      return RasterizerState::Solid;
+		if (stateString == "RasterizerState::WireFrame")      return RasterizerState::WireFrame;
+		if (stateString == "RasterizerState::FrontCulling")      return RasterizerState::FrontCulling;
+		throw std::invalid_argument("Invalid rasterizer state string: " + stateString);
+	}
+
+	static BlendMode BlendModeFromString(const std::string& stateString)
+	{
+		if (stateString == "BlendMode::Opaque")      return BlendMode::Opaque;
+		if (stateString == "BlendMode::Alpha")      return BlendMode::Alpha;
+		throw std::invalid_argument("Invalid blend mode string: " + stateString);
 	}
 
 	static std::filesystem::path FindDirectory(const wchar_t* dir)
