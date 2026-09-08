@@ -323,29 +323,86 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui_ImplWin32_Init((void*)hWnd);
     ImGui_ImplDX11_Init(renderer.Device, renderer.DeviceContext);
 
-    //Mesh Resource 만들기.
-    FMeshResource* SphereResource = new FMeshResource();
-    FMeshResource* CubeResource = new FMeshResource();
-    FMeshResource* TriangleResource = new FMeshResource();
-    FMeshResource* LineResource = new FMeshResource();
-    FMeshResource* PlaneResource = new FMeshResource();
-    FMeshResource* Floor1Resource = new FMeshResource();
-    FMeshResource* Floor2Resource = new FMeshResource();
-    FMeshResource* LocationXGizmoResource = new FMeshResource();
-    FMeshResource* LocationYGizmoResource = new FMeshResource();
-    FMeshResource* LocationZGizmoResource = new FMeshResource();
-    FMeshResource* RotationXGizmoResource = new FMeshResource();
-    FMeshResource* RotationYGizmoResource = new FMeshResource();
-    FMeshResource* RotationZGizmoResource = new FMeshResource();
-    FMeshResource* ScaleXGizmoResource = new FMeshResource();
-    FMeshResource* ScaleYGizmoResource = new FMeshResource();
-    FMeshResource* ScaleZGizmoResource = new FMeshResource();
+    ////Mesh Resource 만들기.
+    //FMeshResource* SphereResource = new FMeshResource();
+    //FMeshResource* CubeResource = new FMeshResource();
+    //FMeshResource* TriangleResource = new FMeshResource();
+    //FMeshResource* LineResource = new FMeshResource();
+    //FMeshResource* PlaneResource = new FMeshResource();
+    //FMeshResource* Floor1Resource = new FMeshResource();
+    //FMeshResource* Floor2Resource = new FMeshResource();
+    //FMeshResource* LocationXGizmoResource = new FMeshResource();
+    //FMeshResource* LocationYGizmoResource = new FMeshResource();
+    //FMeshResource* LocationZGizmoResource = new FMeshResource();
+    //FMeshResource* RotationXGizmoResource = new FMeshResource();
+    //FMeshResource* RotationYGizmoResource = new FMeshResource();
+    //FMeshResource* RotationZGizmoResource = new FMeshResource();
+    //FMeshResource* ScaleXGizmoResource = new FMeshResource();
+    //FMeshResource* ScaleYGizmoResource = new FMeshResource();
+    //FMeshResource* ScaleZGizmoResource = new FMeshResource();
+    //PlaneResource->CreateVertexBuffer(plane_vertices, sizeof(plane_vertices));
+    //리소스 생성
+    /*FCubeResource CubeResource;
+    FSphereResource SphereResource;
+    FLineResource LineResource;
+    FTriangleResource TriangleResource;
+    FPlaneResource PlaneResource;*/
 
-    CubeResource.Initialize();
+    //생성
+    FMeshResource CubeResourceData;
+    FMeshResource SphereResourceData;
+    FMeshResource LineResourceData;
+    FMeshResource TriangleResourceData;
+    FMeshResource PlaneResourceData;
+
+    FMeshResource LocationGizmoResourceData;
+    FMeshResource RotationGizmoResourceData;
+    FMeshResource ScaleGizmoResourceData;
+
+    FMeshResource Floor1ResourceData;
+    FMeshResource Floor2ResourceData;
+
+    //데이터 할당
+    CubeResourceData.SetMeshResourceData(CubeResource);
+    SphereResourceData.SetMeshResourceData(SphereResource);
+    LineResourceData.SetMeshResourceData(LineResource);
+    TriangleResourceData.SetMeshResourceData(TriangleResource);
+    PlaneResourceData.SetMeshResourceData(PlaneResource);
+
+    InitializeVertexArray(LocationGizmoResource.Vertices, 144);
+    InitializeVertexArray(RotationGizmoResource.Vertices, 1536);
+
+    CreateLocationGizmo(LocationGizmoResource.Vertices.Data(), 0.0f, 0.0f, 1.0f);
+    CreateRotationGizmo(RotationGizmoResource.Vertices.Data(), 1.0f, 0.0f, 0.0f);
+
+    LocationGizmoResourceData.SetMeshResourceData(LocationGizmoResource);
+    RotationGizmoResourceData.SetMeshResourceData(RotationGizmoResource);
+    ScaleGizmoResourceData.SetMeshResourceData(ScaleGizmoResource);
+
+    Floor1ResourceData.SetMeshResourceData(FloorResource);
+    Floor2ResourceData.SetMeshResourceData(FloorResource);
+
+
+    //초기화
+    CubeResourceData.Initialize();
+    SphereResourceData.Initialize();
+    LineResourceData.Initialize();
+    TriangleResourceData.Initialize();
+    PlaneResourceData.Initialize();
+
+    LocationGizmoResourceData.Initialize();
+    RotationGizmoResourceData.Initialize();
+    ScaleGizmoResourceData.Initialize();
+
+    Floor1ResourceData.Initialize();
+    Floor2ResourceData.Initialize();
+
+
+    /*CubeResource.Initialize();
     SphereResource.Initialize();
     LineResource.Initialize();
     TriangleResource.Initialize();
-    PlaneResource.Initialize();
+    PlaneResource.Initialize();*/
     ////Mesh Resource 만들기.
     //FMeshResource* SphereResource = new FMeshResource();
     //FMeshResource* CubeResource = new FMeshResource();
@@ -368,7 +425,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     //CreateRotationGizmo(rotation_gizmo_x_vertices, 1.0f, 0.0f, 0.0f);
     //CreateRotationGizmo(rotation_gizmo_y_vertices, 0.0f, 1.0f, 0.0f);
     //CreateRotationGizmo(rotation_gizmo_z_vertices, 0.0f, 0.0f, 1.0f);
-    SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
+    /*SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
     CubeResource->CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
     TriangleResource->CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
     LineResource->CreateVertexBuffer(line_vertices, sizeof(line_vertices));
@@ -377,7 +434,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     LocationYGizmoResource->CreateVertexBuffer(location_gizmo_y_vertices, sizeof(location_gizmo_y_vertices));
     LocationZGizmoResource->CreateVertexBuffer(location_gizmo_z_vertices, sizeof(location_gizmo_z_vertices));
     Floor1Resource->CreateVertexBuffer(floor1_vertices, sizeof(floor1_vertices));
-    Floor2Resource->CreateVertexBuffer(floor2_vertices, sizeof(floor2_vertices));
+    Floor2Resource->CreateVertexBuffer(floor2_vertices, sizeof(floor2_vertices));*/
 
     //SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
     //CubeResource->CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
@@ -410,7 +467,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     //ScaleXGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //ScaleYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //ScaleZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    SphereResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    /*SphereResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     CubeResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     TriangleResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     LineResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -425,7 +482,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ScaleYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ScaleZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     Floor1Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-    Floor2Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    Floor2Resource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);*/
 
     bool bIsExit = false;
 
@@ -449,7 +506,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     AxisGizmo->RelativeScale3D = FVector(1.0f, 1.0f, 1.0f);
 
-    AxisGizmo->SetMeshResource(static_cast<FMeshResource*>(&LineResource));
+    AxisGizmo->SetMeshResource(&LineResourceData);
 
     AxisGizmo->RelativeLocation = FVector(0, 0, 0);
     AxisGizmo->RelativeRotation = FVector(0, 0, 0);
@@ -476,24 +533,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     UGizmo* YGizmo = new UGizmo();
     UGizmo* ZGizmo = new UGizmo();
 
-    Test->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
-    Test2->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
-    Test3->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
-    Test4->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
-    Test5->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
-    Test6->SetMeshResource(static_cast<FMeshResource*>(&CubeResource));
-    Test7->SetMeshResource(static_cast<FMeshResource*>(&PlaneResource));
+    Test->SetMeshResource(&CubeResourceData);
+    Test2->SetMeshResource(&CubeResourceData);
+    Test3->SetMeshResource(&CubeResourceData);
+    Test4->SetMeshResource(&CubeResourceData);
+    Test5->SetMeshResource(&CubeResourceData);
+    Test6->SetMeshResource(&CubeResourceData);
+    Test7->SetMeshResource(&PlaneResourceData);
 
-    Test->SetMeshResource(CubeResource);
-    Test2->SetMeshResource(CubeResource);
-    Test3->SetMeshResource(SphereResource);
-    Test4->SetMeshResource(CubeResource);
-    Test5->SetMeshResource(CubeResource);
-    Test6->SetMeshResource(SphereResource);
-    Test7->SetMeshResource(PlaneResource);
-    XGizmo->SetMeshResource(LocationXGizmoResource);
-    YGizmo->SetMeshResource(LocationYGizmoResource);
-    ZGizmo->SetMeshResource(LocationZGizmoResource);
+    XGizmo->SetMeshResource(&LocationGizmoResourceData);
+    YGizmo->SetMeshResource(&LocationGizmoResourceData);
+    ZGizmo->SetMeshResource(&LocationGizmoResourceData);
 
     XGizmo->RelativeScale3D = FVector(1, 1, 1);
     YGizmo->RelativeScale3D = FVector(1, 1, 1);
@@ -503,7 +553,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
 
     UFloorComp* Floor = new UFloorComp();
-    Floor->ConstructFloor(Floor1Resource, Floor2Resource);
+    Floor->ConstructFloor(&Floor1ResourceData, &Floor2ResourceData);
     GUObjectArray.RemoveObj(Floor);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
@@ -603,9 +653,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         if (GetAsyncKeyState(VK_SPACE) & 0x0001) {
             switch (XGizmo->Type) {
             case UTypeTransform::Location:
-                XGizmo->SetMeshResource(RotationXGizmoResource);
-                YGizmo->SetMeshResource(RotationYGizmoResource);
-                ZGizmo->SetMeshResource(RotationZGizmoResource);
+                XGizmo->SetMeshResource(&RotationGizmoResourceData);
+                YGizmo->SetMeshResource(&RotationGizmoResourceData);
+                ZGizmo->SetMeshResource(&RotationGizmoResourceData);
                 XGizmo->Type = UTypeTransform::Rotation;
                 YGizmo->Type = UTypeTransform::Rotation;
                 ZGizmo->Type = UTypeTransform::Rotation;
@@ -614,9 +664,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 ZGizmo->RelativeRotation = FVector(0, 0, 0);
                 break;
             case UTypeTransform::Rotation:
-                XGizmo->SetMeshResource(ScaleXGizmoResource);
-                YGizmo->SetMeshResource(ScaleYGizmoResource);
-                ZGizmo->SetMeshResource(ScaleZGizmoResource);
+                XGizmo->SetMeshResource(&ScaleGizmoResourceData);
+                YGizmo->SetMeshResource(&ScaleGizmoResourceData);
+                ZGizmo->SetMeshResource(&ScaleGizmoResourceData);
                 XGizmo->Type = UTypeTransform::Scale;
                 YGizmo->Type = UTypeTransform::Scale;
                 ZGizmo->Type = UTypeTransform::Scale;
@@ -625,9 +675,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
                 break;
             case UTypeTransform::Scale:
-                XGizmo->SetMeshResource(LocationXGizmoResource);
-                YGizmo->SetMeshResource(LocationYGizmoResource);
-                ZGizmo->SetMeshResource(LocationZGizmoResource);
+                XGizmo->SetMeshResource(&LocationGizmoResourceData);
+                YGizmo->SetMeshResource(&LocationGizmoResourceData);
+                ZGizmo->SetMeshResource(&LocationGizmoResourceData);
                 XGizmo->Type = UTypeTransform::Location;
                 YGizmo->Type = UTypeTransform::Location;
                 ZGizmo->Type = UTypeTransform::Location;
@@ -741,7 +791,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::NewFrame();
         
         Console.Draw("Console Windows", &is_window_open);
-        DrawCreateWindow(&CubeResource, &SphereResource, &PlaneResource, pickedObjectPtr);
+        DrawCreateWindow(&CubeResourceData, &SphereResourceData, &PlaneResourceData, pickedObjectPtr);
         DrawStatWindow();
 
         ImGui::Render();

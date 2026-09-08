@@ -4,14 +4,15 @@
 #include "Shapes.h"
 #include "Core/Core.h"
 
+//struct ResourceData;
+
 class FMeshResource
 {
 public:
 	//VertexBuffer, IndexBuffer 생성
-	//void CreateVertexBuffer(TArray<FVertexSimple>& vertices, UINT VerticesNum);
-	void CreateVertexBuffer(FVertexSimple* vertices, UINT VerticesNum);
 	void CreateVertexBuffer();
 	void SetTopology(D3D11_PRIMITIVE_TOPOLOGY pTopology);
+	D3D11_PRIMITIVE_TOPOLOGY GetTopology()const;
 
 	void Release();
 
@@ -21,11 +22,21 @@ public:
 	//초기화
 	virtual void Initialize();
 
+	void SetMeshResourceData(ResourceData& pData);
+
+	ID3D11Buffer* GetVertexBuffer()const;
+
+	UINT GetNumVertices()const;
+
+	const TArray<FVertexSimple>& GetVertices()const;
+
+private:
+	//Vertices 등이 담긴 메시 데이터
+	ResourceData MeshResourceData;
+	//TArray<FVertexSimple> Vertices;
+	//D3D11_PRIMITIVE_TOPOLOGY Topology;
+	UINT numVertices;
 	ID3D11Buffer* VertexBuffer;
 	ID3D11Buffer* IndexBuffer;
-	UINT numVertices;
-	D3D11_PRIMITIVE_TOPOLOGY Topology;
-
-	TArray<FVertexSimple> Vertices;
 };
 

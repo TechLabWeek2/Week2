@@ -61,8 +61,8 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
         if (distanceRay < PrimitiveComponent->RelativeScale3D.Size() * sqrt(3)) // Sphere Boundary 체크로 1차 거르기
         {
             int32 numVertices = 0;
-            TArray<FVertexSimple>& targetVertices = PrimitiveComponent->GetMeshResource()->Vertices;
-            numVertices = PrimitiveComponent->GetMeshResource()->numVertices;
+            const TArray<FVertexSimple>& targetVertices = PrimitiveComponent->GetMeshResource()->GetVertices();
+            numVertices = PrimitiveComponent->GetMeshResource()->GetNumVertices();
 
             FMatrix transformMatrix = PrimitiveComponent->GetModelMatrix();
             for (int32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘
