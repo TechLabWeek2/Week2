@@ -3,5 +3,6 @@
 class UPlaneComp :
     public UPrimitiveComponent
 {
+public:
+    UPlaneComp();
 };
-

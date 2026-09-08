@@ -4,6 +4,7 @@
 #include "Shapes.h"
 #include "UCubeComp.h"
 #include "USphereComp.h"
+#include "UPlaneComp.h"
 #include "UCameraComp.h"
 #include "UAxisGizmo.h"
 #include "UPicking.h"
@@ -97,16 +98,16 @@ void DrawStatWindow()
 }
 
 //Test를 위해서 변수를 넘겨줌
-void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource, UPrimitiveComponent*& pickedPrimitivePtr)
+void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource, FMeshResource* PlaneResource, UPrimitiveComponent*& pickedPrimitivePtr)
 {
     ImGui::Begin("Jungle Control Panel");
     ImGui::Text("Hello Jungle World!");
     ImGui::Text("FPS %d (%d ms)", 999, 999);
-    const char* typeNames[] = { "None", "Triangle", "Cube", "Sphere", "XLine", "YLine", "ZLine", "Max" };
+    const char* typeNames[] = { "None", "Plane", "Cube", "Sphere", "XLine", "YLine", "ZLine", "Max" };
     static ETypePrimitive current = ETypePrimitive::Sphere;
     if (ImGui::BeginCombo("Primitive", typeNames[(int32)current]))
     {
-        for (int32 i = 2; i < (int32)ETypePrimitive::XLine; i++)
+        for (int32 i = 1; i < (int32)ETypePrimitive::XLine; i++)
         {
             bool selected = ((int32)current == i);
             if (ImGui::Selectable(typeNames[i], selected))
@@ -142,6 +143,9 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
             newPrimitive = new USphereComp();
             newPrimitive->SetMeshResource(SphereResource);
             break;
+        case ETypePrimitive::Plane:
+            newPrimitive = new UPlaneComp();
+            newPrimitive->SetMeshResource(PlaneResource);
         }
         newPrimitive->RelativeLocation = FVector(Lx, Ly, Lz);
         newPrimitive->RelativeRotation = FVector(DegreeToRadian(Rx), DegreeToRadian(Ry), DegreeToRadian(Rz));
@@ -283,16 +287,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     FMeshResource* CubeResource = new FMeshResource();
     FMeshResource* TriangleResource = new FMeshResource();
     FMeshResource* LineResource = new FMeshResource();
+    FMeshResource* PlaneResource = new FMeshResource();
 
     SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
     CubeResource->CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
     TriangleResource->CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
     LineResource->CreateVertexBuffer(line_vertices, sizeof(line_vertices));
+    PlaneResource->CreateVertexBuffer(plane_vertices, sizeof(plane_vertices));
 
     SphereResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     CubeResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     TriangleResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     LineResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    PlaneResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     bool bIsExit = false;
 
@@ -337,6 +344,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     UCubeComp* Test4 = new UCubeComp();
     UCubeComp* Test5 = new UCubeComp();
     USphereComp* Test6 = new USphereComp(); 
+    UPlaneComp* Test7 = new UPlaneComp();
 
     Test->SetMeshResource(CubeResource);
     Test2->SetMeshResource(CubeResource);
@@ -344,6 +352,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test4->SetMeshResource(CubeResource);
     Test5->SetMeshResource(CubeResource);
     Test6->SetMeshResource(SphereResource);
+    Test7->SetMeshResource(PlaneResource);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
@@ -500,6 +509,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Test4->RelativeLocation = FVector(0, -1, 0);
         Test5->RelativeLocation = FVector(0, 0, 1);
         Test6->RelativeLocation = FVector(0, 0, -1);
+        Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
 
         
         //리스트 돌면서 렌더
@@ -510,7 +520,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::NewFrame();
         
         Console.Draw("Console Windows", &is_window_open);
-        DrawCreateWindow(CubeResource, SphereResource, pickedObjectPtr);
+        DrawCreateWindow(CubeResource, SphereResource, PlaneResource, pickedObjectPtr);
         DrawStatWindow();
 
         ImGui::Render();

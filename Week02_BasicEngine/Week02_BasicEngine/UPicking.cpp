@@ -72,6 +72,9 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
                 targetVertices = cube_vertices;
                 numVertices = sizeof(cube_vertices) / sizeof(FVertexSimple);
                 break;
+            case ETypePrimitive::Plane:
+                targetVertices = plane_vertices;
+                numVertices = sizeof(plane_vertices) / sizeof(FVertexSimple);
             default:
                 break;
             }

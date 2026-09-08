@@ -19,66 +19,83 @@ FVertexSimple triangle_vertices[] =
 	{ -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f }  // Bottom-left vertex (blue)
 };
 
+FVertexSimple plane_vertices[] =
+{
+	{  1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f }, // Top vertex (red)
+	{  1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-right vertex (green)
+	{ -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f },  // Bottom-left vertex (blue)
+	{ -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f }, // Top vertex (red)
+	{ -1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-right vertex (green)
+	{  1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f },  // Bottom-left vertex (blue)
+
+	{  1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f },  // Bottom-left vertex (blue)
+	{ -1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-right vertex (green)
+	{ -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f }, // Top vertex (red)
+	{ -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f },  // Bottom-left vertex (blue)
+	{  1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-right vertex (green)
+	{  1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f }, // Top vertex (red)
+};
+
 FVertexSimple cube_vertices[] =
 {
-	// Front face (Z+)
-	{ -0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Bottom-left
-	{  0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Bottom-right
-	{ -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Top-left
+// Front face (Z+)
+	{ -1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f }, // Bottom-left
+	{ 1.0f, -1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f }, // Bottom-right
+	{ -1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-left
 
-	{ -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Top-left
-	{  0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Bottom-right
-	{  0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Top-right
+	{ -1.0f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-left
+	{ 1.0f, -1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f }, // Bottom-right
+	{ 1.0f,  1.0f,  1.0f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-right
 
 
 	// Back face (Z-)
-	{  0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 1.0f }, // Bottom-right
-	{ -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f }, // Bottom-left
-	{  0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-right
+	{ 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f }, // Bottom-right
+	{ -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f }, // Bottom-left
+	{ 1.0f,  1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-right
 
-	{  0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-right
-	{ -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f }, // Bottom-left
-	{ -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-left
+	{ 1.0f,  1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-right
+	{ -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f }, // Bottom-left
+	{ -1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-left
 
 
 	// Left face (X-)
-	{ -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 1.0f }, // Bottom-back
-	{ -0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-front
-	{ -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-back
+	{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f }, // Bottom-back
+	{ -1.0f, -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-front
+	{ -1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-back
 
-	{ -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-back
-	{ -0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-front
-	{ -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-front
+	{ -1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f }, // Top-back
+	{ -1.0f, -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f }, // Bottom-front
+	{ -1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f }, // Top-front
 
 
 	// Right face (X+)
-	{  0.5f, -0.5f,  0.5f, 0.5f, 0.5f, 0.5f, 1.0f }, // Bottom-front
-	{  0.5f, -0.5f, -0.5f, 1.0f, 0.5f, 0.0f, 1.0f }, // Bottom-back
-	{  0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.5f, 1.0f }, // Top-front
+	{ 1.0f, -1.0f,  1.0f, 0.5f, 0.5f, 0.5f, 1.0f }, // Bottom-front
+	{ 1.0f, -1.0f, -1.0f, 1.0f, 0.5f, 0.0f, 1.0f }, // Bottom-back
+	{ 1.0f,  1.0f,  1.0f, 0.0f, 0.0f, 0.5f, 1.0f }, // Top-front
 
-	{  0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.5f, 1.0f }, // Top-front
-	{  0.5f, -0.5f, -0.5f, 1.0f, 0.5f, 0.0f, 1.0f }, // Bottom-back
-	{  0.5f,  0.5f, -0.5f, 0.5f, 0.0f, 0.5f, 1.0f }, // Top-back
+	{ 1.0f,  1.0f,  1.0f, 0.0f, 0.0f, 0.5f, 1.0f }, // Top-front
+	{ 1.0f, -1.0f, -1.0f, 1.0f, 0.5f, 0.0f, 1.0f }, // Bottom-back
+	{ 1.0f,  1.0f, -1.0f, 0.5f, 0.0f, 0.5f, 1.0f }, // Top-back
 
 
 	// Top face (Y+)
-	{ -0.5f,  0.5f,  0.5f, 0.0f, 0.5f, 1.0f, 1.0f }, // Front-left
-	{  0.5f,  0.5f,  0.5f, 0.5f, 0.5f, 0.0f, 1.0f }, // Front-right
-	{ -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 1.0f }, // Back-left
+	{ -1.0f,  1.0f,  1.0f, 0.0f, 0.5f, 1.0f, 1.0f }, // Front-left
+	{ 1.0f,  1.0f,  1.0f, 0.5f, 0.5f, 0.0f, 1.0f }, // Front-right
+	{ -1.0f,  1.0f, -1.0f, 0.0f, 1.0f, 0.5f, 1.0f }, // Back-left
 
-	{ -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 1.0f }, // Back-left
-	{  0.5f,  0.5f,  0.5f, 0.5f, 0.5f, 0.0f, 1.0f }, // Front-right
-	{  0.5f,  0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f }, // Back-right
+	{ -1.0f,  1.0f, -1.0f, 0.0f, 1.0f, 0.5f, 1.0f }, // Back-left
+	{ 1.0f,  1.0f,  1.0f, 0.5f, 0.5f, 0.0f, 1.0f }, // Front-right
+	{ 1.0f,  1.0f, -1.0f, 0.5f, 1.0f, 1.0f, 1.0f }, // Back-right
 
 
 	// Bottom face (Y-)
-	{ -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.0f, 1.0f }, // Back-left
-	{  0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 1.0f }, // Back-right
-	{ -0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Front-left
+	{ -1.0f, -1.0f, -1.0f, 0.5f, 0.5f, 0.0f, 1.0f }, // Back-left
+	{ 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.5f, 1.0f }, // Back-right
+	{ -1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f }, // Front-left
 
-	{ -0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f }, // Front-left
-	{  0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 1.0f }, // Back-right
-	{  0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f }, // Front-right
+	{ -1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f }, // Front-left
+	{ 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.5f, 1.0f }, // Back-right
+	{ 1.0f, -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f }, // Front-right
 };
 
 FVertexSimple sphere_vertices[] = 

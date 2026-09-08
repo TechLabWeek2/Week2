@@ -5,7 +5,7 @@
 enum class ETypePrimitive : uint8
 {
 	None,
-	Triangle,
+	Plane,
 	Cube,
 	Sphere,
 	XLine,
