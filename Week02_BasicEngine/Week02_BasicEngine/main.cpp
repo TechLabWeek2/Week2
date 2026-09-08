@@ -12,6 +12,7 @@
 #include "UObjectArray.h"
 #include "FGraphicsDevice.h"
 #include "FMeshResource.h"
+#include "UGizmo.h"
 
 #define SCREEN_WIDTH 1800
 #define SCREEN_HEIGHT 1200
@@ -203,6 +204,41 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
         {
             GUObjectArray.RemoveObj(pickedPrimitivePtr);
         }
+
+        ImGui::Separator();
+
+        //카메라
+        ImGui::Checkbox("##Orthogonal", &IsOrthogonal);
+        ImGui::SameLine();
+        ImGui::Text("Orthogonal");
+
+        ImGui::Text("FOV");
+        ImGui::SameLine(130);
+        ImGui::SetNextItemWidth(170.0f);
+        ImGui::InputFloat("##FOV", &FOV);
+        //Location
+        ImGui::Text("Camera Location");
+        ImGui::SameLine(130);
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CLx_input", &CLx);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CLy_input", &CLy);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CLz_input", &CLz);
+
+        //Rotation
+        ImGui::Text("Camera Rotation");
+        ImGui::SameLine(130);
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CRx_input", &CRx);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CRy_input", &CRy);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50.0f);
+        ImGui::InputFloat("##CRz_input", &CRz);
     }
 
     ImGui::Separator();
@@ -288,18 +324,54 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     FMeshResource* TriangleResource = new FMeshResource();
     FMeshResource* LineResource = new FMeshResource();
     FMeshResource* PlaneResource = new FMeshResource();
+    FMeshResource* LocationXGizmoResource = new FMeshResource();
+    FMeshResource* LocationYGizmoResource = new FMeshResource();
+    FMeshResource* LocationZGizmoResource = new FMeshResource();
+    FMeshResource* RotationXGizmoResource = new FMeshResource();
+    FMeshResource* RotationYGizmoResource = new FMeshResource();
+    FMeshResource* RotationZGizmoResource = new FMeshResource();
+    FMeshResource* ScaleXGizmoResource = new FMeshResource();
+    FMeshResource* ScaleYGizmoResource = new FMeshResource();
+    FMeshResource* ScaleZGizmoResource = new FMeshResource();
+
+    CreateLocationGizmo(location_gizmo_x_vertices, 1.0f, 0.0f, 0.0f);
+    CreateLocationGizmo(location_gizmo_y_vertices, 0.0f, 1.0f, 0.0f);
+    CreateLocationGizmo(location_gizmo_z_vertices, 0.0f, 0.0f, 1.0f);
+    CreateRotationGizmo(rotation_gizmo_x_vertices, 1.0f, 0.0f, 0.0f);
+    CreateRotationGizmo(rotation_gizmo_y_vertices, 0.0f, 1.0f, 0.0f);
+    CreateRotationGizmo(rotation_gizmo_z_vertices, 0.0f, 0.0f, 1.0f);
 
     SphereResource->CreateVertexBuffer(sphere_vertices, sizeof(sphere_vertices));
     CubeResource->CreateVertexBuffer(cube_vertices, sizeof(cube_vertices));
     TriangleResource->CreateVertexBuffer(triangle_vertices, sizeof(triangle_vertices));
     LineResource->CreateVertexBuffer(line_vertices, sizeof(line_vertices));
     PlaneResource->CreateVertexBuffer(plane_vertices, sizeof(plane_vertices));
+    LocationXGizmoResource->CreateVertexBuffer(location_gizmo_x_vertices, sizeof(location_gizmo_x_vertices));
+    LocationYGizmoResource->CreateVertexBuffer(location_gizmo_y_vertices, sizeof(location_gizmo_y_vertices));
+    LocationZGizmoResource->CreateVertexBuffer(location_gizmo_z_vertices, sizeof(location_gizmo_z_vertices));
+
+    RotationXGizmoResource->CreateVertexBuffer(rotation_gizmo_x_vertices, sizeof(rotation_gizmo_x_vertices));
+    RotationYGizmoResource->CreateVertexBuffer(rotation_gizmo_y_vertices, sizeof(rotation_gizmo_y_vertices));
+    RotationZGizmoResource->CreateVertexBuffer(rotation_gizmo_z_vertices, sizeof(rotation_gizmo_z_vertices));
+
+    ScaleXGizmoResource->CreateVertexBuffer(scale_gizmo_x_vertices, sizeof(scale_gizmo_x_vertices));
+    ScaleYGizmoResource->CreateVertexBuffer(scale_gizmo_y_vertices, sizeof(scale_gizmo_y_vertices));
+    ScaleZGizmoResource->CreateVertexBuffer(scale_gizmo_z_vertices, sizeof(scale_gizmo_z_vertices));
 
     SphereResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     CubeResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     TriangleResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     LineResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     PlaneResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    LocationXGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    LocationYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    LocationZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    RotationXGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    RotationYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    RotationZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ScaleXGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ScaleYGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ScaleZGizmoResource->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     bool bIsExit = false;
 
@@ -345,6 +417,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     UCubeComp* Test5 = new UCubeComp();
     USphereComp* Test6 = new USphereComp(); 
     UPlaneComp* Test7 = new UPlaneComp();
+    UGizmo* XGizmo = new UGizmo();
+    UGizmo* YGizmo = new UGizmo();
+    UGizmo* ZGizmo = new UGizmo();
 
     Test->SetMeshResource(CubeResource);
     Test2->SetMeshResource(CubeResource);
@@ -353,7 +428,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test5->SetMeshResource(CubeResource);
     Test6->SetMeshResource(SphereResource);
     Test7->SetMeshResource(PlaneResource);
+    XGizmo->SetMeshResource(LocationXGizmoResource);
+    YGizmo->SetMeshResource(LocationYGizmoResource);
+    ZGizmo->SetMeshResource(LocationZGizmoResource);
 
+    XGizmo->RelativeScale3D = FVector(1, 1, 1);
+    YGizmo->RelativeScale3D = FVector(1, 1, 1);
+    ZGizmo->RelativeScale3D = FVector(1, 1, 1);
+    XGizmo->RelativeRotation = FVector(0, 0, 0);
+    YGizmo->RelativeRotation = FVector(0, 0, 1.57);
+    ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false)
     {
@@ -448,6 +532,43 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
             Camera->RelativeLocation.y -= cameraSpeed;
         }
+        if (GetAsyncKeyState(VK_SPACE) & 0x0001) {
+            switch (XGizmo->Type) {
+            case UTypeTransform::Location:
+                XGizmo->SetMeshResource(RotationXGizmoResource);
+                YGizmo->SetMeshResource(RotationYGizmoResource);
+                ZGizmo->SetMeshResource(RotationZGizmoResource);
+                XGizmo->Type = UTypeTransform::Rotation;
+                YGizmo->Type = UTypeTransform::Rotation;
+                ZGizmo->Type = UTypeTransform::Rotation;
+                XGizmo->RelativeRotation = FVector(0, 1.57, 0);
+                YGizmo->RelativeRotation = FVector(1.57, 0, 0);
+                ZGizmo->RelativeRotation = FVector(0, 0, 0);
+                break;
+            case UTypeTransform::Rotation:
+                XGizmo->SetMeshResource(ScaleXGizmoResource);
+                YGizmo->SetMeshResource(ScaleYGizmoResource);
+                ZGizmo->SetMeshResource(ScaleZGizmoResource);
+                XGizmo->Type = UTypeTransform::Scale;
+                YGizmo->Type = UTypeTransform::Scale;
+                ZGizmo->Type = UTypeTransform::Scale;
+                XGizmo->RelativeRotation = FVector(0, 0, 0);
+                YGizmo->RelativeRotation = FVector(0, 0, 1.57);
+                ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
+                break;
+            case UTypeTransform::Scale:
+                XGizmo->SetMeshResource(LocationXGizmoResource);
+                YGizmo->SetMeshResource(LocationYGizmoResource);
+                ZGizmo->SetMeshResource(LocationZGizmoResource);
+                XGizmo->Type = UTypeTransform::Location;
+                YGizmo->Type = UTypeTransform::Location;
+                ZGizmo->Type = UTypeTransform::Location;
+                XGizmo->RelativeRotation = FVector(0, 0, 0);
+                YGizmo->RelativeRotation = FVector(0, 0, 1.57);
+                ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
+                break;
+            }
+        }
         if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
         {
             if (!isDragging && !io.WantCaptureMouse)
@@ -489,11 +610,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 if (pickedObjectPtr != nullptr)
                 {
                     pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                    XGizmo->bIsActive = false;
+                    YGizmo->bIsActive = false;
+                    ZGizmo->bIsActive = false;
                 }
                 pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
                 if (pickedObjectPtr != nullptr) 
                 {
                     pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                    XGizmo->bIsActive = true;
+                    YGizmo->bIsActive = true;
+                    ZGizmo->bIsActive = true;
+                    XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                    YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                    ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
                 }
             }
         }
@@ -506,8 +636,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Test->RelativeLocation = FVector(1, 0, 0);
         Test2->RelativeLocation = FVector(-1, 0, 0);
         Test3->RelativeLocation = FVector(0, 1, 0);
+        Test3->RelativeRotation = FVector(0,0, 1.57);
         Test4->RelativeLocation = FVector(0, -1, 0);
         Test5->RelativeLocation = FVector(0, 0, 1);
+        Test5->RelativeRotation = FVector(0, -1.57, 0);
         Test6->RelativeLocation = FVector(0, 0, -1);
         Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
 

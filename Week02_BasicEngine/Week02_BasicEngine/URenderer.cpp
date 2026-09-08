@@ -264,7 +264,7 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 
 		//UPrimitiveComponent만 Render하도록
 		UPrimitiveComponent* PrimitiveComponent = dynamic_cast<UPrimitiveComponent*>(Objects[i]);
-		if (PrimitiveComponent)
+		if (PrimitiveComponent && PrimitiveComponent->bIsActive)
 		{
 			UpdateConstant(PrimitiveComponent->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix(), PrimitiveComponent->bIsSelected);
 			DeviceContext->IASetPrimitiveTopology(PrimitiveComponent->GetMeshResource()->Topology);
