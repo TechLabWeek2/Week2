@@ -143,15 +143,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ExampleAppConsole.h" />
-    <ClCompile Include="FCubeResource.cpp" />
     <ClCompile Include="FEngineLoop.cpp" />
-    <ClCompile Include="FLineResource.cpp" />
     <ClCompile Include="FMatrix.cpp" />
     <ClCompile Include="FGraphicsDevice.cpp" />
     <ClCompile Include="FMeshResource.cpp" />
-    <ClCompile Include="FPlaneResource.cpp" />
-    <ClCompile Include="FSphereResource.cpp" />
-    <ClCompile Include="FTriangleResource.cpp" />
     <ClCompile Include="FVector.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
@@ -183,15 +178,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h" />
-    <ClInclude Include="FCubeResource.h" />
     <ClInclude Include="FEngineLoop.h" />
-    <ClInclude Include="FLineResource.h" />
     <ClInclude Include="FMatrix.h" />
     <ClInclude Include="FGraphicsDevice.h" />
     <ClInclude Include="FMeshResource.h" />
-    <ClInclude Include="FPlaneResource.h" />
-    <ClInclude Include="FSphereResource.h" />
-    <ClInclude Include="FTriangleResource.h" />
     <ClInclude Include="FVector.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />

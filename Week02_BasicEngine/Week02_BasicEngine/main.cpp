@@ -12,11 +12,6 @@
 #include "UObjectArray.h"
 #include "FGraphicsDevice.h"
 #include "FMeshResource.h"
-#include "FCubeResource.h"
-#include "FSphereResource.h"
-#include "FLineResource.h"
-#include "FTriangleResource.h"
-#include "FPlaneResource.h"
 #include "UGizmo.h"
 #include "UFloorComp.h"
 
