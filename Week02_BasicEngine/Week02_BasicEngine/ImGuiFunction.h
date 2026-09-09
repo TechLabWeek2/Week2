@@ -8,7 +8,7 @@
 #include "USphereComp.h"
 #include "UPlaneComp.h"
 #include "UCameraComp.h"
-#include "FJsonWrapper.h"
+#include "FSceneLoader.h"
 #include "FShaderResource.h"
 #include "FMeshResourceRegistry.h"
 #include "FPrimitiveFactory.h"
@@ -168,7 +168,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
                 path.Append(FString(sceneName));
                 path.Append(L".Scene");
 
-                FJsonWrapper::NewScene(std::filesystem::path(*path));
+                FSceneLoader::NewScene(std::filesystem::path(*path));
 
             }
         }
@@ -193,7 +193,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
                 path.Append(FString(sceneName));
                 path.Append(L".Scene");
 
-                FJsonWrapper::SaveScene(std::filesystem::path(*path));
+                FSceneLoader::SaveScene(std::filesystem::path(*path));
                
             }
         }
@@ -216,7 +216,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
 
             try
             {
-                sceneDirectory = FJsonWrapper::FindDirectory(L".slnx");
+                sceneDirectory = FSceneLoader::FindDirectory(L".slnx");
 
                 if (sceneDirectory.empty())
                 {
@@ -308,7 +308,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
         {
             sceneMessage = "Scene name is too long.";
         }
-        else if (FJsonWrapper::LoadScene(
+        else if (FSceneLoader::LoadScene(
             selectedPath,
             MeshRegistry,
             &DefaultShader,
