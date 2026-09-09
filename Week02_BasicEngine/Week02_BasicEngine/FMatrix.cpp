@@ -488,6 +488,42 @@ FMatrix FMatrix::GetViewMatrixInverse(const FVector& Location, const FVector& Ro
 	return FMatrix::MatrixInverse(FMatrix::GetViewMatrix(Location, Rotation) );
 }
 
+FMatrix FMatrix::GetViewMatrixInverseFast(const FVector& Location, const FVector& Rotation)
+{
+	const FMatrix ViewMatrix  = FMatrix::GetViewMatrix(Location, Rotation);
+	FMatrix result = FMatrix::Identity;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			result.m[i][j] = ViewMatrix.m[j][i];
+		}
+	}
+	result.m[3][0] = Location.x;
+	result.m[3][1] = Location.y;
+	result.m[3][2] = Location.z;
+
+	return result;
+}
+FMatrix FMatrix::GetViewMatrixInverseFast(const FMatrix& ViewMatrix)
+{
+	FMatrix result = FMatrix::Identity;
+
+	for (int i = 0; i < 3; ++i)	
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			result.m[i][j] = ViewMatrix.m[j][i];
+		}
+	}
+	result.m[3][0] = ViewMatrix.m[3][0];
+	result.m[3][1] = ViewMatrix.m[3][1];
+	result.m[3][2] = ViewMatrix.m[3][2];
+
+	return result;
+}
+
 FMatrix FMatrix::GetProjectionMatrix(float FOV, float Zoom, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal) {
 	if (IsOrthogonal)
 		return Orthographic(Zoom, AspectRatio, NearClip, FarClip);
@@ -501,6 +537,33 @@ FMatrix FMatrix::GetProjectionMatrixInverse(float FOV, float Zoom, float AspectR
 	else
 		return  FMatrix::MatrixInverse(Perspective(FOV, AspectRatio, NearClip, FarClip));
 }
+
+FMatrix FMatrix::GetProjectionMatrixInverseFast(float FOV, float Zoom, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal)
+{
+	if (IsOrthogonal)
+	{
+		const float Height = Zoom * 5.f;
+		const float Width = Height * AspectRatio;
+		FMatrix M;
+		M.m[0][0] = Width / 2.0f;
+		M.m[1][1] = Height / 2.0f;
+		M.m[2][2] = (FarClip - NearClip);
+		M.m[3][2] = NearClip;
+		return M;
+	}
+	else
+	{
+		FMatrix M;
+		M.m[0][0] = tanf(FOV / 2.f) * AspectRatio;
+		M.m[1][1] = tanf(FOV / 2.f);
+		M.m[2][2] = 0.f;
+		M.m[2][3] = -(FarClip - NearClip) / (FarClip * NearClip);
+		M.m[3][2] = 1.f;
+		M.m[3][3] = 1.f / NearClip;
+		return M;
+	}
+}
+
 
 FMatrix FMatrix::Perspective(float FOV, float AspectRatio, float NearClip, float FarClip)
 {

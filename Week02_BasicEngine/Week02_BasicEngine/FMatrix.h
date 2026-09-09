@@ -84,13 +84,22 @@ public:
 
 	static FMatrix GetModelMatrixInverse(const FVector& Location, const FVector& Rotation, const FVector& Scale);
 
+
 	static FMatrix GetViewMatrix(const FVector& Location, const FVector& Rotation);
 
 	static FMatrix GetViewMatrixInverse(const FVector& Location, const FVector& Rotation);
 
+	static FMatrix GetViewMatrixInverseFast(const FVector& Location, const FVector& Rotation);
+
+	static FMatrix GetViewMatrixInverseFast(const FMatrix& ViewMatrix);
+
+
 	static FMatrix GetProjectionMatrix(float FOV, float Zoom, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal);
 
 	static FMatrix GetProjectionMatrixInverse(float FOV, float Zoom, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal);
+
+	static FMatrix GetProjectionMatrixInverseFast(float FOV, float Zoom, float AspectRatio, float NearClip, float FarClip, bool IsOrthogonal);
+
 
 	static FMatrix Perspective(float FOV, float AspectRatio, float NearClip, float FarClip);
 
