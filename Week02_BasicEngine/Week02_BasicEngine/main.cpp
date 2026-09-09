@@ -329,9 +329,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test6->RelativeLocation = FVector(0, 0, -1);
     Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
 
-    TArray<float> Red = { 1.f, 0.f, 0.f, 1.0f };
-    TArray<float> Green = { 0.f, 1.f, 0.f, 1.f };
-    TArray<float> Blue = { 0.f, 0.f, 1.f, 1.f };
+    TArray<float> Red = { 0.7f, 0.f, 0.f, 1.0f };
+    TArray<float> Green = { 0.f, 0.7f, 0.f, 1.f };
+    TArray<float> Blue = { 0.f, 0.f, 0.7f, 1.f };
     XGizmo->SetModelColor(Red);
     YGizmo->SetModelColor(Green);
     ZGizmo->SetModelColor(Blue);
@@ -651,7 +651,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
                             if (pickedObjectPtr != nullptr)
                             {
-                                pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                                //pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
                                 XGizmo->bIsActive = true;
                                 YGizmo->bIsActive = true;
                                 ZGizmo->bIsActive = true;
