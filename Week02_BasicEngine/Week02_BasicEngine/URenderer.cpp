@@ -312,17 +312,25 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 
 	TArray<UPrimitiveComponent*> OpaqueList;
 	TArray<UPrimitiveComponent*> AlphaList;
+	TArray<UPrimitiveComponent*> GizmoList;
 
 	//불투명과 반투명으로 나눔
 	for (UObject* Obj : Objects)
 	{
 		UPrimitiveComponent* PrimitiveComponent = dynamic_cast<UPrimitiveComponent*>(Obj);
 		if (PrimitiveComponent == nullptr) continue;
-
-		if (PrimitiveComponent->GetBlendMode() == BlendMode::Opaque)
+				
+		//기즈모인지
+		if (PrimitiveComponent->IsA(UGizmo::StaticClass()))
+		{
+			GizmoList.Add(PrimitiveComponent);
+		}
+		//불투명
+		else if (PrimitiveComponent->GetBlendMode() == BlendMode::Opaque)
 		{
 			OpaqueList.Add(PrimitiveComponent);
 		}
+		//반투명
 		else
 		{
 			AlphaList.Add(PrimitiveComponent);
@@ -337,6 +345,13 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 
 	//반투명 렌더
 	RenderList(AlphaList, Camera);
+
+	//뎁스 버퍼를 1.0으로 초기화. 화면 전체를 가장 멀리 둔다.
+	//항상 기즈모가 뎁스 상 가까이에 있다.
+	GGraphicsDevice.GetDeviceContext()->ClearDepthStencilView(GGraphicsDevice.GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.f, 0);
+
+	//기즈모 렌더
+	RenderList(GizmoList, Camera);
 }
 
 void URenderer::Init()

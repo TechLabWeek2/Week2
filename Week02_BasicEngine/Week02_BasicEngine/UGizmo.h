@@ -30,7 +30,7 @@ public:
     UGizmo(ETypeAxis axis);
     static UClass* StaticClass()
     {
-        static UClass Class("USphere", UPrimitiveComponent::StaticClass());
+        static UClass Class("UGizmo", UPrimitiveComponent::StaticClass());
         return &Class;
     }
 
