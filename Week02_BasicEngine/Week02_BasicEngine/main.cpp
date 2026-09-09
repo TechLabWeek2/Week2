@@ -73,7 +73,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         if (wParam == SIZE_MINIMIZED)
         {
-            bStopRender = true;
+            //bStopRender = true; // 최소화시 구현 필요
             break;
         }
         else if (wParam == SIZE_MAXIMIZED || (wParam == SIZE_RESTORED && !bStopRender))
@@ -161,8 +161,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     FMeshResource RotationGizmoResourceData;
     FMeshResource ScaleGizmoResourceData;
 
-    FMeshResource Floor1ResourceData;
-    FMeshResource Floor2ResourceData;
+    FMeshResource FloorResourceData;
 
     //데이터 할당
     CubeResourceData.SetMeshResourceData(CubeResource);
@@ -181,9 +180,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     RotationGizmoResourceData.SetMeshResourceData(RotationGizmoResource);
     ScaleGizmoResourceData.SetMeshResourceData(ScaleGizmoResource);
 
-    Floor1ResourceData.SetMeshResourceData(Floor1Resource);
-    Floor2ResourceData.SetMeshResourceData(Floor2Resource);
-
+    FloorResourceData.SetMeshResourceData(FloorResource);
 
     //초기화
     CubeResourceData.Initialize();
@@ -196,8 +193,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     RotationGizmoResourceData.Initialize();
     ScaleGizmoResourceData.Initialize();
 
-    Floor1ResourceData.Initialize();
-    Floor2ResourceData.Initialize();
+    FloorResourceData.Initialize();
 
 
     FMeshResourceRegistry MeshRegistry;
@@ -361,7 +357,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     UFloorComp* Floor = new UFloorComp();
 
     Floor->primitiveType = ETypePrimitive::Floor;
-    Floor->SetMeshResource(&Floor1ResourceData);
+    Floor->SetMeshResource(&FloorResourceData);
     Floor->SetShaderResource(&CheckerShader);
 
     Floor->SetRasterizerState(RasterizerState::Solid_Culling_None);
