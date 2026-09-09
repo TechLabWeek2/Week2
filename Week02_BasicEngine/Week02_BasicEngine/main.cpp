@@ -441,7 +441,7 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
             sceneFiles[selectedScene],
             CubeResource,
             SphereResource,
-            PlaneResource))
+            PlaneResource,&DefaultShader))
         {
             pickedPrimitivePtr = nullptr;
             sceneMessage = "Scene loaded.";

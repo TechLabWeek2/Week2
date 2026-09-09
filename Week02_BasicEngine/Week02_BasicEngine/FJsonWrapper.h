@@ -102,6 +102,10 @@ public:
 		{
 			data["RasterizerState"] = "RasterizerState::FrontCulling";
 		}
+		else if (value->GetRasterizerState() == RasterizerState::Solid_Culling_None)
+		{
+			data["RasterizerState"] = "RasterizerState::Solid_Culling_None";
+		}
 		else
 		{
 			throw std::invalid_argument("Invalid RasterizerState type.");
@@ -128,7 +132,7 @@ public:
 		return data;
 	}
 
-	static UPrimitiveComponent* DeserializePrimitive(const Json& data, FMeshResource* cubeResource, FMeshResource* sphereResource,FMeshResource* PlaneResource)
+	static UPrimitiveComponent* DeserializePrimitive(const Json& data, FMeshResource* cubeResource, FMeshResource* sphereResource,FMeshResource* PlaneResource,FShaderResource* shaderResource)
 	{
 		FVector location = DeserializeVector3(data.at("Location"));
 		FVector rotation = DeserializeVector3(data.at("Rotation"));
@@ -179,7 +183,7 @@ public:
 
 		UPrimitiveComponent* NewPrimitive = new UPrimitiveComponent();
 
-		// 공통 속성은 생성 후 한 번에 적용
+		// 생성 후 한 번에 적용
 		NewPrimitive->primitiveType = type;
 		NewPrimitive->RelativeLocation = location;
 		NewPrimitive->RelativeRotation = rotation;
@@ -187,8 +191,11 @@ public:
 		NewPrimitive->SetRasterizerState(RasterizerStateType);
 		NewPrimitive->SetBlendMode(BlendModeState);
 		NewPrimitive->SetMeshResource(MeshResource);
+		NewPrimitive->SetShaderResource(shaderResource); 
 		NewPrimitive->SetModelColor(modelColor);
 		NewPrimitive->SetUseColorFlag(useColor);
+
+
 			
 		return NewPrimitive;
 	}
@@ -268,7 +275,7 @@ public:
 		return true;
 	}
 
-	static bool LoadScene(const std::filesystem::path& filename, FMeshResource* cubeResource, FMeshResource* sphereResource, FMeshResource* PlaneResource)
+	static bool LoadScene(const std::filesystem::path& filename, FMeshResource* cubeResource, FMeshResource* sphereResource, FMeshResource* PlaneResource,FShaderResource* shaderResource)
 	{
 		std::ifstream file(filename);
 
@@ -320,7 +327,7 @@ public:
 		for (const auto& [uuidString, primitiveData]
 			: primitives.ObjectRange())
 		{
-			DeserializePrimitive(primitiveData, cubeResource, sphereResource, PlaneResource);
+			DeserializePrimitive(primitiveData, cubeResource, sphereResource, PlaneResource, shaderResource);
 
 		}
 
@@ -365,6 +372,7 @@ public:
 		if (stateString == "RasterizerState::Solid")      return RasterizerState::Solid;
 		if (stateString == "RasterizerState::WireFrame")      return RasterizerState::WireFrame;
 		if (stateString == "RasterizerState::FrontCulling")      return RasterizerState::FrontCulling;
+		if (stateString == "RasterizerState::Solid_Culling_None")      return RasterizerState::Solid_Culling_None;
 		throw std::invalid_argument("Invalid rasterizer state string: " + stateString);
 	}
 
