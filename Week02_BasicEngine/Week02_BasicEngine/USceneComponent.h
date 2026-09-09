@@ -22,7 +22,7 @@ public:
     FMatrix GetQuatModelMatrix() const;
 
     //이동, 
-    virtual void Update();
+    virtual void Update(float deltaTime);
 
     static UClass* StaticClass() {
         static UClass Class("USceneComponent", UObject::StaticClass());

@@ -13,14 +13,17 @@ public:
     float ZoomLevel = 1.f;
     bool IsOrthogonal = false;
     float cameraSpeed = 0.04f;
+    float rotateSpeed = 0.04f;
+
     FVector ZAxis;
     FVector XAxis;
     FVector YAxis;
 
-    bool* isDragging = nullptr;
+    bool bIsRotating = false;
     bool bImGuiWantCaptureMouse = false;
-    POINT* lastMousePos = nullptr;
-    POINT* currentMousePos = nullptr;
+    POINT lastMousePos = {};
+    POINT* currentMousePos = {};
+    HWND* hWnd = nullptr;
 
 public:
     UCameraComp();
@@ -34,6 +37,6 @@ public:
     const FVector GetRightVector_UE()const;
     const FVector GetUpVector_UE()const;*/
 
-    void UpdateArguments(bool* isDragging, bool bImGuiWantCaptureMouse, POINT* lastMousePos, POINT* currentMousePos);
-    void Update() override;
+    void UpdateArguments(bool bImGuiWantCaptureMouse, POINT* currentMousePos, HWND* hWnd);
+    void Update(float deltaTime) override;
 };

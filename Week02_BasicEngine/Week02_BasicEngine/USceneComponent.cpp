@@ -38,7 +38,7 @@ FMatrix USceneComponent::GetQuatModelMatrix() const
 	return scaleMatrix * rotationMatrix * translationMatrix;
 };
 
-void USceneComponent::Update()
+void USceneComponent::Update(float deltaTime)
 {
 }
 

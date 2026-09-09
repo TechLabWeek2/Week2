@@ -337,9 +337,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test7->RelativeLocation = FVector(0, 0, 0.5f);
     //Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
 
-    TArray<float> Red = { 1.f, 0.f, 0.f, 1.0f };
-    TArray<float> Green = { 0.f, 1.f, 0.f, 1.f };
-    TArray<float> Blue = { 0.f, 0.f, 1.f, 1.f };
+    TArray<float> Red = { 0.8f, 0.f, 0.f, 1.0f };
+    TArray<float> Green = { 0.f, 0.8f, 0.f, 1.f };
+    TArray<float> Blue = { 0.f, 0.f, 0.8f, 1.f };
     XGizmo->SetModelColor(Red);
     YGizmo->SetModelColor(Green);
     ZGizmo->SetModelColor(Blue);
@@ -409,17 +409,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         POINT currentMousePos;
         GetCursorPos(&currentMousePos); // 현재 마우스 스크린 좌표 획득
         ScreenToClient(hWnd, &currentMousePos);
+        static POINT lastMousePos = currentMousePos;
         RECT Rect;
         GetClientRect(hWnd, &Rect);
         float Width = static_cast<float>(Rect.right - Rect.left);
         float Height = static_cast<float>(Rect.bottom - Rect.top);
         Camera->AspectRatio = Width / Height;
-        static POINT lastMousePos = currentMousePos;
+
         static bool isDragging = false;
-        static bool wasLeftMouseDown = false;
-        const bool isLeftMouseDown = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
-        const bool isLeftMousePressed = isLeftMouseDown && !wasLeftMouseDown;
-        wasLeftMouseDown = isLeftMouseDown;
+        //static bool wasLeftMouseDown = false;
+        //const bool isLeftMouseDown = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+        //const bool isLeftMousePressed = isLeftMouseDown && !wasLeftMouseDown;
+        //wasLeftMouseDown = isLeftMouseDown;
         
         // camera forward
         FVector ZAxis(cos(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x), sin(Camera->RelativeRotation.x), -sin(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x));
@@ -444,7 +445,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         
         if (bFocus)
         {
-            Camera->UpdateArguments(&isDragging, io.WantCaptureMouse, &lastMousePos, &currentMousePos);
+            Camera->UpdateArguments(io.WantCaptureMouse, &currentMousePos ,&hWnd);
 
             if (GetAsyncKeyState(VK_SPACE) & 0x0001 && pickedObjectPtr) {
                 switch (XGizmo->Type) {
@@ -493,6 +494,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     float ndcY = 1.f - 2.f * (float)currentMousePos.y / screenHeight;
 
                     if (pickedGizmoPtr) {
+                        float deltaX = (float)(currentMousePos.x - lastMousePos.x);
+                        float deltaY = (float)(currentMousePos.y - lastMousePos.y);
                         if (!isDragging && !io.WantCaptureMouse)
                         {
                             isDragging = true;
@@ -500,9 +503,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         }
 
                         float sensitivity = 0.002f;
-                        float deltaX = (float)(currentMousePos.x - lastMousePos.x);
-                        float deltaY = (float)(currentMousePos.y - lastMousePos.y);
-
                         FVector GizmoAxis;
 
                         switch (static_cast<UGizmo*>(pickedGizmoPtr)->Axis)
@@ -541,7 +541,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                             // 마우스 이동량을 NDC로 변환
                             FVector MouseDeltaNDC(deltaX * 2.0f / Width, -deltaY * 2.0f / Height);
-
+                           
                             // 마우스 이동을 Gizmo 화면 방향으로 투영
                             float MouseAxisMovement = MouseDeltaNDC.Dot(GizmoDirection);
 
@@ -612,6 +612,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
             else
             {
+                isDragging = false;
+                lastMousePos = currentMousePos;
                 pickedGizmoPtr = nullptr;
             }
         }
@@ -631,7 +633,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             USceneComponent* SceneComponent = dynamic_cast<USceneComponent*>(AllObj[i]);
             if (SceneComponent)
             {
-                SceneComponent->Update();
+                SceneComponent->Update(elapsedTime);
             }
         }
                    

@@ -1,5 +1,6 @@
 #include "UCameraComp.h"
 #include "FMatrix.h"
+#include "FGraphicsDevice.h"
 
 UCameraComp::UCameraComp()
 {
@@ -47,19 +48,27 @@ FMatrix UCameraComp::GetProjectionMatrix() const
 //	return Up;
 //}
 //
-//void UCameraComp::UpdateArguments(bool* isDragging, bool bImGuiWantCaptureMouse, POINT* lastMousePos, POINT* currentMousePos)
-//{
-//    this->isDragging = isDragging;
-//    this->bImGuiWantCaptureMouse = bImGuiWantCaptureMouse;
-//    this->lastMousePos = lastMousePos;
-//    this->currentMousePos = currentMousePos;
-//}
+void UCameraComp::UpdateArguments(bool bImGuiWantCaptureMouse, POINT* currentMousePos, HWND* hWnd)
+{
+    this->bImGuiWantCaptureMouse = bImGuiWantCaptureMouse;
+    this->hWnd = hWnd;
+    this->currentMousePos = currentMousePos;
+}
 
-void UCameraComp::Update()
+void UCameraComp::Update(float deltaTime)
 {
     FVector CameraForward = GetForwardVector_UE();
     FVector CameraRight = GetRightVector_UE();
     FVector CameraUp = GetUpVector_UE();
+
+    const float moveSensitivity = 0.004f;
+    const float rotateSensitivity = 0.00015f;
+    cameraSpeed = deltaTime * moveSensitivity;
+    rotateSpeed = deltaTime * rotateSensitivity;
+
+    float deltaX = float(lastMousePos.x - currentMousePos->x);
+    float deltaY = float(lastMousePos.y - currentMousePos->y);
+    lastMousePos = *currentMousePos;
 
     if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
         RelativeLocation -= (CameraRight * cameraSpeed);
@@ -99,19 +108,14 @@ void UCameraComp::Update()
     }
     if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) // 마우스 우클릭으로 시점 변경
     {
-        if (!isDragging && !bImGuiWantCaptureMouse)
+        if (!bIsRotating && !bImGuiWantCaptureMouse)
         {
-            *isDragging = true;
-            *lastMousePos = *currentMousePos;
+            bIsRotating = true;
+            lastMousePos = *currentMousePos;
         }
 
-        float deltaX = (float)(lastMousePos->x - currentMousePos->x);
-        float deltaY = (float)(lastMousePos->y - currentMousePos->y);
-
-        const float sensitivity = 0.002f;
-
-        float angleX = deltaX * sensitivity;
-        float angleY = deltaY * sensitivity;
+        float angleX = deltaX * rotateSpeed;
+        float angleY = deltaY * rotateSpeed;
 
         // 좌우
         RelativeRotation.z += angleX;
@@ -128,11 +132,11 @@ void UCameraComp::Update()
             RelativeRotation.y = DegreeToRadian(89.f);
         }
 
-        *lastMousePos = *currentMousePos;
+        lastMousePos = *currentMousePos;
     }
-    else
+    else if (bIsRotating)
     {
-        *isDragging = false;
-        *lastMousePos = *currentMousePos;
+        bIsRotating = false;
+        lastMousePos = *currentMousePos;
     }
 }
