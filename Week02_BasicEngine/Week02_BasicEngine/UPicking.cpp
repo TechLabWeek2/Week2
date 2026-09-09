@@ -133,6 +133,10 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
                     bIsFound = true;
                     distanceMin = distanceCamera;
                     pickedObject = PrimitiveComponent;
+                    if (PrimitiveComponent->primitiveType == ETypePrimitive::Gizmo)
+                    {
+                        return pickedObject;
+                    }
                 }
             }
         }
