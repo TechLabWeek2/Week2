@@ -32,6 +32,31 @@ FQuat FQuat::FromEuler(const FVector& Euler)
     return Rz * Ry * Rx;
 }
 
+FVector FQuat::ToEuler(const FQuat& Q) const
+{
+    FVector Euler;
+
+    // X (Roll)
+    float sinr_cosp = 2.0f * (w * x + y * z);
+    float cosr_cosp = 1.0f - 2.0f * (x * x + y * y);
+    Euler.x = atan2(sinr_cosp, cosr_cosp);
+
+    // Y (Pitch)
+    float sinp = 2.0f * (w * y - z * x);
+
+    if (fabs(sinp) >= 1.0f)
+        Euler.y = copysign(PI / 2.0f, sinp);
+    else
+        Euler.y = asin(sinp);
+
+    // Z (Yaw)
+    float siny_cosp = 2.0f * (w * z + x * y);
+    float cosy_cosp = 1.0f - 2.0f * (y * y + z * z);
+    Euler.z = atan2(siny_cosp, cosy_cosp);
+
+    return Euler;
+}
+
 FMatrix FQuat::ToMatrix() const
 {
     FMatrix M;
