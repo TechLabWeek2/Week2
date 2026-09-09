@@ -43,6 +43,25 @@ public:
     {
         return FVector(x * f, y * f, z * f);
     }
+    [[nodiscard]] __forceinline FVector operator*(const FMatrix& M) const
+    {
+        float X = x * M.m[0][0] + y * M.m[1][0] + z * M.m[2][0] + 1.0f * M.m[3][0];
+
+        float Y = x * M.m[0][1] + y * M.m[1][1] + z * M.m[2][1] + 1.0f * M.m[3][1];
+
+        float Z = x * M.m[0][2] + y * M.m[1][2] + z * M.m[2][2] + 1.0f * M.m[3][2];
+
+        float W = x * M.m[0][3] + y * M.m[1][3] + z * M.m[2][3] + 1.0f * M.m[3][3];
+
+        if (W != 0.0f)
+        {
+            X /= W;
+            Y /= W;
+            Z /= W;
+        }
+
+        return FVector(X, Y, Z);
+    }
 
     [[nodiscard]] __forceinline FVector operator/(const FVector& V) const
     {

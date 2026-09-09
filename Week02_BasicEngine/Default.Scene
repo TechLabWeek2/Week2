@@ -3,7 +3,7 @@
   "Primitives" : {
     "10" : {
       "BlendMode" : "BlendMode::Opaque",
-      "Location" : [-1.000000, 0.276733, 0.000000],
+      "Location" : [0.000000, 0.499865, -1.000000],
       "ModelColor" : [0.000000, 1.000000, 0.000000, 1.000000],
       "RasterizerState" : "RasterizerState::Solid",
       "Rotation" : [0.000000, 0.000000, 1.570000],
@@ -13,7 +13,7 @@
     },
     "11" : {
       "BlendMode" : "BlendMode::Opaque",
-      "Location" : [-1.000000, 0.276733, 0.000000],
+      "Location" : [0.000000, 0.499865, -1.000000],
       "ModelColor" : [0.000000, 0.000000, 1.000000, 1.000000],
       "RasterizerState" : "RasterizerState::Solid",
       "Rotation" : [0.000000, -1.570000, 0.000000],
@@ -43,10 +43,10 @@
     },
     "3" : {
       "BlendMode" : "BlendMode::Opaque",
-      "Location" : [-1.000000, 0.276733, 0.000000],
+      "Location" : [-1.000000, 0.347239, 0.194870],
       "ModelColor" : [1.000000, 1.000000, 1.000000, 1.000000],
       "RasterizerState" : "RasterizerState::Solid",
-      "Rotation" : [0.000000, 0.000000, 0.000000],
+      "Rotation" : [0.000000, 0.000000, -0.638345],
       "Scale" : [0.100000, 0.100000, 0.100000],
       "Type" : "ETypePrimitive::Cube",
       "UseColor" : false
@@ -83,11 +83,11 @@
     },
     "7" : {
       "BlendMode" : "BlendMode::Opaque",
-      "Location" : [0.000000, 0.000000, -1.000000],
+      "Location" : [0.000000, 0.499865, -1.000000],
       "ModelColor" : [1.000000, 1.000000, 1.000000, 1.000000],
       "RasterizerState" : "RasterizerState::Solid",
       "Rotation" : [0.000000, 0.000000, 0.000000],
-      "Scale" : [0.100000, 0.100000, 0.100000],
+      "Scale" : [0.100000, 0.210043, 0.100000],
       "Type" : "ETypePrimitive::Sphere",
       "UseColor" : false
     },
@@ -103,7 +103,7 @@
     },
     "9" : {
       "BlendMode" : "BlendMode::Opaque",
-      "Location" : [-1.000000, 0.276733, 0.000000],
+      "Location" : [0.000000, 0.499865, -1.000000],
       "ModelColor" : [1.000000, 0.000000, 0.000000, 1.000000],
       "RasterizerState" : "RasterizerState::Solid",
       "Rotation" : [0.000000, 0.000000, 0.000000],

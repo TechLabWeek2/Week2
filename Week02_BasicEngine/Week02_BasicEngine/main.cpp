@@ -289,7 +289,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test4->SetMeshResource(&CubeResourceData);
     Test5->SetMeshResource(&CubeResourceData);
     Test6->SetMeshResource(&SphereResourceData);
-    Test7->SetMeshResource(&PlaneResourceData);
+    Test7->SetMeshResource(&PlaneResourceData);    
 
     Test->SetShaderResource(&DefaultShader);
     Test2->SetShaderResource(&DefaultShader);
@@ -355,6 +355,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Floor->SetUseColorFlag(true);
     TArray<float> Black = { 0.f, 0.f, 0.f, 1.f };
     Floor->SetModelColor(Black);
+
+    GUObjectArray.RemoveObj(Test);
+    GUObjectArray.RemoveObj(Test3);
+    GUObjectArray.RemoveObj(Test4);
+    GUObjectArray.RemoveObj(Test5);
+    GUObjectArray.RemoveObj(Test6);
+    GUObjectArray.RemoveObj(Test7);
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false && !bStopRender)
@@ -465,7 +472,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
                 Camera->RelativeLocation.y += cameraSpeed;
             }
-            if (pickedObjectPtr && GetAsyncKeyState(VK_SPACE) & 0x0001) {
+            if (GetAsyncKeyState(VK_SPACE) & 0x0001 && pickedObjectPtr) {
                 switch (XGizmo->Type) {
                 case ETypeTransform::Location:
                     XGizmo->SetMeshResource(&RotationGizmoResourceData);
@@ -492,9 +499,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     ZGizmo->Type = ETypeTransform::Location;
                     break;
                 }
-                XGizmo->Update(pickedObjectPtr);
-                YGizmo->Update(pickedObjectPtr);
-                ZGizmo->Update(pickedObjectPtr);
+                XGizmo->Update(pickedObjectPtr, Camera);
+                YGizmo->Update(pickedObjectPtr, Camera);
+                ZGizmo->Update(pickedObjectPtr, Camera);
             }
             if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
             {
@@ -605,9 +612,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                             static_cast<UGizmo*>(pickedGizmoPtr)->ObjUpdate(pickedObjectPtr, WorldMove);
                         }
-                        XGizmo->Update(pickedObjectPtr);
-                        YGizmo->Update(pickedObjectPtr);
-                        ZGizmo->Update(pickedObjectPtr);
+                        XGizmo->Update(pickedObjectPtr, Camera);
+                        YGizmo->Update(pickedObjectPtr, Camera);
+                        ZGizmo->Update(pickedObjectPtr, Camera);
 
                         lastMousePos = currentMousePos;
                     }
@@ -663,7 +670,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 pickedGizmoPtr = nullptr;
             }
         }
-
+        if (pickedObjectPtr) {
+            XGizmo->Update(pickedObjectPtr, Camera);
+            YGizmo->Update(pickedObjectPtr, Camera);
+            ZGizmo->Update(pickedObjectPtr, Camera);
+        }
         //오브젝트 순회하면서 Update 호출
         TArray<UObject*>& AllObj = GUObjectArray.GetAllObjects();
         for (int i = 0; i < AllObj.Num(); i++)

@@ -1,4 +1,5 @@
 #include "UGizmo.h"
+#include "Core/Core.h"
 
 UGizmo::UGizmo(ETypeAxis axis)
 {
@@ -9,12 +10,14 @@ UGizmo::UGizmo(ETypeAxis axis)
 	Axis = axis;
 }
 
-void UGizmo::Update(UPrimitiveComponent* Obj)
+void UGizmo::Update(UPrimitiveComponent* Obj, USceneComponent* Camera)
 {
     this->RelativeLocation = Obj->RelativeLocation;
+    float CameraToGizmo = (RelativeLocation - Camera->RelativeLocation).Size();
+
+    this->RelativeScale3D = FVector(0.1f, 0.1f, 0.1f) * CameraToGizmo;
     switch (Type) {
     case ETypeTransform::Location:
-    case ETypeTransform::Rotation:
         switch (Axis)
         {
         case XAxis:
@@ -30,6 +33,22 @@ void UGizmo::Update(UPrimitiveComponent* Obj)
             break;
         }
         break;
+    case ETypeTransform::Rotation:
+        switch (Axis)
+        {
+        case XAxis:
+            RelativeRotation = FVector(PI/2, PI / 2, 0);
+            break;
+        case YAxis:
+            RelativeRotation = FVector(PI / 2, 0, PI / 2);
+            break;
+        case ZAxis:
+            RelativeRotation = FVector(0, 0, 0);
+            break;
+        default:
+            break;
+        }
+        break;
     case ETypeTransform::Scale:
         switch (Axis)
         {
@@ -37,10 +56,19 @@ void UGizmo::Update(UPrimitiveComponent* Obj)
             RelativeRotation = Obj->RelativeRotation;
             break;
         case YAxis:
-            RelativeRotation = Obj->RelativeRotation + FVector(0, 0, 1.57);
+            RelativeRotation = Obj->RelativeRotation +FVector(0, 0, 1.57);
             break;
         case ZAxis:
-            RelativeRotation = FVector(0, 1.57, 0) + Obj->RelativeRotation;
+        {
+            RelativeRotation = FVector(0, -1.57, 0) - Obj->RelativeRotation;
+             FMatrix ObjRot;
+            ObjRot = FMatrix::Rotation(FVector(Obj->RelativeRotation));
+            FMatrix Rot_90;
+            Rot_90 = FMatrix::Rotation(FVector(0, -PI/2.f, 0));
+            RelativeRotation = (ObjRot * Rot_90).GetEuler();
+            //RelativeRotation = (Rot_90 * ObjRot).GetEuler();
+            //RelativeRotation = Obj->RelativeRotation + FVector(0, -0.57, 0);
+        };
             break;
         default:
             break;
@@ -57,7 +85,9 @@ void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove)
         Obj->RelativeLocation += MouseMove;
         break;
     case ETypeTransform::Rotation:
-        Obj->RelativeRotation += MouseMove;
+        Obj->RelativeRotation.x += MouseMove.x;
+        Obj->RelativeRotation.y -= MouseMove.y;
+        Obj->RelativeRotation.z += MouseMove.z;
         break;
     case ETypeTransform::Scale:
         Obj->RelativeScale3D += MouseMove;
