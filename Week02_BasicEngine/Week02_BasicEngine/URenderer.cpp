@@ -162,15 +162,23 @@ void URenderer::CreateRasterizerState()
 	}
 
 	rasterizerdesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerdesc.CullMode = D3D11_CULL_FRONT; // 백 페이스 컬링
+	rasterizerdesc.CullMode = D3D11_CULL_FRONT; // 프론트 페이스 컬링
 	hr = GGraphicsDevice.GetDevice()->CreateRasterizerState(&rasterizerdesc, &RasterizerState_FrontCulling);
 	if (FAILED(hr))
 	{
 		assert(false);
 	}
 
+	rasterizerdesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerdesc.CullMode = D3D11_CULL_FRONT; // 프론트 페이스 컬링
+	hr = GGraphicsDevice.GetDevice()->CreateRasterizerState(&rasterizerdesc, &RasterizerState_WireFrame_FrontCulling);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
 	rasterizerdesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerdesc.CullMode = D3D11_CULL_NONE; // 백 페이스 컬링
+	rasterizerdesc.CullMode = D3D11_CULL_NONE; // 컬링 없음
 	hr = GGraphicsDevice.GetDevice()->CreateRasterizerState(&rasterizerdesc, &RasterizerState_Solid_CullingNone);
 	if (FAILED(hr))
 	{
@@ -235,6 +243,12 @@ void URenderer::PrepareShader()
 //실질적인 Rendering 요청을 할 RenderPrimitive 함수
 void URenderer::RenderPrimitive(ID3D11Buffer* pBuffer, UINT numVertices)
 {
+	if (pBuffer == nullptr)
+	{
+		assert(false);
+		return;
+	}
+
 	UINT offset = 0;
 	GGraphicsDevice.GetDeviceContext()->IASetVertexBuffers(0, 1, &pBuffer, &Stride, &offset);
 
@@ -314,9 +328,26 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 		if (Obj->bIsActive)
 		{
 			//Shader Set
-			GGraphicsDevice.GetDeviceContext()->VSSetShader(Obj->GetShaderResource()->GetVertexShader(), nullptr, 0);
+			if (FShaderResource* TempShaderResource = Obj->GetShaderResource())
+			{
+				if (ID3D11VertexShader* VSShader = TempShaderResource->GetVertexShader())
+				{
+					GGraphicsDevice.GetDeviceContext()->VSSetShader(VSShader, nullptr, 0);
+				}
+				if (ID3D11PixelShader* PSShader = TempShaderResource->GetPixelShader())
+				{
+					GGraphicsDevice.GetDeviceContext()->PSSetShader(PSShader, nullptr, 0);
+				}
+
+				if (ID3D11InputLayout* InputLO = TempShaderResource->GetInputLayout())
+				{
+					GGraphicsDevice.GetDeviceContext()->IASetInputLayout(InputLO);
+				}
+			}
+
+			/*GGraphicsDevice.GetDeviceContext()->VSSetShader(Obj->GetShaderResource()->GetVertexShader(), nullptr, 0);
 			GGraphicsDevice.GetDeviceContext()->PSSetShader(Obj->GetShaderResource()->GetPixelShader(), nullptr, 0);
-			GGraphicsDevice.GetDeviceContext()->IASetInputLayout(Obj->GetShaderResource()->GetInputLayout());  
+			GGraphicsDevice.GetDeviceContext()->IASetInputLayout(Obj->GetShaderResource()->GetInputLayout()); */ 
 
 			//Constant Buffer Set
 			GGraphicsDevice.GetDeviceContext()->VSSetConstantBuffers(0, 1, &ConstantBuffer);
@@ -341,10 +372,17 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 			UpdateConstant(TempConstantData);
 
 			//Topology Set
-			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(Obj->GetMeshResource()->GetTopology());
+			//메시 리소스
+			if (FMeshResource* TempMeshResource = Obj->GetMeshResource())
+			{
+				if (D3D11_PRIMITIVE_TOPOLOGY TempTopology = TempMeshResource->GetTopology())
+				{
+					GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(TempTopology);
+				}
+				//Render
+				RenderPrimitive(TempMeshResource->GetVertexBuffer(), TempMeshResource->GetNumVertices());
+			}
 
-			//Render
-			RenderPrimitive(Obj->GetMeshResource()->GetVertexBuffer(), Obj->GetMeshResource()->GetNumVertices());
 		}
 	}
 
@@ -356,10 +394,23 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 	{
 		if (Obj->bIsActive)
 		{
-			GGraphicsDevice.GetDeviceContext()->VSSetShader(Obj->GetShaderResource()->GetVertexShader(), nullptr, 0);
-			GGraphicsDevice.GetDeviceContext()->PSSetShader(Obj->GetShaderResource()->GetPixelShader(), nullptr, 0);
-			GGraphicsDevice.GetDeviceContext()->IASetInputLayout(Obj->GetShaderResource()->GetInputLayout());
+			if (FShaderResource* TempShaderResource = Obj->GetShaderResource())
+			{
+				if (ID3D11VertexShader* VSShader = TempShaderResource->GetVertexShader())
+				{
+					GGraphicsDevice.GetDeviceContext()->VSSetShader(VSShader, nullptr, 0);
+				}
+				if (ID3D11PixelShader* PSShader = TempShaderResource->GetPixelShader())
+				{
+					GGraphicsDevice.GetDeviceContext()->PSSetShader(PSShader, nullptr, 0);
+				}
 
+				if (ID3D11InputLayout* InputLO = TempShaderResource->GetInputLayout())
+				{
+					GGraphicsDevice.GetDeviceContext()->IASetInputLayout(InputLO);
+				}
+			}
+			
 			GGraphicsDevice.GetDeviceContext()->VSSetConstantBuffers(0, 1, &ConstantBuffer);
 			GGraphicsDevice.GetDeviceContext()->PSSetConstantBuffers(0, 1, &ConstantBuffer);
 
@@ -419,7 +470,11 @@ ID3D11RasterizerState* URenderer::FindRasterizerState(RasterizerState StateType)
 		case Solid_Culling_None:
 			return RasterizerState_Solid_CullingNone;
 			break;
+		case WireFrame_FrontCulling:
+			return RasterizerState_WireFrame_FrontCulling;
+			break;
 		default:
+			return RasterizerState_Solid;
 			break;
 	}
 	return nullptr;
