@@ -96,7 +96,7 @@ public:
 
 	static FMatrix Orthographic(float FOV, float AspectRatio, float NearClip, float FarClip);
 
-
+	FVector GetEuler() const;
 public:
 	float m[4][4];
 	static const FMatrix Identity;

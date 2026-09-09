@@ -526,6 +526,25 @@ FMatrix FMatrix::Orthographic(float Zoom, float AspectRatio, float NearClip, flo
 	return M;
 }
 
+FVector FMatrix::GetEuler() const
+{
+	FVector Rotation;
+
+	Rotation.y = asinf(std::clamp(m[2][0], -1.0f, 1.0f));
+
+	Rotation.x = atan2f(
+		-m[2][1],
+		m[2][2]
+	);
+
+	Rotation.z = atan2f(
+		-m[1][0],
+		m[0][0]
+	);
+
+	return Rotation;
+}
+
 static FMatrix TranslationMatrixInverse(const FVector& Other)
 {
 	FMatrix result;
