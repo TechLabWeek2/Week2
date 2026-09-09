@@ -347,7 +347,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     TArray<float> Orange = { 1.f, 0.5f, 0.f, 1.0f };
     HighlightObj->SetModelColor(Orange);
     HighlightObj->SetUseColorFlag(true);
-    
+    //하이라이트 오브젝트 스케일 증가 두께
+    FVector HighlightThickness = { 0.008f, 0.008f, 0.008f };
 
     /*GUObjectArray.RemoveObj(Test);
     GUObjectArray.RemoveObj(Test3);
@@ -486,9 +487,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             {
                 if (!io.WantCaptureMouse)
                 {
-                    //하이라이트 오브젝트 스케일 증가 두께
-                    FVector HighlightThickness = { 0.008f, 0.008f, 0.008f };
-
                     // picking
                     RECT rect;
                     GetClientRect(hWnd, &rect);
@@ -566,13 +564,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                         lastMousePos = currentMousePos;
 
-                        if (HighlightObj != nullptr)
+                        /*if (HighlightObj != nullptr)
                         {
                             HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
                             HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
                             HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
                             HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
-                        }
+                        }*/
                     }
 
                     if (!isDragging) {
@@ -583,6 +581,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 ndcX, ndcY, Camera, CameraForward, CameraRight, CameraUp, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
                             
 
+                            //빈공간 클릭
                             if (pickedGizmoPtr == nullptr) {
                                 pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
                                 pickedObjectPtr = nullptr;
@@ -614,7 +613,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                 ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
 
-                                if (HighlightObj != nullptr)
+                                /*if (HighlightObj != nullptr)
                                 {
                                     HighlightObj->bIsActive = true;
                                     HighlightObj->SetMeshResource(pickedObjectPtr->GetMeshResource());
@@ -623,7 +622,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
                                     HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
                                     HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
-                                }                                
+                                }  */                              
                             }
                         }
                         else {
@@ -641,17 +640,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                 ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
 
-                                //하이라이트 데이터 수정
-                                if (HighlightObj != nullptr)
-                                {
-                                    HighlightObj->bIsActive = true;
-                                    HighlightObj->SetMeshResource(pickedObjectPtr->GetMeshResource());
-                                    HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
-                                    HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                                    HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
-                                    HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
-                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
-                                }
+                                ////하이라이트 데이터 수정
+                                //if (HighlightObj != nullptr)
+                                //{
+                                //    HighlightObj->bIsActive = true;
+                                //    HighlightObj->SetMeshResource(pickedObjectPtr->GetMeshResource());
+                                //    HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
+                                //    HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                                //    HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
+                                //    HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
+                                //    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
+                                //}
                             }                            
                         }
                     }
@@ -678,6 +677,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             YGizmo->Update(pickedObjectPtr, Camera);
             ZGizmo->Update(pickedObjectPtr, Camera);
         }
+
+        //하이라이트 데이터 수정
+        if (HighlightObj != nullptr && pickedObjectPtr != nullptr)
+        {
+            HighlightObj->bIsActive = true;
+            HighlightObj->SetMeshResource(pickedObjectPtr->GetMeshResource());
+            HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
+            HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
+            HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
+            HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
+            HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
+        }
+
 
         //오브젝트 순회하면서 Update 호출
         TArray<UObject*>& AllObj = GUObjectArray.GetAllObjects();
