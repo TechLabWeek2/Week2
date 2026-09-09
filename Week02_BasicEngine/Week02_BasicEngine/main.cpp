@@ -496,9 +496,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     ZGizmo->Type = ETypeTransform::Location;
                     break;
                 }
-                XGizmo->Update(pickedObjectPtr);
-                YGizmo->Update(pickedObjectPtr);
-                ZGizmo->Update(pickedObjectPtr);
+                XGizmo->Update(pickedObjectPtr, Camera);
+                YGizmo->Update(pickedObjectPtr, Camera);
+                ZGizmo->Update(pickedObjectPtr, Camera);
             }
             if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
             {
@@ -609,9 +609,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                             static_cast<UGizmo*>(pickedGizmoPtr)->ObjUpdate(pickedObjectPtr, WorldMove);
                         }
-                        XGizmo->Update(pickedObjectPtr);
-                        YGizmo->Update(pickedObjectPtr);
-                        ZGizmo->Update(pickedObjectPtr);
+                        XGizmo->Update(pickedObjectPtr, Camera);
+                        YGizmo->Update(pickedObjectPtr, Camera);
+                        ZGizmo->Update(pickedObjectPtr, Camera);
 
                         lastMousePos = currentMousePos;
                     }
@@ -667,7 +667,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 pickedGizmoPtr = nullptr;
             }
         }
-
+        if (pickedObjectPtr) {
+            XGizmo->Update(pickedObjectPtr, Camera);
+            YGizmo->Update(pickedObjectPtr, Camera);
+            ZGizmo->Update(pickedObjectPtr, Camera);
+        }
         //오브젝트 순회하면서 Update 호출
         TArray<UObject*>& AllObj = GUObjectArray.GetAllObjects();
         for (int i = 0; i < AllObj.Num(); i++)

@@ -27,7 +27,7 @@ public:
         return &Class;
     }
 
-    void Update(UPrimitiveComponent* Obj);
+    void Update(UPrimitiveComponent* Obj, USceneComponent* Camera);
 
     void ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove);
 };

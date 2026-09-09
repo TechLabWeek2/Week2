@@ -10,9 +10,12 @@ UGizmo::UGizmo(ETypeAxis axis)
 	Axis = axis;
 }
 
-void UGizmo::Update(UPrimitiveComponent* Obj)
+void UGizmo::Update(UPrimitiveComponent* Obj, USceneComponent* Camera)
 {
     this->RelativeLocation = Obj->RelativeLocation;
+    float CameraToGizmo = (RelativeLocation - Camera->RelativeLocation).Size();
+
+    this->RelativeScale3D = FVector(0.1f, 0.1f, 0.1f) * CameraToGizmo;
     switch (Type) {
     case ETypeTransform::Location:
         switch (Axis)
