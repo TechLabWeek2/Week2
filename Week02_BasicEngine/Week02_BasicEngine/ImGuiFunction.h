@@ -51,6 +51,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
         newPrimitive->RelativeLocation = FVector(Lx, Ly, Lz);
         newPrimitive->RelativeRotation = FVector(DegreeToRadian(Rx), DegreeToRadian(Ry), DegreeToRadian(Rz));
         newPrimitive->RelativeScale3D = FVector(Sx, Sy, Sz);
+        newPrimitive->RelativeQ = newPrimitive->RelativeQ.FromEuler(newPrimitive->RelativeRotation);
     }
     ImGui::SameLine();
     ImGui::InputInt("Number of spawn", &spawnNum);

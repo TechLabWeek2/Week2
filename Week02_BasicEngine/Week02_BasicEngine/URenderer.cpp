@@ -6,7 +6,7 @@
 #include "FMeshResource.h"
 #include "d3dcompiler.h"
 #include "FShaderResource.h"
-
+#include "UGizmo.h"
 
 void URenderer::CreateConstantBuffer() {
 	D3D11_BUFFER_DESC constantbufferdesc = {};
@@ -329,7 +329,8 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 
 			//Constant Buffer Update
 			FConstants TempConstantData = {};
-			TempConstantData.MVP = Obj->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
+
+			TempConstantData.MVP = Obj->GetQuatModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
 			TempConstantData.HightLightIntensity = Obj->bIsSelected ? 2.0 : 1.0;
 			TempConstantData.Color[0] = Obj->GetModelColor()[0];
 			TempConstantData.Color[1] = Obj->GetModelColor()[1];
@@ -366,7 +367,7 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 			GGraphicsDevice.GetDeviceContext()->OMSetBlendState(FindBlendState(Obj->GetBlendMode()), nullptr, 0xffffffff);
 
 			FConstants TempConstantData = {};
-			TempConstantData.MVP = Obj->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
+			TempConstantData.MVP = Obj->GetQuatModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
 			TempConstantData.HightLightIntensity = Obj->bIsSelected ? 2.0 : 1.0;
 			TempConstantData.Color[0] = Obj->GetModelColor()[0];
 			TempConstantData.Color[1] = Obj->GetModelColor()[1];

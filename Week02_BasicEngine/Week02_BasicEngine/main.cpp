@@ -539,7 +539,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             float deltaX = (float)(lastMousePos.x - currentMousePos.x);
             float deltaY = (float)(lastMousePos.y - currentMousePos.y);
 
-                const float sensitivity = 0.002f;
+            const float sensitivity = 0.002f;
 
             float angleX = deltaX * sensitivity;
             float angleY = deltaY * sensitivity;
@@ -635,7 +635,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             // 선택된 월드 축으로만 이동
                             FVector WorldMove = GizmoAxis * WorldMoveAmount;
 
-                            static_cast<UGizmo*>(pickedGizmoPtr)->ObjUpdate(pickedObjectPtr, WorldMove);
+                            static_cast<UGizmo*>(pickedGizmoPtr)->ObjUpdate(pickedObjectPtr, WorldMove, deltaX* sensitivity, deltaY* sensitivity);
                         }
                         XGizmo->Update(pickedObjectPtr, Camera);
                         YGizmo->Update(pickedObjectPtr, Camera);

@@ -19,6 +19,7 @@ class UGizmo :
 public:
     ETypeTransform Type;
     ETypeAxis Axis;
+
 public:
     UGizmo(ETypeAxis axis);
     static UClass* StaticClass()
@@ -29,5 +30,5 @@ public:
 
     void Update(UPrimitiveComponent* Obj, USceneComponent* Camera);
 
-    void ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove);
+    void ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove, float DeltaX, float DeltaY);
 };
