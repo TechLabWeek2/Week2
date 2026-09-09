@@ -29,5 +29,9 @@ public:
     }
 
     const FVector& GetLocation()const;
+
+    const FVector GetForwardVector_UE()const;
+    const FVector GetRightVector_UE()const;
+    const FVector GetUpVector_UE()const;
 };
 
