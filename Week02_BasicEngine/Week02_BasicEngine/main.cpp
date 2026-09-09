@@ -317,9 +317,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     YGizmo->SetUseColorFlag(true);
     ZGizmo->SetUseColorFlag(true);
 
-    XGizmo->SetDepthStateMode(DepthStateMode::NoDepth);
+    /*XGizmo->SetDepthStateMode(DepthStateMode::NoDepth);
     YGizmo->SetDepthStateMode(DepthStateMode::NoDepth);
-    ZGizmo->SetDepthStateMode(DepthStateMode::NoDepth);
+    ZGizmo->SetDepthStateMode(DepthStateMode::NoDepth);*/
 
     UFloorComp* Floor = new UFloorComp();
 
@@ -487,7 +487,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 if (!io.WantCaptureMouse)
                 {
                     //하이라이트 오브젝트 스케일 증가 두께
-                    FVector HighlightThickness = { 0.01f, 0.01f, 0.01f };
+                    FVector HighlightThickness = { 0.008f, 0.008f, 0.008f };
 
                     // picking
                     RECT rect;
