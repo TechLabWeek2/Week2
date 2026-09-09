@@ -44,6 +44,15 @@ public:
 		return json::Array(value.x, value.y, value.z);
 	}
 
+	static Json SerializeVector4(const FVector4& value)
+	{
+		if (!std::isfinite(value.x) || !std::isfinite(value.y) || !std::isfinite(value.z))
+		{
+			throw std::invalid_argument("FVector contains non-finite values.");
+		}
+		return json::Array(value.x, value.y, value.z, value.w);
+	}
+
 	static FVector DeserializeVector3(const Json& jsonValue)
 	{
 		return FVector(
@@ -52,6 +61,17 @@ public:
 			GetNumber(jsonValue.at(2))
 		);
 	}
+
+	static FVector4 DeserializeVector4(const Json& jsonValue)
+	{
+		return FVector4(
+			GetNumber(jsonValue.at(0)),
+			GetNumber(jsonValue.at(1)),
+			GetNumber(jsonValue.at(2)),
+			GetNumber(jsonValue.at(3))
+		);
+	}
+
 
 	static float GetNumber(const Json& jsonValue)
 	{
@@ -83,6 +103,7 @@ public:
 		data["Location"] = SerializeVector3(Camera.RelativeLocation);
 		data["Rotation"] = SerializeVector3(Camera.RelativeRotation);
 		data["Scale"] = SerializeVector3(Camera.RelativeScale3D);
+		data["Quat"] = SerializeVector4(FVector4(Camera.RelativeQ.x, Camera.RelativeQ.y, Camera.RelativeQ.z, Camera.RelativeQ.w));
 		data["Type"] = "Camera";
 		data["FOV"] = Camera.FOV;
 		data["AspectRatio"] = Camera.AspectRatio;
@@ -97,11 +118,11 @@ public:
 	static Json SerializePrimitive(UPrimitiveComponent* value = nullptr)
 	{
 		
-
 		Json data = json::Object();
 		data["Location"] = SerializeVector3(value->RelativeLocation);
 		data["Rotation"] = SerializeVector3(value->RelativeRotation);
 		data["Scale"] = SerializeVector3(value->RelativeScale3D);
+		data["Quat"] = SerializeVector4(FVector4(value->RelativeQ.x, value->RelativeQ.y, value->RelativeQ.z, value->RelativeQ.w));
 
 		if( value->primitiveType == ETypePrimitive::None ||
 			value->primitiveType == ETypePrimitive::Plane ||
@@ -175,6 +196,7 @@ public:
 		const FVector location = DeserializeVector3(data.at("Location"));
 		const FVector rotation = DeserializeVector3(data.at("Rotation"));
 		const FVector scale = DeserializeVector3(data.at("Scale"));
+		const FVector4 quat = DeserializeVector4(data.at("Quat"));
 
 		const float fov = GetNumber(data.at("FOV"));
 		const float aspectRatio = GetNumber(data.at("AspectRatio"));
@@ -201,6 +223,10 @@ public:
 		camera.RelativeLocation = location;
 		camera.RelativeRotation = rotation;
 		camera.RelativeScale3D = scale;
+		camera.RelativeQ.x = quat.x;
+		camera.RelativeQ.y = quat.y;
+		camera.RelativeQ.z = quat.z;	
+		camera.RelativeQ.w = quat.w;
 
 		camera.FOV = fov;
 		camera.AspectRatio = aspectRatio;
@@ -216,6 +242,7 @@ public:
 		FVector location = DeserializeVector3(data.at("Location"));
 		FVector rotation = DeserializeVector3(data.at("Rotation"));
 		FVector scale = DeserializeVector3(data.at("Scale"));
+		FQuat quat = FQuat(DeserializeVector4(data.at("Quat")).x, DeserializeVector4(data.at("Quat")).y, DeserializeVector4(data.at("Quat")).z, DeserializeVector4(data.at("Quat")).w);
 		
 		//나중에 FString으로 바꿀수 있으면
 		std::string typeString = data.at("Type").ToString();
@@ -250,6 +277,7 @@ public:
 		NewPrimitive->RelativeLocation = location;
 		NewPrimitive->RelativeRotation = rotation;
 		NewPrimitive->RelativeScale3D = scale;
+		NewPrimitive->RelativeQ = quat;
 		NewPrimitive->SetRasterizerState(RasterizerStateType);
 		NewPrimitive->SetBlendMode(BlendModeState);
 		NewPrimitive->SetModelColor(modelColor);
