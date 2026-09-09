@@ -19,6 +19,8 @@
 #include "UGizmo.h"
 #include "FMeshResourceRegistry.h"
 #include "FPrimitiveFactory.h"
+#include "TArray.h"
+#include "UCameraComp.h"
 
 class FJsonWrapper
 {
@@ -66,11 +68,35 @@ public:
 		}
 	}
 
+	static bool IsEditorHelper(UObject* object)
+	{
+		return dynamic_cast<UAxisGizmo*>(object) != nullptr
+			|| dynamic_cast<UGizmo*>(object) != nullptr
+			|| dynamic_cast<UFloorComp*>(object) != nullptr;
+	}
 
-	static Json SerializePrimitive(UPrimitiveComponent* value)
+	static Json SerializeCamera(const UCameraComp& Camera)
 	{
 		Json data = json::Object();
+		data["Location"] = SerializeVector3(Camera.RelativeLocation);
+		data["Rotation"] = SerializeVector3(Camera.RelativeRotation);
+		data["Scale"] = SerializeVector3(Camera.RelativeScale3D);
+		data["Type"] = "Camera";
+		data["FOV"] = Camera.FOV;
+		data["AspectRatio"] = Camera.AspectRatio;
+		data["NearClip"] = Camera.NearClip;
+		data["FarClip"] = Camera.FarClip;
+		data["ZoomLevel"] = Camera.ZoomLevel;
+		data["IsOrthogonal"] = Camera.IsOrthogonal;
+	
+		return data;
+	}
 
+	static Json SerializePrimitive(UPrimitiveComponent* value = nullptr)
+	{
+		
+
+		Json data = json::Object();
 		data["Location"] = SerializeVector3(value->RelativeLocation);
 		data["Rotation"] = SerializeVector3(value->RelativeRotation);
 		data["Scale"] = SerializeVector3(value->RelativeScale3D);
@@ -136,8 +162,51 @@ public:
 		return data;
 	}
 
+
+	static void DeserializeCamera(const Json& data, UCameraComp& camera)
+	{
+		// 먼저 모두 읽고 검사한 뒤 기존 카메라에 적용한다.
+		const FVector location = DeserializeVector3(data.at("Location"));
+		const FVector rotation = DeserializeVector3(data.at("Rotation"));
+		const FVector scale = DeserializeVector3(data.at("Scale"));
+
+		const float fov = GetNumber(data.at("FOV"));
+		const float aspectRatio = GetNumber(data.at("AspectRatio"));
+		const float nearClip = GetNumber(data.at("NearClip"));
+		const float farClip = GetNumber(data.at("FarClip"));
+		const float zoomLevel = GetNumber(data.at("ZoomLevel"));
+
+		const Json& orthogonal = data.at("IsOrthogonal");
+
+		if (orthogonal.JSONType() != Json::Class::Boolean)
+		{
+			throw std::invalid_argument("IsOrthogonal must be boolean.");
+		}
+
+		if (fov <= 0.f || fov >= 180.f ||
+			aspectRatio <= 0.f ||
+			nearClip <= 0.f ||
+			farClip <= nearClip ||
+			zoomLevel <= 0.f)
+		{
+			throw std::invalid_argument("Invalid camera projection values.");
+		}
+
+		camera.RelativeLocation = location;
+		camera.RelativeRotation = rotation;
+		camera.RelativeScale3D = scale;
+
+		camera.FOV = fov;
+		camera.AspectRatio = aspectRatio;
+		camera.NearClip = nearClip;
+		camera.FarClip = farClip;
+		camera.ZoomLevel = zoomLevel;
+		camera.IsOrthogonal = orthogonal.ToBool();
+	}
+
 	static UPrimitiveComponent* DeserializePrimitive(const Json& data,FShaderResource* shaderResource, const FMeshResourceRegistry& MeshRegistry)
 	{
+
 		FVector location = DeserializeVector3(data.at("Location"));
 		FVector rotation = DeserializeVector3(data.at("Rotation"));
 		FVector scale = DeserializeVector3(data.at("Scale"));
@@ -206,17 +275,7 @@ public:
 			}
 		}
 
-		// 디버그용
-		/*for (int i = 0; i < GUObjectArray.GetNum(); ++i)
-		{
-			UObject* object = GUObjectArray.GetAllObjects()[i];
 
-			std::string message =
-				"Remaining [" + std::to_string(i) + "] " +
-				typeid(*object).name() + "\n";
-
-			OutputDebugStringA(message.c_str());
-		}*/
 
 		json::JSON root = json::Object();
 		root["Version"] = 1;
@@ -241,11 +300,27 @@ public:
 
 		for (int i = 1; i < GUObjectArray.GetNum(); i++) {
 			
-			std::string uuid =
-				std::to_string(GUObjectArray.GetAllObjects()[i]->UUID);
 
-			primitiveJson[uuid] =
-				SerializePrimitive(static_cast<UPrimitiveComponent*>(GUObjectArray.GetAllObjects()[i]));
+			UObject* object = GUObjectArray.GetAllObjects()[i];
+
+			std::string uuid =
+				std::to_string(object->UUID);
+
+			
+			if (object->IsA(UCameraComp::StaticClass()))
+			{
+				auto* camera = static_cast<UCameraComp*>(object);
+				primitiveJson[uuid] = SerializeCamera(*camera);
+			}
+			else if (IsEditorHelper(object))
+			{
+				continue;
+			}
+			else if (object->IsA(UPrimitiveComponent::StaticClass()))
+			{
+				auto* primitive = static_cast<UPrimitiveComponent*>(object);
+				primitiveJson[uuid] = SerializePrimitive(primitive);
+			}
 		}
 
 		root["Primitives"] = primitiveJson;
@@ -260,61 +335,154 @@ public:
 		return true;
 	}
 
-	static bool LoadScene(const std::filesystem::path& filename, const FMeshResourceRegistry& MeshRegistry,FShaderResource* shaderResource)
+	static bool LoadScene(const std::filesystem::path& filename, const FMeshResourceRegistry& MeshRegistry,FShaderResource* shaderResource, UCameraComp& camera)
 	{
-		std::ifstream file(filename);
 
-		if (!file.is_open())
-			return false;
+		TArray<UPrimitiveComponent*> oldPrimitives;
+		TArray<UPrimitiveComponent*> newPrimitives;
 
-		std::stringstream buffer;
-		buffer << file.rdbuf();
-
-		json::JSON root =
-			json::JSON::Load(buffer.str());
-
-		int version =
-			static_cast<int>(root.at("Version").ToInt());
-
-		if (version != 1)
-			return false;
-
-		int nextUUID =
-			static_cast<int>(root.at("NextUUID").ToInt());
-
-		//현재 화면 Clear()
-		for (int i = GUObjectArray.GetNum() - 1; i >=0; --i)
+		try
 		{
-			UObject* object = GUObjectArray.GetAllObjects()[i];
-			if (dynamic_cast<UCameraComp*>(object) ||
-				dynamic_cast<UAxisGizmo*>(object) ||
-				dynamic_cast<UGizmo*>(object) ||
-				dynamic_cast<UFloorComp*>(object))
+			std::ifstream file(filename);
+
+			if (!file.is_open())
 			{
-				continue;
+				return false;
 			}
 
-			if (dynamic_cast<UPrimitiveComponent*>(object))
+			std::stringstream buffer;
+			buffer << file.rdbuf();
+
+			const Json root = Json::Load(buffer.str());
+			const Json& version = root.at("Version");
+
+			const Json& primitives = root.at("Primitives");
+
+
+
+			// 새 객체 생성 전에 기존 프리미티브 목록을 보관한다.
+			for (int32 i = 0; i < GUObjectArray.GetNum(); ++i)
 			{
-				GUObjectArray.RemoveObj(object);
+				UObject* object = GUObjectArray.GetAllObjects()[i];
+
+				if (object == nullptr || IsEditorHelper(object))
+				{
+					continue;
+				}
+
+				if (object->IsA(UPrimitiveComponent::StaticClass()))
+				{
+					oldPrimitives.Add(
+						static_cast<UPrimitiveComponent*>(object));
+				}
+			}
+
+			// 생성한 객체를 기록할 슬롯을 미리 확보한다.
+			// TArray::Resize()가 포인터 원소를 nullptr로 초기화한다.
+			int32 entryCount = 0;
+
+			for (const auto& entry : primitives.ObjectRange())
+			{
+				++entryCount;
+			}
+
+			newPrimitives.Resize(entryCount);
+
+			int32 createdCount = 0;
+			const Json* cameraData = nullptr;
+
+			for (const auto& [uuid, data] : primitives.ObjectRange())
+			{
+				if (data.JSONType() != Json::Class::Object)
+				{
+					throw std::invalid_argument(
+						"Scene entry must be an object.");
+				}
+
+				const Json& typeValue = data.at("Type");
+
+				if (typeValue.JSONType() != Json::Class::String)
+				{
+					throw std::invalid_argument(
+						"Type must be a string.");
+				}
+
+				const std::string typeName = typeValue.ToString();
+
+				// 카메라는 생성하지 않고 데이터를 보관한다.
+				if (typeName == "Camera")
+				{
+					if (cameraData != nullptr)
+					{
+						throw std::invalid_argument(
+							"Only one editor camera is supported.");
+					}
+
+					cameraData = &data;
+					continue;
+				}
+
+				const ETypePrimitive type = FromString(typeName);
+
+				// 이전 파일에 포함된 에디터 보조 객체는 유지한다.
+				if (type == ETypePrimitive::Floor ||
+					type == ETypePrimitive::XLine ||
+					type == ETypePrimitive::YLine ||
+					type == ETypePrimitive::ZLine ||
+					type == ETypePrimitive::Gizmo)
+				{
+					continue;
+				}
+
+				UPrimitiveComponent* primitive =
+					DeserializePrimitive(
+						data,
+						shaderResource,
+						MeshRegistry);
+
+				if (primitive == nullptr)
+				{
+					throw std::runtime_error(
+						"Failed to create primitive: " + typeName);
+				}
+
+				// Resize로 확보했으므로 Add 대신 인덱스로 기록한다.
+				newPrimitives[createdCount++] = primitive;
+			}
+
+			// 모든 프리미티브 생성 성공 후 기존 카메라에 적용한다.
+			// 카메라 데이터가 없는 파일은 현재 카메라를 유지한다.
+			if (cameraData != nullptr)
+			{
+				DeserializeCamera(*cameraData, camera);
 			}
 		}
-
-		//scene.SetNextUUID(nextUUID);
-
-		// TODO : buffer를 어떻게 땡겨올지, 다음 설계 pull 넘어온거 보고 생각하기
-		// resource로 부터 넘어온 buffer를 받아서 등록
-		// 클래스 구조 변화에 따른 타입도 신경
-		// 팩토리 패턴 사용하기 - 후순위
-		const auto& primitives =
-			root.at("Primitives");
-
-		for (const auto& [uuidString, primitiveData]
-			: primitives.ObjectRange())
+		catch (const std::exception& error)
 		{
-			DeserializePrimitive(primitiveData,shaderResource, MeshRegistry);
+			// 실패하면 이번 로드에서 생성한 객체만 제거한다.
+			for (int32 i = 0; i < newPrimitives.Num(); ++i)
+			{
+				UPrimitiveComponent* primitive = newPrimitives[i];
 
+				if (primitive != nullptr)
+				{
+					GUObjectArray.RemoveObj(primitive);
+				}
+			}
+
+			OutputDebugStringA(error.what());
+			OutputDebugStringA("\n");
+
+			return false;
 		}
+
+		// 복원 준비가 끝난 후 기존 프리미티브를 제거한다.
+		for (int32 i = 0; i < oldPrimitives.Num(); ++i)
+		{
+			GUObjectArray.RemoveObj(oldPrimitives[i]);
+		}
+
+		
 
 		return true;
 	}

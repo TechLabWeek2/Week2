@@ -11,8 +11,13 @@ public:
     UCubeComp();
 
 	static UClass* StaticClass() {
-		static UClass Class("USphere", UPrimitiveComponent::StaticClass());
+		static UClass Class("UCubeComp", UPrimitiveComponent::StaticClass(), &UCubeComp::CreateObject);
 		return &Class;
+	}
+
+	static UObject* CreateObject()
+	{
+		return new UCubeComp();
 	}
 };
 

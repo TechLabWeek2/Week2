@@ -305,7 +305,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
         if (FJsonWrapper::LoadScene(
             sceneFiles[selectedScene],
             MeshRegistry,
-            &DefaultShader))
+            &DefaultShader, *Camera))
         {
             pickedPrimitivePtr = nullptr;
             sceneMessage = "Scene loaded.";

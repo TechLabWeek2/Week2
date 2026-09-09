@@ -248,32 +248,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Camera->RelativeLocation = { -4.7f, 4.0f, 2.6f };
     Camera->RelativeRotation = { 0.f, -0.3f, 0.6f };
 
-    UCubeComp* Test = new UCubeComp();
-    UCubeComp* Test2 = new UCubeComp();
-    USphereComp* Test3 = new USphereComp();
-    UCubeComp* Test4 = new UCubeComp();
-    UCubeComp* Test5 = new UCubeComp();
-    USphereComp* Test6 = new USphereComp(); 
-    UPlaneComp* Test7 = new UPlaneComp();
+    auto* Test = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Cube, &DefaultShader, MeshRegistry);
+    auto* Test2 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Cube, &DefaultShader, MeshRegistry);
+    auto* Test3 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Sphere, &DefaultShader, MeshRegistry);
+    auto* Test4 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Cube, &DefaultShader, MeshRegistry);
+    auto* Test5 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Cube, &DefaultShader, MeshRegistry);
+    auto* Test6 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Sphere, &DefaultShader, MeshRegistry);
+    auto* Test7 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Plane, &DefaultShader, MeshRegistry);
+
     UGizmo* XGizmo = new UGizmo(ETypeAxis::XAxis);
     UGizmo* YGizmo = new UGizmo(ETypeAxis::YAxis);
     UGizmo* ZGizmo = new UGizmo(ETypeAxis::ZAxis);
-
-    Test->SetMeshResource(&CubeResourceData);
-    Test2->SetMeshResource(&CubeResourceData);
-    Test3->SetMeshResource(&SphereResourceData);
-    Test4->SetMeshResource(&CubeResourceData);
-    Test5->SetMeshResource(&CubeResourceData);
-    Test6->SetMeshResource(&SphereResourceData);
-    Test7->SetMeshResource(&PlaneResourceData);    
-
-    Test->SetShaderResource(&DefaultShader);
-    Test2->SetShaderResource(&DefaultShader);
-    Test3->SetShaderResource(&DefaultShader);
-    Test4->SetShaderResource(&DefaultShader);
-    Test5->SetShaderResource(&DefaultShader);
-    Test6->SetShaderResource(&DefaultShader);
-    Test7->SetShaderResource(&DefaultShader);
 
     Test->SetRasterizerState(RasterizerState::WireFrame);
     Test3->SetRasterizerState(RasterizerState::WireFrame);

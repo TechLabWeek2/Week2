@@ -186,6 +186,7 @@
     <ClInclude Include="FGraphicsDevice.h" />
     <ClInclude Include="FMeshResource.h" />
     <ClInclude Include="FMeshResourceRegistry.h" />
+    <ClInclude Include="FObjectFactory.h" />
     <ClInclude Include="FPrimitiveFactory.h" />
     <ClInclude Include="FQuat.h" />
     <ClInclude Include="FShaderResource.h" />

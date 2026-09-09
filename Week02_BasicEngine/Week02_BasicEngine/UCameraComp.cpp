@@ -4,6 +4,7 @@
 
 UCameraComp::UCameraComp()
 {
+    Class = StaticClass();
 	FOV = 90.0f;
 }
 

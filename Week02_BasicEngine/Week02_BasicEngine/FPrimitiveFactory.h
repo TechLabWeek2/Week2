@@ -4,6 +4,7 @@
 #include "USphereComp.h"
 #include "UPlaneComp.h"
 #include "FMeshResourceRegistry.h"
+#include <FObjectFactory.h>
 
 class FShaderResource;
 
@@ -20,23 +21,34 @@ public:
 			return nullptr;
 		}
 
-		UPrimitiveComponent* NewPrimitive = nullptr;
+		UClass* PrimitiveClass = nullptr;
 
 		switch (type)
 		{
 		case ETypePrimitive::Cube:
-			NewPrimitive = new UCubeComp();
+			PrimitiveClass = UCubeComp::StaticClass();
 			break;
 		case ETypePrimitive::Sphere:
-			NewPrimitive = new USphereComp();
+			PrimitiveClass = USphereComp::StaticClass();
 			break;
 		case ETypePrimitive::Plane:
-			NewPrimitive = new UPlaneComp();
+			PrimitiveClass = UPlaneComp::StaticClass();
 			break;
 
 		default:
 			return nullptr;
 		}
+
+		UObject* NewObject =
+			FObjectFactory::ConstructObject(PrimitiveClass);
+
+		if (!NewObject)
+		{
+			return nullptr;
+		}
+
+		UPrimitiveComponent* NewPrimitive =
+			static_cast<UPrimitiveComponent*>(NewObject);
 
 		NewPrimitive->SetMeshResource(MeshResource);
 		NewPrimitive->SetShaderResource(shaderResource);
