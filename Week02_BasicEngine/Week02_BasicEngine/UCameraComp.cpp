@@ -61,7 +61,7 @@ void UCameraComp::Update(float deltaTime)
     FVector CameraRight = GetRightVector_UE();
     FVector CameraUp = GetUpVector_UE();
 
-    const float moveSensitivity = 0.004f;
+    const float moveSensitivity = 0.002f;
     const float rotateSensitivity = 0.00015f;
     cameraSpeed = deltaTime * moveSensitivity;
     rotateSpeed = deltaTime * rotateSensitivity;
