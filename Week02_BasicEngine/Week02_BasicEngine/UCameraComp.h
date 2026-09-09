@@ -9,7 +9,7 @@ public:
     float FOV = 90.0f;
     float AspectRatio = 1024.f / 1024.f;
     float NearClip = 0.1f;
-    float FarClip = 1000.0f;
+    float FarClip = 5000.0f;
     float ZoomLevel = 1.f;
     bool IsOrthogonal = false;
     float cameraSpeed = 0.04f;

@@ -337,7 +337,7 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 			TempConstantData.Color[2] = Obj->GetModelColor()[2];
 			TempConstantData.Color[3] = Obj->GetModelColor()[3];
 			TempConstantData.UseColor = Obj->GetUseColorFlag();
-			TempConstantData.PatternNum = 20;
+			TempConstantData.PatternNum = 2000;
 			UpdateConstant(TempConstantData);
 
 			//Topology Set
@@ -374,7 +374,7 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 			TempConstantData.Color[2] = Obj->GetModelColor()[2];
 			TempConstantData.Color[3] = Obj->GetModelColor()[3];
 			TempConstantData.UseColor = Obj->GetUseColorFlag();
-			TempConstantData.PatternNum = 20;
+			TempConstantData.PatternNum = 2000;
 			UpdateConstant(TempConstantData);
 
 			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(Obj->GetMeshResource()->GetTopology());

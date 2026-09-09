@@ -17,31 +17,15 @@
 #include "FShaderResource.h"
 #include "ImGuiFunction.h"
 
-#define SCREEN_WIDTH_INIT 1800
-#define SCREEN_HEIGHT_INIT 1200
-
-//#if IMGUI_VERSION_NUM >= 19263
-//namespace ImGui { extern IMGUI_API void DemoMarker(const char* file, int line, const char* section); }
-//#define IMGUI_DEMO_MARKER(section)  do { ImGui::DemoMarker("imgui_demo.cpp", __LINE__, section); } while (0)
-//#endif
-////struct FVertexSimple;
-//struct ExampleAppConsole
-//{
-//    char                  InputBuf[256];
-//    ImVector<char*>       Items;
-//    ImVector<const char*> Commands;
-//    ImVector<char*>       History;
-//    int                   HistoryPos;    // -1: new line, 0..History.Size-1 browsing history.
-//    ImGuiTextFilter       Filter;
-//    bool                  AutoScroll;
-//    bool                  ScrollToBottom;
-
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include "imGui/imgui_impl_win32.h"
 #include "ExampleAppConsole.h"
 #include <FJsonWrapper.h>
+
+#define SCREEN_WIDTH_INIT 1800
+#define SCREEN_HEIGHT_INIT 1200
 
 UINT screenWidth = SCREEN_WIDTH_INIT;
 UINT screenHeight = SCREEN_HEIGHT_INIT;
@@ -51,8 +35,7 @@ bool bFocus = true;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-// 각종 메시지를 처리할 함수
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) // 각종 메시지를 처리할 함수
 {
     if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
     {
@@ -147,7 +130,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGui_ImplDX11_Init(GGraphicsDevice.GetDevice(), GGraphicsDevice.GetDeviceContext());
 
     ////Mesh Resource 만들기.
-
     //생성
     FMeshResource CubeResourceData;
     FMeshResource SphereResourceData;
@@ -193,12 +175,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     FloorResourceData.Initialize();
 
-
     FMeshResourceRegistry MeshRegistry;
     MeshRegistry.Registry(ETypePrimitive::Cube, &CubeResourceData);
     MeshRegistry.Registry(ETypePrimitive::Sphere, &SphereResourceData);
     MeshRegistry.Registry(ETypePrimitive::Plane, &PlaneResourceData);
-
 
     //Shader Resource
     DefaultShader.SetVertexShaderName(L"ShaderW0.hlsl");
@@ -252,7 +232,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     AxisGizmo->RelativeLocation = FVector(0, 0, 0);
     AxisGizmo->RelativeRotation = FVector(0, 0, 0);
-    AxisGizmo->RelativeScale3D = FVector(10.f, 10.f, 10.f);
+    AxisGizmo->RelativeScale3D = FVector(500.f, 500.f, 500.f);
 
     //ExampleAppConsole Console;
     bool is_window_open = true;
@@ -328,14 +308,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     //UE -> DX 테스트
     Test->RelativeLocation = FVector(0, 0, 1);
     Test2->RelativeLocation = FVector(0, 0, 2);
-    Test3->RelativeLocation = FVector(0, 0, 3);
-    //Test3->RelativeRotation = FVector(0, 0, 1.57);
-    Test4->RelativeLocation = FVector(0, 0, 4);
-    Test5->RelativeLocation = FVector(0, 0, 5);
-    //Test5->RelativeRotation = FVector(0, -1.57, 0);
-    Test6->RelativeLocation = FVector(0, 0, 6);
-    Test7->RelativeLocation = FVector(0, 0, 0.5f);
-    //Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
+    Test3->RelativeLocation = FVector(-1, 0, 0);
+    Test4->RelativeLocation = FVector(0, 1, 0);
+    Test5->RelativeLocation = FVector(1, 0, 0);
+    Test6->RelativeLocation = FVector(0, 0, -1);
+    Test7->RelativeLocation = FVector(0, -1, 0);
 
     TArray<float> Red = { 0.8f, 0.f, 0.f, 1.0f };
     TArray<float> Green = { 0.f, 0.8f, 0.f, 1.f };
@@ -349,19 +326,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     UFloorComp* Floor = new UFloorComp();
 
-    Floor->primitiveType = ETypePrimitive::Floor;
+    //Floor->primitiveType = ETypePrimitive::Floor;
     Floor->SetMeshResource(&FloorResourceData);
     Floor->SetShaderResource(&CheckerShader);
 
     Floor->SetRasterizerState(RasterizerState::Solid_Culling_None);
 
-    Floor->RelativeScale3D = FVector(5.f, 5.f, 5.f);
+    Floor->RelativeScale3D = FVector(500.f, 500.f, 500.f);
     //Floor->RelativeRotation = FVector(DegreeToRadian(90), 0.f, 0.f); 
     Floor->RelativeLocation = FVector(0.f, 0.f, 0.f);
 
     Floor->SetBlendMode(BlendMode::Alpha); 
     Floor->SetUseColorFlag(true);
-    TArray<float> Black = { 0.f, 0.f, 0.f, 0.5f };
+    TArray<float> Black = { 0.f, 0.f, 0.f, 0.1f };
     Floor->SetModelColor(Black);
 
     /*GUObjectArray.RemoveObj(Test);
@@ -628,7 +605,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         for (int i = 0; i < AllObj.Num(); i++)
         {
             if (AllObj[i] == nullptr) continue;
-
             //USceneComponent만 Render하도록
             USceneComponent* SceneComponent = dynamic_cast<USceneComponent*>(AllObj[i]);
             if (SceneComponent)
