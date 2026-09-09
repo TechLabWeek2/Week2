@@ -313,16 +313,21 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 	{
 		if (Obj->bIsActive)
 		{
+			//Shader Set
 			GGraphicsDevice.GetDeviceContext()->VSSetShader(Obj->GetShaderResource()->GetVertexShader(), nullptr, 0);
 			GGraphicsDevice.GetDeviceContext()->PSSetShader(Obj->GetShaderResource()->GetPixelShader(), nullptr, 0);
 			GGraphicsDevice.GetDeviceContext()->IASetInputLayout(Obj->GetShaderResource()->GetInputLayout());  
 
+			//Constant Buffer Set
 			GGraphicsDevice.GetDeviceContext()->VSSetConstantBuffers(0, 1, &ConstantBuffer);
 			GGraphicsDevice.GetDeviceContext()->PSSetConstantBuffers(0, 1, &ConstantBuffer);
 
+			//Rasterizer State Set
 			GGraphicsDevice.GetDeviceContext()->RSSetState(FindRasterizerState(Obj->GetRasterizerState()));
+			//BlendState Set
 			GGraphicsDevice.GetDeviceContext()->OMSetBlendState(FindBlendState(Obj->GetBlendMode()), nullptr, 0xffffffff);
 
+			//Constant Buffer Update
 			FConstants TempConstantData = {};
 			TempConstantData.MVP = Obj->GetModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
 			TempConstantData.HightLightIntensity = Obj->bIsSelected ? 2.0 : 1.0;
@@ -334,7 +339,10 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 			TempConstantData.PatternNum = 20;
 			UpdateConstant(TempConstantData);
 
+			//Topology Set
 			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(Obj->GetMeshResource()->GetTopology());
+
+			//Render
 			RenderPrimitive(Obj->GetMeshResource()->GetVertexBuffer(), Obj->GetMeshResource()->GetNumVertices());
 		}
 	}

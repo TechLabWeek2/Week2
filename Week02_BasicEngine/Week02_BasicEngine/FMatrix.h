@@ -86,6 +86,7 @@ public:
 
 
 	static FMatrix GetViewMatrix(const FVector& Location, const FVector& Rotation);
+	static FMatrix GetViewMatrix_UEToDX(const FVector& Location, const FVector& Rotation);
 
 	static FMatrix GetViewMatrixInverse(const FVector& Location, const FVector& Rotation);
 

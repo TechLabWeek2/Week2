@@ -252,8 +252,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     double elapsedTime = 0.0;
     
     //카메라
-    Camera->RelativeLocation = { -2.5f, 2.5f,-2.5f };
-    Camera->RelativeRotation = { -0.5f,-1.0f, 0 };
+    Camera->RelativeLocation = { -4.7f, 4.0f, 2.6f };
+    Camera->RelativeRotation = { 0.f, -0.3f, 0.6f };
 
     //좌표축
     UAxisGizmo* AxisGizmo = new UAxisGizmo();
@@ -326,7 +326,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
 
 
-    Test->RelativeLocation = FVector(1, 0, 0);
+    /*Test->RelativeLocation = FVector(1, 0, 0);
     Test2->RelativeLocation = FVector(-1, 0, 0);
     Test3->RelativeLocation = FVector(0, 1, 0);
     Test3->RelativeRotation = FVector(0, 0, 1.57);
@@ -334,11 +334,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test5->RelativeLocation = FVector(0, 0, 1);
     Test5->RelativeRotation = FVector(0, -1.57, 0);
     Test6->RelativeLocation = FVector(0, 0, -1);
-    Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
+    Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);*/
 
-    TArray<float> Red = { 0.7f, 0.f, 0.f, 1.0f };
-    TArray<float> Green = { 0.f, 0.7f, 0.f, 1.f };
-    TArray<float> Blue = { 0.f, 0.f, 0.7f, 1.f };
+    //UE -> DX 테스트
+    Test->RelativeLocation = FVector(0, 0, 1);
+    Test2->RelativeLocation = FVector(0, 0, 2);
+    Test3->RelativeLocation = FVector(0, 0, 3);
+    //Test3->RelativeRotation = FVector(0, 0, 1.57);
+    Test4->RelativeLocation = FVector(0, 0, 4);
+    Test5->RelativeLocation = FVector(0, 0, 5);
+    //Test5->RelativeRotation = FVector(0, -1.57, 0);
+    Test6->RelativeLocation = FVector(0, 0, 6);
+    Test7->RelativeLocation = FVector(0, 0, 0.5f);
+    //Test7->RelativeRotation = FVector(DegreeToRadian(90), 0, 0);
+
+    TArray<float> Red = { 1.f, 0.f, 0.f, 1.0f };
+    TArray<float> Green = { 0.f, 1.f, 0.f, 1.f };
+    TArray<float> Blue = { 0.f, 0.f, 1.f, 1.f };
     XGizmo->SetModelColor(Red);
     YGizmo->SetModelColor(Green);
     ZGizmo->SetModelColor(Blue);
@@ -355,10 +367,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Floor->SetRasterizerState(RasterizerState::Solid_Culling_None);
 
     Floor->RelativeScale3D = FVector(5.f, 5.f, 5.f);
-    Floor->RelativeRotation = FVector(DegreeToRadian(90), 0.f, 0.f);
-    Floor->RelativeLocation = FVector(0.f, 0.f, -1.0f);
+    //Floor->RelativeRotation = FVector(DegreeToRadian(90), 0.f, 0.f); 
+    Floor->RelativeLocation = FVector(0.f, 0.f, 0.f);
 
-    Floor->SetBlendMode(BlendMode::Alpha);
+    Floor->SetBlendMode(BlendMode::Alpha); 
     Floor->SetUseColorFlag(true);
     TArray<float> Black = { 0.f, 0.f, 0.f, 1.f };
     Floor->SetModelColor(Black);
@@ -435,19 +447,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         float ndcY = 1.f - 2.f * (float)currentMousePos.y / Height;
         UPicking::Hovering(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking, hoveringtObjectPtr, prevObjectPtr, pickedObjectPtr, pickedGizmoPtr);
 
+        //UE 기준 3축 벡터
+        FVector CameraForward = Camera->GetForwardVector_UE();
+        FVector CameraRight = Camera->GetRightVector_UE();
+        FVector CameraUp = Camera->GetUpVector_UE();
+
         const float cameraSpeed = 0.04f;
         if (bFocus)
         {
             if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
-                Camera->RelativeLocation.x -= XAxis.x * cameraSpeed;
+                /*Camera->RelativeLocation.x -= XAxis.x * cameraSpeed;
                 Camera->RelativeLocation.y -= XAxis.y * cameraSpeed;
-                Camera->RelativeLocation.z -= XAxis.z * cameraSpeed;
+                Camera->RelativeLocation.z -= XAxis.z * cameraSpeed;*/
+                Camera->RelativeLocation -= (CameraRight * cameraSpeed);
                 //Console.UE_LOG("%s %c %f %d %u %o %x","Hello",'A',3.14f,-100,100,100,255);
             }
             if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
-                Camera->RelativeLocation.x += XAxis.x * cameraSpeed;
+                /*Camera->RelativeLocation.x += XAxis.x * cameraSpeed;
                 Camera->RelativeLocation.y += XAxis.y * cameraSpeed;
-                Camera->RelativeLocation.z += XAxis.z * cameraSpeed;
+                Camera->RelativeLocation.z += XAxis.z * cameraSpeed;*/
+                Camera->RelativeLocation += CameraRight * cameraSpeed;
             }
             if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
                 if (Camera->IsOrthogonal)
@@ -456,9 +475,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 }
                 else
                 {
-                    Camera->RelativeLocation.x += ZAxis.x * cameraSpeed;
-                    Camera->RelativeLocation.y += ZAxis.y * cameraSpeed;
-                    Camera->RelativeLocation.z += ZAxis.z * cameraSpeed;
+                    Camera->RelativeLocation.x += CameraForward.x * cameraSpeed;
+                    Camera->RelativeLocation.y += CameraForward.y * cameraSpeed;
+                    Camera->RelativeLocation.z += CameraForward.z * cameraSpeed;
                 }
             }
             if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
@@ -468,16 +487,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 }
                 else
                 {
-                    Camera->RelativeLocation.x -= ZAxis.x * cameraSpeed;
-                    Camera->RelativeLocation.y -= ZAxis.y * cameraSpeed;
-                    Camera->RelativeLocation.z -= ZAxis.z * cameraSpeed;
+                    Camera->RelativeLocation.x -= CameraForward.x * cameraSpeed;
+                    Camera->RelativeLocation.y -= CameraForward.y * cameraSpeed;
+                    Camera->RelativeLocation.z -= CameraForward.z * cameraSpeed;
                 }
             }
             if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
-                Camera->RelativeLocation.y -= cameraSpeed;
+                Camera->RelativeLocation.z -= cameraSpeed;
             }
             if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
-                Camera->RelativeLocation.y += cameraSpeed;
+                Camera->RelativeLocation.z += cameraSpeed;
             }
             if (GetAsyncKeyState(VK_SPACE) & 0x0001 && pickedObjectPtr) {
                 switch (XGizmo->Type) {
@@ -518,28 +537,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     lastMousePos = currentMousePos;
                 }
 
-                float deltaX = (float)(currentMousePos.x - lastMousePos.x);
-                float deltaY = (float)(currentMousePos.y - lastMousePos.y);
+            /*float deltaX = (float)(currentMousePos.x - lastMousePos.x);
+            float deltaY = (float)(currentMousePos.y - lastMousePos.y);*/
+
+            float deltaX = (float)(lastMousePos.x - currentMousePos.x);
+            float deltaY = (float)(lastMousePos.y - currentMousePos.y);
 
                 const float sensitivity = 0.002f;
 
-                float angleX = deltaX * sensitivity;
-                float angleY = -deltaY * sensitivity;
+            float angleX = deltaX * sensitivity;
+            float angleY = deltaY * sensitivity;
 
-                // 좌우
-                Camera->RelativeRotation.y += angleX;
-                // 상하
-                Camera->RelativeRotation.x += angleY;
+            // 좌우
+            Camera->RelativeRotation.z += angleX;
+            // 상하
+            Camera->RelativeRotation.y += angleY;
 
-                // 상하 각도 제한
-                if (Camera->RelativeRotation.x <= DegreeToRadian(-89.f))
-                {
-                    Camera->RelativeRotation.x = DegreeToRadian(-89.f);
-                }
-                else if (Camera->RelativeRotation.x >= DegreeToRadian(89.f))
-                {
-                    Camera->RelativeRotation.x = DegreeToRadian(89.f);
-                }
+            // 상하 각도 제한
+            if (Camera->RelativeRotation.y <= DegreeToRadian(-89.f))
+            {
+                Camera->RelativeRotation.y = DegreeToRadian(-89.f);
+            }
+            else if (Camera->RelativeRotation.y >= DegreeToRadian(89.f))
+            {
+                Camera->RelativeRotation.y = DegreeToRadian(89.f);
+            }
 
                 lastMousePos = currentMousePos;
             }
@@ -629,7 +651,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     if (!isDragging) {
                         if (pickedObjectPtr != nullptr)
                         {
-                            pickedGizmoPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                            //pickedGizmoPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                            pickedGizmoPtr = UPicking::GetPickedPrimitive(
+                                ndcX, ndcY, Camera, CameraForward, CameraRight, CameraUp, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+
                             if (pickedGizmoPtr == nullptr) {
                                 pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
                                 pickedObjectPtr = nullptr;
@@ -655,7 +680,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             }
                         }
                         else {
-                            pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                            //pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                            pickedGizmoPtr = UPicking::GetPickedPrimitive(
+                                ndcX, ndcY, Camera, CameraForward, CameraRight, CameraUp, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+
                             if (pickedObjectPtr != nullptr)
                             {
                                 //pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
