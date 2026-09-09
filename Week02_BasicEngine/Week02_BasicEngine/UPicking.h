@@ -5,6 +5,7 @@
 #include "FMeshResource.h"
 #include "Shapes.h"
 #include "TArray.h"
+#include "UObjectArray.h"
 
 class UPicking
 {
@@ -29,4 +30,6 @@ public:
 	FVector DragPlaneNormal;
 public:
 	static UPrimitiveComponent* GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, const TArray<UObject*> &PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking);
+
+	static void Hovering(float ndcX, float ndcY, UCameraComp*& Camera, FVector forward, FVector right, FVector up, const TArray<UObject*>& PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking, UPrimitiveComponent*& hoveringtObjectPtr, UPrimitiveComponent*& prevObjectPtr, UPrimitiveComponent*& pickedObjectPtr, UPrimitiveComponent*& pickedGizmoPtr);
 };
