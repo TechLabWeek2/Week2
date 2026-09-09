@@ -20,3 +20,9 @@ enum BlendMode
 	Opaque,
 	Alpha
 }; 
+
+enum DepthStateMode
+{
+	Depth,
+	NoDepth
+};

@@ -193,10 +193,8 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
                 path.Append(FString(sceneName));
                 path.Append(L".Scene");
 
-                if (FJsonWrapper::SaveScene(std::filesystem::path(*path)))
-                {
-                    inputBuffer[0] = '\0';
-                }
+                FJsonWrapper::SaveScene(std::filesystem::path(*path));
+               
             }
         }
     }
@@ -300,12 +298,25 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
 
     if (ImGui::Button("Load Selected Scene"))
     {
-        // 경로에 이미 .Scene이 포함되어 있으므로 다시 붙이지 않음
-        if (FJsonWrapper::LoadScene(
-            sceneFiles[selectedScene],
-            MeshRegistry,
-            &DefaultShader, *Camera))
+        const fs::path& selectedPath = sceneFiles[selectedScene];
+
+        // 확장자를 제외한 이름을 UTF-8로 얻는다.
+        const auto sceneNameUtf8 = selectedPath.stem().u8string();
+
+        // 마지막 널 문자 공간까지 필요하다.
+        if (sceneNameUtf8.size() >= sizeof(inputBuffer))
         {
+            sceneMessage = "Scene name is too long.";
+        }
+        else if (FJsonWrapper::LoadScene(
+            selectedPath,
+            MeshRegistry,
+            &DefaultShader,
+            *Camera))
+        {
+            std::memcpy(inputBuffer,sceneNameUtf8.data(), sceneNameUtf8.size());
+
+            inputBuffer[sceneNameUtf8.size()] = '\0';
             pickedPrimitivePtr = nullptr;
             sceneMessage = "Scene loaded.";
         }

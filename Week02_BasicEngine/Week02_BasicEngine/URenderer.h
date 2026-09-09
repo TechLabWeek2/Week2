@@ -68,6 +68,7 @@ public:
     //ID3D11Texture2D* DepthStencilBuffer = nullptr; // 깊이, 스텐실 버퍼
     //ID3D11DepthStencilView* DepthStencilView = nullptr; // 깊이 버퍼 연결 인터페이스
     ID3D11DepthStencilState* DepthStencilState = nullptr; // 깊이, 스텐실을 어떻게 처리할지 
+    ID3D11DepthStencilState* DepthStencilState_NoDepth = nullptr; // 깊이, 스텐실을 어떻게 처리할지 
 
     FLOAT ClearColor[4] = { 0.53f, 0.81f, 0.92f, 1.0f }; // 화면을 초기화(clear)할 때 사용할 색상 (하늘색, RGBA)
     //D3D11_VIEWPORT ViewportInfo; // 렌더링 영역을 정의하는 뷰포트 정보
@@ -143,4 +144,6 @@ public:
     void SortTranslucentByDistance(TArray<UPrimitiveComponent*>& AlphaList, const FVector& CameraLoc);
 
     void RenderList(TArray<UPrimitiveComponent*>& ObjList, const UCameraComp* Camera);
+
+    ID3D11DepthStencilState* FindDepthStateMode(DepthStateMode DepthMode)const;
 };

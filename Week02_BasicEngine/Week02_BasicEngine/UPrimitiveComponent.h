@@ -61,6 +61,9 @@ public:
 	FShaderResource* GetShaderResource()const;
 	void SetShaderResource(FShaderResource* pShaderResource);
 
+	DepthStateMode GetDepthStateMode()const;
+	void SetDepthStateMode(DepthStateMode NewDepthStateMode);
+
 
 private:
     //메시 데이터
@@ -74,4 +77,6 @@ private:
 	float ModelColor[4] = { 1.f, 1.f, 1.f, 1.f };
 
 	bool UseColor = false;
+
+	DepthStateMode DepthStateType = DepthStateMode::Depth;
 };

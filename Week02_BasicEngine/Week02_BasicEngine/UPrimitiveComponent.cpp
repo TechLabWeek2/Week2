@@ -102,3 +102,13 @@ void UPrimitiveComponent::SetShaderResource(FShaderResource* pShaderResource)
 {
 	ShaderResource = pShaderResource;
 }
+
+DepthStateMode UPrimitiveComponent::GetDepthStateMode() const
+{
+	return DepthStateType;
+}
+
+void UPrimitiveComponent::SetDepthStateMode(DepthStateMode NewDepthStateMode)
+{
+	DepthStateType = NewDepthStateMode;
+}

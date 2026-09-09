@@ -264,6 +264,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     Test->SetRasterizerState(RasterizerState::WireFrame);
     Test3->SetRasterizerState(RasterizerState::WireFrame);
+    Test4->SetRasterizerState(RasterizerState::WireFrame);
     Test5->SetRasterizerState(RasterizerState::FrontCulling);
     Test6->SetRasterizerState(RasterizerState::Solid);
 
@@ -281,6 +282,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     XGizmo->RelativeRotation = FVector(0, 0, 0);
     YGizmo->RelativeRotation = FVector(0, 0, 1.57);
     ZGizmo->RelativeRotation = FVector(0, -1.57, 0);
+
+    XGizmo->SetBlendMode(BlendMode::Alpha);
+    YGizmo->SetBlendMode(BlendMode::Alpha);
+    ZGizmo->SetBlendMode(BlendMode::Alpha);
 
 
     /*Test->RelativeLocation = FVector(1, 0, 0);
@@ -300,7 +305,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Test4->RelativeLocation = FVector(0, 1, 0);
     Test5->RelativeLocation = FVector(1, 0, 0);
     Test6->RelativeLocation = FVector(0, 0, -1);
-    Test7->RelativeLocation = FVector(0, -1, 0);
+    Test7->RelativeLocation = FVector(0, -1, 1);
 
     TArray<float> Red = { 0.8f, 0.f, 0.f, 1.0f };
     TArray<float> Green = { 0.f, 0.8f, 0.f, 1.f };
@@ -311,6 +316,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     XGizmo->SetUseColorFlag(true);
     YGizmo->SetUseColorFlag(true);
     ZGizmo->SetUseColorFlag(true);
+
+    XGizmo->SetDepthStateMode(DepthStateMode::NoDepth);
+    YGizmo->SetDepthStateMode(DepthStateMode::NoDepth);
+    ZGizmo->SetDepthStateMode(DepthStateMode::NoDepth);
 
     UFloorComp* Floor = new UFloorComp();
 
