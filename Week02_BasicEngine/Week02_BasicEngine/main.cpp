@@ -423,7 +423,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
             bMouseOut = true;
         }
-        Console.UE_LOG("%f %f", ndcX, ndcY);
 
         Camera->UpdateArguments(bFocus, bMouseOut, io.WantCaptureMouse, &currentMousePos);
 
@@ -690,6 +689,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Console.Draw("Console Windows", &is_window_open);
         DrawCreateWindow(Camera, pickedObjectPtr, MeshRegistry, elapsedTime, currentFPS);
         DrawStatWindow();
+        DrawDetailsWindow(pickedObjectPtr);
 
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

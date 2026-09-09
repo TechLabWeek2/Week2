@@ -398,8 +398,108 @@ void DrawDetailsWindow(UPrimitiveComponent* selectedObject)
         const char* typeNames[] = { "None", "Plane", "Cube", "Sphere", "Floor", "XLine", "YLine", "ZLine", "Max" };
         ImGui::Text("Primitive Type: %s", typeNames[(int32)type]);
 
+        RasterizerState state = selectedObject->GetRasterizerState();
+        const char* stateNames[] = { "Solid", "WireFrame","FrontCulling", "Solid_Culling_None", "WireFrame_FrontCulling" };
+        if (ImGui::BeginCombo("Rasterizer State", stateNames[(int32)state]))
+        {
+            for (int32 i = 0; i <= (int32)RasterizerState::WireFrame_FrontCulling; i++)
+            {
+                bool selected = ((int32)state == i);
+                if (ImGui::Selectable(stateNames[i], selected))
+                {
+                    state = (RasterizerState)i;
+                }
+                if (selected)
+                {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            selectedObject->SetRasterizerState(state);
+            ImGui::EndCombo();
+        }
 
+        BlendMode mode = selectedObject->GetBlendMode();
+        const char* modeNames[] = { "Opaque", "Alpha" };
+        if (ImGui::BeginCombo("Blend Mode", modeNames[(int32)mode]))
+        {
+            for (int32 i = 0; i <= (int32)BlendMode::Alpha; i++)
+            {
+                bool selected = ((int32)mode == i);
+                if (ImGui::Selectable(modeNames[i], selected))
+                {
+                    mode = (BlendMode)i;
+                }
+                if (selected)
+                {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            selectedObject->SetBlendMode(mode);
+            ImGui::EndCombo();
+        }
+
+        ImGui::Separator();
+
+        float LocationX = selectedObject->GetLocation().x;
+        float LocationY = selectedObject->GetLocation().y;
+        float LocationZ = selectedObject->GetLocation().z;
+
+        ImGui::Text("Location");
+        ImGui::SameLine(130);
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::DragFloat("##LocationX_input", &LocationX, 0.01f);
+        selectedObject->RelativeLocation.x = LocationX;
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::DragFloat("##LocationY_input", &LocationY, 0.01f);
+        selectedObject->RelativeLocation.y = LocationY;
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::DragFloat("##LocationZ_input", &LocationZ, 0.01f);
+        selectedObject->RelativeLocation.z = LocationZ;
+
+        float RotationX = selectedObject->RelativeRotation.x;
+        float RotationY = selectedObject->RelativeRotation.y;
+        float RotationZ = selectedObject->RelativeRotation.z;
+
+        ImGui::Text("Rotation");
+        ImGui::SameLine(130);
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::DragFloat("##RotationX_input", &RotationX, 0.01f);
+        selectedObject->RelativeRotation.x = RotationX;
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::DragFloat("##RotationY_input", &RotationY, 0.01f);
+        selectedObject->RelativeRotation.y = RotationY;
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::DragFloat("##RotationZ_input", &RotationZ, 0.01f);
+        selectedObject->RelativeRotation.z = RotationZ;
+        selectedObject->RelativeQ = selectedObject->RelativeQ.FromEuler(selectedObject->RelativeRotation);
+
+        float ScaleX = selectedObject->RelativeScale3D.x;
+        float ScaleY = selectedObject->RelativeScale3D.y;
+        float ScaleZ = selectedObject->RelativeScale3D.z;
+
+        ImGui::Text("Scale");
+        ImGui::SameLine(130);
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::DragFloat("##ScaleX_input", &ScaleX, 0.01f);
+        selectedObject->RelativeScale3D.x = ScaleX;
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::DragFloat("##ScaleY_input", &ScaleY, 0.01f);
+        selectedObject->RelativeScale3D.y = ScaleY;
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::DragFloat("##ScaleZ_input", &ScaleZ, 0.01f);
+        selectedObject->RelativeScale3D.z = ScaleZ;
+
+        //ImGui::Separator();
     }
-
+    else
+    {
+        ImGui::Text("Object not selected");
+    }
     ImGui::End();
 }
