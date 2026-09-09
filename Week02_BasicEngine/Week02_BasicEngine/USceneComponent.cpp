@@ -25,7 +25,7 @@ FMatrix USceneComponent::GetModelMatrix() const
 	return scaleMatrix * rotationMatrix * translationMatrix;
 }
 
-void USceneComponent::Update(float deltaTime)
+void USceneComponent::Update()
 {
 }
 

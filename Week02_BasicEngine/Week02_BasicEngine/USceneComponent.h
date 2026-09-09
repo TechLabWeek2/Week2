@@ -13,11 +13,12 @@ public:
     bool bIsSelected = false;
 public:
     USceneComponent();
+    virtual ~USceneComponent() {}
 
     FMatrix GetModelMatrix() const;
 
     //이동, 
-    virtual void Update(float deltaTime);
+    virtual void Update();
 
     static UClass* StaticClass() {
         static UClass Class("USceneComponent", UObject::StaticClass());

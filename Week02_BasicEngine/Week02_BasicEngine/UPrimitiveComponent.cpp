@@ -6,9 +6,9 @@ UPrimitiveComponent::UPrimitiveComponent()
 	Class = StaticClass();
 }
 
-void UPrimitiveComponent::Update(float deltaTime)
+void UPrimitiveComponent::Update()
 {
-	Super::Update(deltaTime);
+	Super::Update();
 }
 
 FMeshResource* UPrimitiveComponent::GetMeshResource() const

@@ -49,8 +49,6 @@ bool bStopRender = false;
 bool bResizeWindow = false;
 bool bFocus = true;
 
-UCameraComp* Camera = new UCameraComp();
-
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // 각종 메시지를 처리할 함수
@@ -232,25 +230,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     //Shader 데이터 생성
     CheckerShader.CreateShaderResource();
 
-
     bool bIsExit = false;
 
     //FPS 제한을 위한 설정
     const int targetFPS = 60;
     const double targetFrameTime = 1000.0 / targetFPS; //한 프레임의 목표 시간(밀리초 단위)
     double currentFPS = 0.0;
-
     //고성능 타이머 초기화
     LARGE_INTEGER frequency;
     QueryPerformanceFrequency(&frequency);
-
     LARGE_INTEGER startTime, endTime;
     double elapsedTime = 0.0;
-    
-    //카메라
-    Camera->RelativeLocation = { -4.7f, 4.0f, 2.6f };
-    Camera->RelativeRotation = { 0.f, -0.3f, 0.6f };
-
+   
     //좌표축
     UAxisGizmo* AxisGizmo = new UAxisGizmo();
 
@@ -263,10 +254,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     AxisGizmo->RelativeRotation = FVector(0, 0, 0);
     AxisGizmo->RelativeScale3D = FVector(10.f, 10.f, 10.f);
 
-
     //ExampleAppConsole Console;
     bool is_window_open = true;
-
 
     //picking
     bool bIsPicking = false;
@@ -274,6 +263,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     UPrimitiveComponent* hoveringtObjectPtr = nullptr;
     UPrimitiveComponent* pickedObjectPtr = nullptr;
     UPrimitiveComponent* pickedGizmoPtr = nullptr;
+
+    UCameraComp* Camera = new UCameraComp();    //카메라
+    Camera->RelativeLocation = { -4.7f, 4.0f, 2.6f };
+    Camera->RelativeRotation = { 0.f, -0.3f, 0.6f };
 
     UCubeComp* Test = new UCubeComp();
     UCubeComp* Test2 = new UCubeComp();
@@ -448,52 +441,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         float ndcY = 1.f - 2.f * (float)currentMousePos.y / Height;
         UPicking::Hovering(ndcX, ndcY, Camera, CameraForward, CameraRight, CameraUp, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking, hoveringtObjectPtr, prevObjectPtr, pickedObjectPtr, pickedGizmoPtr);
 
-        const float cameraSpeed = 0.04f;
+        
         if (bFocus)
         {
-            if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
-                /*Camera->RelativeLocation.x -= XAxis.x * cameraSpeed;
-                Camera->RelativeLocation.y -= XAxis.y * cameraSpeed;
-                Camera->RelativeLocation.z -= XAxis.z * cameraSpeed;*/
-                Camera->RelativeLocation -= (CameraRight * cameraSpeed);
-                //Console.UE_LOG("%s %c %f %d %u %o %x","Hello",'A',3.14f,-100,100,100,255);
-            }
-            if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
-                /*Camera->RelativeLocation.x += XAxis.x * cameraSpeed;
-                Camera->RelativeLocation.y += XAxis.y * cameraSpeed;
-                Camera->RelativeLocation.z += XAxis.z * cameraSpeed;*/
-                Camera->RelativeLocation += CameraRight * cameraSpeed;
-            }
-            if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
-                if (Camera->IsOrthogonal)
-                {
-                    Camera->ZoomLevel -= 0.5f * cameraSpeed;
-                }
-                else
-                {
-                    Camera->RelativeLocation.x += CameraForward.x * cameraSpeed;
-                    Camera->RelativeLocation.y += CameraForward.y * cameraSpeed;
-                    Camera->RelativeLocation.z += CameraForward.z * cameraSpeed;
-                }
-            }
-            if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
-                if (Camera->IsOrthogonal)
-                {
-                    Camera->ZoomLevel += 0.5f * cameraSpeed;
-                }
-                else
-                {
-                    Camera->RelativeLocation.x -= CameraForward.x * cameraSpeed;
-                    Camera->RelativeLocation.y -= CameraForward.y * cameraSpeed;
-                    Camera->RelativeLocation.z -= CameraForward.z * cameraSpeed;
-                }
-            }
-            if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
-                Camera->RelativeLocation.z -= cameraSpeed;
-            }
-            if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
-                Camera->RelativeLocation.z += cameraSpeed;
-            }
+            Camera->UpdateArguments(&isDragging, io.WantCaptureMouse, &lastMousePos, &currentMousePos);
+
             if (GetAsyncKeyState(VK_SPACE) & 0x0001 && pickedObjectPtr) {
                 switch (XGizmo->Type) {
                 case ETypeTransform::Location:
@@ -524,42 +476,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 XGizmo->Update(pickedObjectPtr, Camera);
                 YGizmo->Update(pickedObjectPtr, Camera);
                 ZGizmo->Update(pickedObjectPtr, Camera);
-            }
-            if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
-            {
-                if (!isDragging && !io.WantCaptureMouse)
-                {
-                    isDragging = true;
-                    lastMousePos = currentMousePos;
-                }
-
-            /*float deltaX = (float)(currentMousePos.x - lastMousePos.x);
-            float deltaY = (float)(currentMousePos.y - lastMousePos.y);*/
-
-            float deltaX = (float)(lastMousePos.x - currentMousePos.x);
-            float deltaY = (float)(lastMousePos.y - currentMousePos.y);
-
-                const float sensitivity = 0.002f;
-
-            float angleX = deltaX * sensitivity;
-            float angleY = deltaY * sensitivity;
-
-            // 좌우
-            Camera->RelativeRotation.z += angleX;
-            // 상하
-            Camera->RelativeRotation.y += angleY;
-
-            // 상하 각도 제한
-            if (Camera->RelativeRotation.y <= DegreeToRadian(-89.f))
-            {
-                Camera->RelativeRotation.y = DegreeToRadian(-89.f);
-            }
-            else if (Camera->RelativeRotation.y >= DegreeToRadian(89.f))
-            {
-                Camera->RelativeRotation.y = DegreeToRadian(89.f);
-            }
-
-                lastMousePos = currentMousePos;
             }
             else if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000))
             {
@@ -696,8 +612,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
             else
             {
-                isDragging = false;
-                lastMousePos = currentMousePos;
                 pickedGizmoPtr = nullptr;
             }
         }
@@ -706,17 +620,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             YGizmo->Update(pickedObjectPtr, Camera);
             ZGizmo->Update(pickedObjectPtr, Camera);
         }
+
         //오브젝트 순회하면서 Update 호출
         TArray<UObject*>& AllObj = GUObjectArray.GetAllObjects();
         for (int i = 0; i < AllObj.Num(); i++)
         {
             if (AllObj[i] == nullptr) continue;
 
-            //UPrimitiveComponent만 Render하도록
-            UPrimitiveComponent* PrimitiveComponent = dynamic_cast<UPrimitiveComponent*>(AllObj[i]);
-            if (PrimitiveComponent && PrimitiveComponent->bIsActive)
+            //USceneComponent만 Render하도록
+            USceneComponent* SceneComponent = dynamic_cast<USceneComponent*>(AllObj[i]);
+            if (SceneComponent)
             {
-                PrimitiveComponent->Update(elapsedTime);
+                SceneComponent->Update();
             }
         }
                    
