@@ -426,7 +426,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         //Mouse Hovering
         float ndcX = 2.f * (float)currentMousePos.x / Width - 1.f;  // screen xy to NDC xy
         float ndcY = 1.f - 2.f * (float)currentMousePos.y / Height;
-        UPicking::Hovering(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking, hoveringtObjectPtr, prevObjectPtr);
+        UPicking::Hovering(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking, hoveringtObjectPtr, prevObjectPtr, pickedObjectPtr, pickedGizmoPtr);
 
         const float cameraSpeed = 0.04f;
         if (bFocus)
