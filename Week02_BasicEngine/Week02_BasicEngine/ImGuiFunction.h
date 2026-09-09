@@ -514,23 +514,108 @@ void DrawDetailsWindow(UPrimitiveComponent* selectedObject)
         float RotationZ = selectedObject->RelativeRotation.z;
 
         ImGui::Text("Rotation");
+
         ImGui::SameLine(130);
         ImGui::SetNextItemWidth(100.0f);
-        bool rotationChanged = false;
-        rotationChanged |= ImGui::DragFloat("##RotationX_input", &RotationX, 0.01f);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(100.0f);
-        rotationChanged |= ImGui::DragFloat("##RotationY_input", &RotationY, 0.01f);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(100.0f);
-        rotationChanged |= ImGui::DragFloat("##RotationZ_input", &RotationZ, 0.01f);
 
-        if (rotationChanged)
+        bool bRotated = false;
+
+        // 현재 UI에 표시되고 있는 이전 값
+        float OldRotationX = RotationX;
+        float OldRotationY = RotationY;
+        float OldRotationZ = RotationZ;
+
+
+        // X축 드래그
+        if (ImGui::DragFloat("##RotationX_input", &RotationX, 0.1f))
         {
-            selectedObject->RelativeRotation.x = RotationX;
-            selectedObject->RelativeRotation.y = RotationY;
-            selectedObject->RelativeRotation.z = RotationZ;
-            selectedObject->RelativeQ = selectedObject->RelativeQ.FromEuler(selectedObject->RelativeRotation);
+            float DeltaAngle = RotationX - OldRotationX;
+
+            FVector Axis =
+                selectedObject->RelativeQ.RotateVector(
+                    FVector(1.f, 0.f, 0.f)
+                );
+
+            FQuat DeltaQuat;
+            DeltaQuat = DeltaQuat.FromAxisAngle(
+                Axis,
+                DeltaAngle
+            );
+
+            selectedObject->RelativeQ =
+                DeltaQuat * selectedObject->RelativeQ;
+
+            selectedObject->RelativeQ.Normalize();
+
+            bRotated = true;
+        }
+
+
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100.0f);
+
+
+        // Y축 드래그
+        if (ImGui::DragFloat("##RotationY_input", &RotationY, 0.1f))
+        {
+            float DeltaAngle = RotationY - OldRotationY;
+
+            FVector Axis =
+                selectedObject->RelativeQ.RotateVector(
+                    FVector(0.f, 1.f, 0.f)
+                );
+
+            FQuat DeltaQuat;
+            DeltaQuat = DeltaQuat.FromAxisAngle(
+                Axis,
+                DeltaAngle
+            );
+
+            selectedObject->RelativeQ =
+                DeltaQuat * selectedObject->RelativeQ;
+
+            selectedObject->RelativeQ.Normalize();
+
+            bRotated = true;
+        }
+
+
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100.0f);
+
+
+        // Z축 드래그
+        if (ImGui::DragFloat("##RotationZ_input", &RotationZ, 0.1f))
+        {
+            float DeltaAngle = RotationZ - OldRotationZ;
+
+            FVector Axis =
+                selectedObject->RelativeQ.RotateVector(
+                    FVector(0.f, 0.f, 1.f)
+                );
+
+            FQuat DeltaQuat;
+            DeltaQuat = DeltaQuat.FromAxisAngle(
+                    Axis,
+                    DeltaAngle
+                );
+
+            selectedObject->RelativeQ =
+                DeltaQuat * selectedObject->RelativeQ;
+
+            selectedObject->RelativeQ.Normalize();
+
+            bRotated = true;
+        }
+
+
+        // 회전 후 Euler 값 갱신
+        if (bRotated)
+        {
+            selectedObject->RelativeRotation =
+                selectedObject->RelativeQ.ToEuler(
+                    selectedObject->RelativeQ
+                );
         }
 
         float ScaleX = selectedObject->RelativeScale3D.x;

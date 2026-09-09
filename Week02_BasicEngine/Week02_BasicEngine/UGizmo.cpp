@@ -97,7 +97,7 @@ void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove, POINT Curren
             switch (Axis)
             {
             case ETypeAxis::XAxis:
-                LocalGizmoAxis = RelativeQ.RotateVector(FVector(1, 0, 0));
+                LocalGizmoAxis = (RelativeQ).RotateVector(FVector(1, 0, 0));
                 break;
             case ETypeAxis::YAxis:
                 LocalGizmoAxis = (RelativeQ * RelativeQ.FromEuler(FVector(0, 0, -PI / 2))).RotateVector(FVector(0, 1, 0));
@@ -110,7 +110,7 @@ void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove, POINT Curren
 
             // 2. 기즈모 원점과 끝점
             FVector Origin = Obj->RelativeLocation;
-            FVector End = Origin + LocalGizmoAxis * 1.25f;
+            FVector End = Origin + Obj->RelativeQ.Inverse().RotateVector(LocalGizmoAxis) * 1.25f;
 
 
             // 3. 두 점을 Clip Space로 변환
@@ -128,16 +128,19 @@ void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove, POINT Curren
 
 
             // 5. 화면상의 기즈모 축 방향
-            FVector2 ScreenAxis = FVector2(EndClip.x / EndClip.z - OriginClip.x / OriginClip.z, EndClip.y / EndClip.z - OriginClip.y / OriginClip.z);
+            FVector2 ScreenAxis = FVector2(EndClip.x - OriginClip.x , EndClip.y - OriginClip.y);
 
             ScreenAxis.Normalize();
 
 
             // 6. 마우스 이동을 화면상의 기즈모 축으로 투영
             FVector2 MouseDelta(CurrentMousePos.x - LastMousePos.x, -CurrentMousePos.y + LastMousePos.y);
+            FVector2 MouseDeltaN(CurrentMousePos.x - LastMousePos.x, -CurrentMousePos.y + LastMousePos.y);
+            MouseDeltaN.Normalize();
+            float theta = acos(MouseDelta.Dot(ScreenAxis) / MouseDelta.Length());
+            if (MouseDelta.Length() < 0.0001f || Abs(acos(MouseDeltaN.Dot(ScreenAxis))-(PI/2)) < PI/4)    break;
             
-            float Distance = MouseDelta.Dot(ScreenAxis);
-
+            float Distance = MouseDelta.Length() / cos(theta);
 
             // 7. 화면 이동량을 월드 이동량으로 변환
             float WorldPerPixel = 0.005f;
@@ -147,7 +150,7 @@ void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove, POINT Curren
                 -RelativeQ.z,
                 RelativeQ.w
             );
-
+            InverseQ.Normalize();
             FVector LocalMove =InverseQ.RotateVector(LocalGizmoAxis * Distance * WorldPerPixel);
 
             Obj->RelativeLocation += LocalGizmoAxis * Distance * WorldPerPixel;
@@ -213,6 +216,7 @@ void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove, POINT Curren
             if (reverse < 0) DeltaQuat.Inverse();
             DeltaQuat.Normalize();
             Obj->RelativeQ = Obj->RelativeQ * DeltaQuat;
+            Obj->RelativeRotation = Obj->RelativeQ.ToEuler(Obj->RelativeQ);
             break;
         }
         case Scale: {
@@ -230,7 +234,66 @@ void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove, POINT Curren
     case World:
         switch (Type) {
         case ETypeTransform::Location:
-            Obj->RelativeLocation += MouseMove;
+        {
+            switch (Axis)
+            {
+            case ETypeAxis::XAxis:
+                LocalGizmoAxis = (RelativeQ).RotateVector(FVector(1, 0, 0));
+                break;
+            case ETypeAxis::YAxis:
+                LocalGizmoAxis = (RelativeQ * RelativeQ.FromEuler(FVector(0, 0, -PI / 2))).RotateVector(FVector(0, 1, 0));
+                break;
+            case ETypeAxis::ZAxis:
+                LocalGizmoAxis = (RelativeQ * RelativeQ.FromEuler(FVector(0, PI / 2, 0))).RotateVector(FVector(0, 0, 1));
+                break;
+            }
+            // 2. 기즈모 원점과 끝점
+            FVector Origin = Obj->RelativeLocation;
+            FVector End = Origin + Obj->RelativeQ.Inverse().RotateVector(LocalGizmoAxis) * 1.25f;
+
+
+            // 3. 두 점을 Clip Space로 변환
+            FVector OriginClip =
+                Origin *
+                Obj->GetQuatModelMatrix() *
+                Camera->GetViewMatrix() *
+                Camera->GetProjectionMatrix();
+
+            FVector EndClip =
+                End *
+                Obj->GetQuatModelMatrix() *
+                Camera->GetViewMatrix() *
+                Camera->GetProjectionMatrix();
+
+
+            // 5. 화면상의 기즈모 축 방향
+            FVector2 ScreenAxis = FVector2(EndClip.x / EndClip.z - OriginClip.x / OriginClip.z, EndClip.y / EndClip.z - OriginClip.y / OriginClip.z);
+
+            ScreenAxis.Normalize();
+
+
+            // 6. 마우스 이동을 화면상의 기즈모 축으로 투영
+            FVector2 MouseDelta(CurrentMousePos.x - LastMousePos.x, -CurrentMousePos.y + LastMousePos.y);
+            FVector2 MouseDeltaN(CurrentMousePos.x - LastMousePos.x, -CurrentMousePos.y + LastMousePos.y);
+            MouseDeltaN.Normalize();
+            float theta = acos(MouseDelta.Dot(ScreenAxis) / MouseDelta.Length());
+            if (MouseDelta.Length() < 0.0001f || Abs(acos(MouseDeltaN.Dot(ScreenAxis)) - (PI / 2)) < PI / 4)    break;
+
+            float Distance = MouseDelta.Length() / cos(theta);
+
+            // 7. 화면 이동량을 월드 이동량으로 변환
+            float WorldPerPixel = 0.005f;
+            FQuat InverseQ = FQuat(
+                -RelativeQ.x,
+                -RelativeQ.y,
+                -RelativeQ.z,
+                RelativeQ.w
+            );
+            InverseQ.Normalize();
+            FVector LocalMove = InverseQ.RotateVector(LocalGizmoAxis * Distance * WorldPerPixel);
+
+            Obj->RelativeLocation += LocalGizmoAxis * Distance * WorldPerPixel;
+        }
             break;
         case ETypeTransform::Rotation: {
             float Angle = 0.0f;
@@ -278,6 +341,7 @@ void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove, POINT Curren
                 break;
             }
             Obj->RelativeQ = DeltaQuat * Obj->RelativeQ;
+            Obj->RelativeRotation = Obj->RelativeQ.ToEuler(Obj->RelativeQ);
             break;
         }
         case ETypeTransform::Scale:
