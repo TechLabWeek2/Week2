@@ -289,6 +289,13 @@ void URenderer::CreateDepthStencilState()
 	{
 		assert(false);
 	}
+
+	depthstencildesc.DepthEnable = false;
+	hr = GGraphicsDevice.GetDevice()->CreateDepthStencilState(&depthstencildesc, &DepthStencilState_NoDepth);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}	
 }
 
 void URenderer::ReleaseDepthStencilState()
@@ -567,6 +574,12 @@ void URenderer::RenderList(TArray<UPrimitiveComponent*>& ObjList, const UCameraC
 			UpdateConstant(TempConstantData);
 
 
+			if (ID3D11DepthStencilState* TempDepthStateMode = FindDepthStateMode(Obj->GetDepthStateMode()))
+			{
+				GGraphicsDevice.GetDeviceContext()->OMSetDepthStencilState(TempDepthStateMode, 1);
+			}			
+			else continue;
+
 			if (FMeshResource* TempMeshResource = Obj->GetMeshResource())
 			{
 				GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(TempMeshResource->GetTopology());
@@ -575,4 +588,20 @@ void URenderer::RenderList(TArray<UPrimitiveComponent*>& ObjList, const UCameraC
 			else continue;
 		}
 	}
+}
+
+ID3D11DepthStencilState* URenderer::FindDepthStateMode(DepthStateMode DepthMode)const
+{
+	switch (DepthMode)
+	{
+		case Depth:
+			return DepthStencilState;
+			break;
+		case NoDepth:
+			return DepthStencilState_NoDepth;
+			break;
+		default:
+			break;
+	}
+	return nullptr;
 }
