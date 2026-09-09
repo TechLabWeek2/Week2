@@ -11,7 +11,8 @@ enum RasterizerState
 	Solid,
 	WireFrame,
 	FrontCulling,
-	Solid_Culling_None
+	Solid_Culling_None,
+	WireFrame_FrontCulling
 };
 
 enum BlendMode

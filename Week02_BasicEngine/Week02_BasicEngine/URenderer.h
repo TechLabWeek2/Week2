@@ -62,6 +62,7 @@ public:
     ID3D11RasterizerState* RasterizerState_Solid = nullptr; // 래스터라이저 상태(컬링, 채우기 모드 등 정의)
     ID3D11RasterizerState* RasterizerState_WireFrame = nullptr; // 와이어프레임 래스터라이저 상태
     ID3D11RasterizerState* RasterizerState_FrontCulling = nullptr; // 래스터라이저 상태
+    ID3D11RasterizerState* RasterizerState_WireFrame_FrontCulling = nullptr; // 래스터라이저 상태
     ID3D11RasterizerState* RasterizerState_Solid_CullingNone = nullptr; // 래스터라이저 상태
     ID3D11Buffer* ConstantBuffer = nullptr; // 쉐이더에 데이터를 전달하기 위한 상수 버퍼
     //ID3D11Texture2D* DepthStencilBuffer = nullptr; // 깊이, 스텐실 버퍼

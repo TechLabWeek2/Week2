@@ -168,6 +168,7 @@
     <ClCompile Include="UEngineStatics.cpp" />
     <ClCompile Include="UGizmo.cpp" />
     <ClCompile Include="UFloorComp.cpp" />
+    <ClCompile Include="UHighlightComp.cpp" />
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UPicking.cpp" />
     <ClCompile Include="UObjectArray.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="UEngineStatics.h" />
     <ClInclude Include="UGizmo.h" />
     <ClInclude Include="UFloorComp.h" />
+    <ClInclude Include="UHighlightComp.h" />
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UPicking.h" />
     <ClInclude Include="UObjectArray.h" />

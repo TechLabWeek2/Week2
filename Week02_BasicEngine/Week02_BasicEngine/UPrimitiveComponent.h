@@ -46,6 +46,7 @@ public:
 
 	RasterizerState GetRasterizerState()const;
 	void SetRasterizerState(RasterizerState StateType);
+	RasterizerState GetHighlightRasterizerState(RasterizerState StateType)const;
 
 	BlendMode GetBlendMode()const;
 	void SetBlendMode(BlendMode NewBlendMode);
@@ -59,6 +60,7 @@ public:
 
 	FShaderResource* GetShaderResource()const;
 	void SetShaderResource(FShaderResource* pShaderResource);
+
 
 private:
     //메시 데이터
