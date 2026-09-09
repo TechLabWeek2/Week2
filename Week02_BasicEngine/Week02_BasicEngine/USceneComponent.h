@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "UObject.h"
 #include "FVector.h"
+#include "FQuat.h"
 #include "Shapes.h"
 
 class USceneComponent :
@@ -10,12 +11,15 @@ public:
     FVector RelativeLocation;
     FVector RelativeRotation;
     FVector RelativeScale3D;
+    FQuat RelativeQ;
     bool bIsSelected = false;
 public:
     USceneComponent();
     virtual ~USceneComponent() {}
 
     FMatrix GetModelMatrix() const;
+
+    FMatrix GetQuatModelMatrix() const;
 
     //이동, 
     virtual void Update();
@@ -26,5 +30,9 @@ public:
     }
 
     const FVector& GetLocation()const;
+
+    const FVector GetForwardVector_UE()const;
+    const FVector GetRightVector_UE()const;
+    const FVector GetUpVector_UE()const;
 };
 

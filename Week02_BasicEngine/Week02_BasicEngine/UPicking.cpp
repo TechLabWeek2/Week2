@@ -69,7 +69,7 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
             const TArray<FVertexSimple>& targetVertices = PrimitiveComponent->GetMeshResource()->GetVertices();
             numVertices = PrimitiveComponent->GetMeshResource()->GetNumVertices();
 
-            FMatrix transformMatrix = PrimitiveComponent->GetModelMatrix();
+            FMatrix transformMatrix = PrimitiveComponent->GetQuatModelMatrix();
             for (int32 j = 0; j < numVertices; j+=3) // Moller-Trumbore 알고리즘
             {
                 float epslion = KINDA_SMALL_NUMBER;

@@ -30,9 +30,9 @@ public:
     FMatrix GetProjectionMatrix() const;
     FMatrix GetProjectionMatrixOrthogonal() const;
 
-    const FVector GetForwardVector_UE()const;
+    /*const FVector GetForwardVector_UE()const;
     const FVector GetRightVector_UE()const;
-    const FVector GetUpVector_UE()const;
+    const FVector GetUpVector_UE()const;*/
 
     void UpdateArguments(bool* isDragging, bool bImGuiWantCaptureMouse, POINT* lastMousePos, POINT* currentMousePos);
     void Update() override;

@@ -1,6 +1,6 @@
 #include "UGizmo.h"
 #include "Core/Core.h"
-
+#include "FGraphicsDevice.h"
 UGizmo::UGizmo(ETypeAxis axis)
 {
 	primitiveType = ETypePrimitive::Gizmo;
@@ -16,18 +16,24 @@ void UGizmo::Update(UPrimitiveComponent* Obj, USceneComponent* Camera)
     float CameraToGizmo = (RelativeLocation - Camera->RelativeLocation).Size();
 
     this->RelativeScale3D = FVector(0.1f, 0.1f, 0.1f) * CameraToGizmo;
+
+    RelativeQ = FQuat();
+    FQuat Delta;
     switch (Type) {
     case ETypeTransform::Location:
         switch (Axis)
         {
         case XAxis:
-            RelativeRotation = FVector(0, 0, 0);
+            Delta = Delta.FromEuler(FVector(0, 0, 0));
+            RelativeQ = RelativeQ * Delta;
             break;
         case YAxis:
-            RelativeRotation = FVector(0, 0, 1.57);
+            Delta = Delta.FromEuler(FVector(0, 0, PI / 2));
+            RelativeQ = RelativeQ * Delta;
             break;
         case ZAxis:
-            RelativeRotation = FVector(0, -1.57, 0);
+            Delta = Delta.FromEuler(FVector(0, -PI / 2, 0));
+            RelativeQ = RelativeQ * Delta;
             break;
         default:
             break;
@@ -37,13 +43,16 @@ void UGizmo::Update(UPrimitiveComponent* Obj, USceneComponent* Camera)
         switch (Axis)
         {
         case XAxis:
-            RelativeRotation = FVector(PI/2, PI / 2, 0);
+            Delta = Delta.FromEuler(FVector(PI / 2, 0, PI / 2));
+            RelativeQ = RelativeQ * Delta;
             break;
         case YAxis:
-            RelativeRotation = FVector(PI / 2, 0, PI / 2);
+            Delta = Delta.FromEuler(FVector(0, PI / 2, PI / 2));
+            RelativeQ = RelativeQ * Delta;
             break;
         case ZAxis:
-            RelativeRotation = FVector(0, 0, 0);
+            Delta = Delta.FromEuler(FVector(0, 0, 0));
+            RelativeQ = RelativeQ * Delta;
             break;
         default:
             break;
@@ -53,22 +62,19 @@ void UGizmo::Update(UPrimitiveComponent* Obj, USceneComponent* Camera)
         switch (Axis)
         {
         case XAxis:
-            RelativeRotation = Obj->RelativeRotation;
+            RelativeQ = Obj->RelativeQ;
+            Delta = Delta.FromEuler(FVector(0, 0, 0));
+            RelativeQ = RelativeQ * Delta;
             break;
         case YAxis:
-            RelativeRotation = Obj->RelativeRotation +FVector(0, 0, 1.57);
+            RelativeQ = Obj->RelativeQ;
+            Delta = Delta.FromEuler(FVector(0, 0, PI / 2));
+            RelativeQ = RelativeQ * Delta;
             break;
         case ZAxis:
-        {
-            RelativeRotation = FVector(0, -1.57, 0) - Obj->RelativeRotation;
-             FMatrix ObjRot;
-            ObjRot = FMatrix::Rotation(FVector(Obj->RelativeRotation));
-            FMatrix Rot_90;
-            Rot_90 = FMatrix::Rotation(FVector(0, -PI/2.f, 0));
-            RelativeRotation = (ObjRot * Rot_90).GetEuler();
-            //RelativeRotation = (Rot_90 * ObjRot).GetEuler();
-            //RelativeRotation = Obj->RelativeRotation + FVector(0, -0.57, 0);
-        };
+            RelativeQ = Obj->RelativeQ;
+            Delta = Delta.FromEuler(FVector(0, -PI / 2, 0));
+            RelativeQ = RelativeQ * Delta;
             break;
         default:
             break;
@@ -78,17 +84,39 @@ void UGizmo::Update(UPrimitiveComponent* Obj, USceneComponent* Camera)
 
 }
 
-void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove)
+void UGizmo::ObjUpdate(UPrimitiveComponent* Obj, FVector MouseMove, float DeltaX, float DeltaY)
 {
     switch (Type) {
     case ETypeTransform::Location:
         Obj->RelativeLocation += MouseMove;
         break;
-    case ETypeTransform::Rotation:
-        Obj->RelativeRotation.x += MouseMove.x;
-        Obj->RelativeRotation.y -= MouseMove.y;
-        Obj->RelativeRotation.z += MouseMove.z;
+    case ETypeTransform::Rotation: {
+        float Angle = 0.0f;
+        FQuat DeltaQuat = FQuat(0, 0, 0, 1);
+
+        switch (Axis)
+        {
+        case XAxis:
+            Angle = DeltaX;
+            DeltaQuat = FQuat(sin(Angle * 0.5f), 0.0f, 0.0f, cos(Angle * 0.5f));
+            Console.UE_LOG("X");
+            break;
+        case YAxis:
+            Angle = DeltaX;
+            DeltaQuat = FQuat(0.0f, sin(Angle * 0.5f), 0.0f, cos(Angle * 0.5f));
+            Console.UE_LOG("Y");
+            break;
+        case ZAxis:
+            Angle = DeltaY;
+            DeltaQuat = FQuat(0.0f, 0.0f, sin(Angle * 0.5f), cos(Angle * 0.5f));
+            Console.UE_LOG("Z");
+            break;
+        default:
+            break;
+        }
+        Obj->RelativeQ = DeltaQuat * Obj->RelativeQ;
         break;
+    }
     case ETypeTransform::Scale:
         Obj->RelativeScale3D += MouseMove;
         break;

@@ -18,6 +18,7 @@
 #include "UFloorComp.h"
 #include "UGizmo.h"
 #include "FMeshResourceRegistry.h"
+#include "FPrimitiveFactory.h"
 
 class FJsonWrapper
 {
@@ -167,7 +168,7 @@ public:
 		if (MeshResource == nullptr)
 			return nullptr;
 
-		UPrimitiveComponent* NewPrimitive = new UPrimitiveComponent();
+		UPrimitiveComponent* NewPrimitive = FPrimitiveFactory::CreatePrimitive(type, shaderResource, MeshRegistry);
 
 		// 생성 후 한 번에 적용
 		NewPrimitive->primitiveType = type;
@@ -176,8 +177,6 @@ public:
 		NewPrimitive->RelativeScale3D = scale;
 		NewPrimitive->SetRasterizerState(RasterizerStateType);
 		NewPrimitive->SetBlendMode(BlendModeState);
-		NewPrimitive->SetMeshResource(MeshResource);
-		NewPrimitive->SetShaderResource(shaderResource); 
 		NewPrimitive->SetModelColor(modelColor);
 		NewPrimitive->SetUseColorFlag(useColor);
 
