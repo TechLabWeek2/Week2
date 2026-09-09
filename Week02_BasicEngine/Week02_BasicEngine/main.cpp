@@ -434,7 +434,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             bMouseOut = true;
         }
 
-        Camera->UpdateArguments(bFocus, bMouseOut, io.WantCaptureMouse, &currentMousePos);
+        Camera->UpdateArguments(bFocus, bMouseOut, io.WantCaptureMouse, io.WantCaptureKeyboard, &currentMousePos);
 
         if (bFocus)
         {
