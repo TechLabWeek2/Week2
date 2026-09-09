@@ -681,7 +681,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         }
                         else {
                             //pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
-                            pickedGizmoPtr = UPicking::GetPickedPrimitive(
+                            pickedObjectPtr = UPicking::GetPickedPrimitive(
                                 ndcX, ndcY, Camera, CameraForward, CameraRight, CameraUp, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
 
                             if (pickedObjectPtr != nullptr)
