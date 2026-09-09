@@ -21,6 +21,7 @@
 #include "FPrimitiveFactory.h"
 #include "TArray.h"
 #include "UCameraComp.h"
+#include "UHighlightComp.h"
 
 class FJsonWrapper
 {
@@ -72,7 +73,8 @@ public:
 	{
 		return dynamic_cast<UAxisGizmo*>(object) != nullptr
 			|| dynamic_cast<UGizmo*>(object) != nullptr
-			|| dynamic_cast<UFloorComp*>(object) != nullptr;
+			|| dynamic_cast<UFloorComp*>(object) != nullptr 
+			|| dynamic_cast<UHighlightComp*>(object) != nullptr;
 	}
 
 	static Json SerializeCamera(const UCameraComp& Camera)
@@ -135,6 +137,10 @@ public:
 		else if (value->GetRasterizerState() == RasterizerState::Solid_Culling_None)
 		{
 			data["RasterizerState"] = "RasterizerState::Solid_Culling_None";
+		}
+		else if(value->GetRasterizerState() == RasterizerState::WireFrame_FrontCulling)
+		{
+			data["RasterizerState"] = "RasterizerState::WireFrame_FrontCulling";
 		}
 		else
 		{
@@ -261,10 +267,8 @@ public:
 		{
 			UObject* object = GUObjectArray.GetAllObjects()[i];
 			// 카메라와 축만 보존
-			if (dynamic_cast<UCameraComp*>(object) ||
-				dynamic_cast<UAxisGizmo*>(object) ||
-				dynamic_cast<UGizmo*>(object) || 
-				dynamic_cast<UFloorComp*>(object))
+			if (dynamic_cast<UCameraComp*>(object) != nullptr ||
+				IsEditorHelper(object))
 			{
 				continue;
 			}
@@ -298,7 +302,7 @@ public:
 
 		json::JSON primitiveJson = json::Object();
 
-		for (int i = 1; i < GUObjectArray.GetNum(); i++) {
+		for (int i = 0; i < GUObjectArray.GetNum(); i++) {
 			
 
 			UObject* object = GUObjectArray.GetAllObjects()[i];
@@ -526,6 +530,8 @@ public:
 		if (stateString == "RasterizerState::WireFrame")      return RasterizerState::WireFrame;
 		if (stateString == "RasterizerState::FrontCulling")      return RasterizerState::FrontCulling;
 		if (stateString == "RasterizerState::Solid_Culling_None")      return RasterizerState::Solid_Culling_None;
+		if (stateString == "RasterizerState::WireFrame_FrontCulling") return RasterizerState::WireFrame_FrontCulling;
+		
 		throw std::invalid_argument("Invalid rasterizer state string: " + stateString);
 	}
 
