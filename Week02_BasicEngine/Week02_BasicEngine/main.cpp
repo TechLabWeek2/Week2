@@ -588,6 +588,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 XGizmo->bIsActive = false;
                                 YGizmo->bIsActive = false;
                                 ZGizmo->bIsActive = false;
+                                XGizmo->bIsSelected = false;
+                                YGizmo->bIsSelected = false;
+                                ZGizmo->bIsSelected = false;
 
                                 if (HighlightObj != nullptr)
                                 {

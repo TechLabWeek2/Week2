@@ -151,30 +151,23 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
 
 void UPicking::Hovering(float ndcX, float ndcY, UCameraComp*& Camera, FVector forward, FVector right, FVector up, const TArray<UObject*>& PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking, UPrimitiveComponent*& hoveringtObjectPtr, UPrimitiveComponent*& prevObjectPtr, UPrimitiveComponent*& pickedObjectPtr, UPrimitiveComponent*& pickedGizmoPtr)
 {
-    if (hoveringtObjectPtr != prevObjectPtr && hoveringtObjectPtr != nullptr)
+    if (bIsPicking && pickedGizmoPtr)
     {
-        prevObjectPtr = hoveringtObjectPtr;
+        return;
     }
-    hoveringtObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, forward, right, up, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), bIsPicking);
-    if (hoveringtObjectPtr)// 오브젝트 위에 마우스가 있음 (호버)
+    UPrimitiveComponent* oldHoverPtr = hoveringtObjectPtr;
+    UPrimitiveComponent* newHoverPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, forward, right, up, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), bIsPicking);
+    if (oldHoverPtr != newHoverPtr)
     {
-        hoveringtObjectPtr->bIsSelected = true;
-    }
-    else // 빈공간에 마우스가 있음
-    {
-        if (prevObjectPtr)
+        if (oldHoverPtr && oldHoverPtr != pickedObjectPtr && oldHoverPtr != pickedGizmoPtr)
         {
-            if (prevObjectPtr != pickedObjectPtr)
-            {
-                prevObjectPtr->bIsSelected = false;
-            }
-            if (pickedGizmoPtr)
-            {
-                if (prevObjectPtr != pickedGizmoPtr)
-                {
-                    prevObjectPtr->bIsSelected = false;
-                }
-            }
+            oldHoverPtr->bIsSelected = false;
         }
+        prevObjectPtr = oldHoverPtr;
     }
+    if (newHoverPtr)
+    {
+        newHoverPtr->bIsSelected = true;
+    }
+    hoveringtObjectPtr = newHoverPtr;
 }
