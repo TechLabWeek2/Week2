@@ -2,6 +2,7 @@
 
 USphereComp::USphereComp()
 {
+	Class = StaticClass();
 	primitiveType = ETypePrimitive::Sphere;
 }
 

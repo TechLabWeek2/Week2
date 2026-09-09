@@ -2,5 +2,6 @@
 
 UPlaneComp::UPlaneComp()
 {
+	Class = StaticClass();
 	primitiveType = ETypePrimitive::Plane;
 }

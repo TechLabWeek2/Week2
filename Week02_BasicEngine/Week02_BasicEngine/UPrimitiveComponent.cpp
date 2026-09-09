@@ -31,6 +31,30 @@ void UPrimitiveComponent::SetRasterizerState(RasterizerState StateType)
 	RasterizerStateType = StateType;
 }
 
+RasterizerState UPrimitiveComponent::GetHighlightRasterizerState(RasterizerState StateType) const
+{
+	switch (StateType)
+	{
+		case Solid:
+			return FrontCulling;
+			break;
+		case WireFrame:
+			return WireFrame_FrontCulling;
+			break;
+		case FrontCulling:
+			return FrontCulling;
+			break;
+		case Solid_Culling_None:
+			return FrontCulling;
+			break;
+		case WireFrame_FrontCulling:
+			return WireFrame_FrontCulling;
+			break;
+		default:
+			break;
+	}
+}
+
 BlendMode UPrimitiveComponent::GetBlendMode() const
 {
 	return BlendModeState;

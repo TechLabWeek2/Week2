@@ -16,6 +16,7 @@
 #include "UFloorComp.h"
 #include "FShaderResource.h"
 #include "ImGuiFunction.h"
+#include "UHighlightComp.h"
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
@@ -248,36 +249,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Camera->RelativeLocation = { -4.7f, 4.0f, 2.6f };
     Camera->RelativeRotation = { 0.f, -0.3f, 0.6f };
 
-    UCubeComp* Test = new UCubeComp();
-    UCubeComp* Test2 = new UCubeComp();
-    USphereComp* Test3 = new USphereComp();
-    UCubeComp* Test4 = new UCubeComp();
-    UCubeComp* Test5 = new UCubeComp();
-    USphereComp* Test6 = new USphereComp(); 
-    UPlaneComp* Test7 = new UPlaneComp();
+    auto* Test = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Cube, &DefaultShader, MeshRegistry);
+    auto* Test2 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Cube, &DefaultShader, MeshRegistry);
+    auto* Test3 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Sphere, &DefaultShader, MeshRegistry);
+    auto* Test4 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Cube, &DefaultShader, MeshRegistry);
+    auto* Test5 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Cube, &DefaultShader, MeshRegistry);
+    auto* Test6 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Sphere, &DefaultShader, MeshRegistry);
+    auto* Test7 = FPrimitiveFactory::CreatePrimitive(ETypePrimitive::Plane, &DefaultShader, MeshRegistry);
+
     UGizmo* XGizmo = new UGizmo(ETypeAxis::XAxis);
     UGizmo* YGizmo = new UGizmo(ETypeAxis::YAxis);
     UGizmo* ZGizmo = new UGizmo(ETypeAxis::ZAxis);
 
-    Test->SetMeshResource(&CubeResourceData);
-    Test2->SetMeshResource(&CubeResourceData);
-    Test3->SetMeshResource(&SphereResourceData);
-    Test4->SetMeshResource(&CubeResourceData);
-    Test5->SetMeshResource(&CubeResourceData);
-    Test6->SetMeshResource(&SphereResourceData);
-    Test7->SetMeshResource(&PlaneResourceData);    
-
-    Test->SetShaderResource(&DefaultShader);
-    Test2->SetShaderResource(&DefaultShader);
-    Test3->SetShaderResource(&DefaultShader);
-    Test4->SetShaderResource(&DefaultShader);
-    Test5->SetShaderResource(&DefaultShader);
-    Test6->SetShaderResource(&DefaultShader);
-    Test7->SetShaderResource(&DefaultShader);
-
     Test->SetRasterizerState(RasterizerState::WireFrame);
     Test3->SetRasterizerState(RasterizerState::WireFrame);
     Test5->SetRasterizerState(RasterizerState::FrontCulling);
+    Test6->SetRasterizerState(RasterizerState::Solid);
 
     XGizmo->SetMeshResource(&LocationGizmoResourceData);
     YGizmo->SetMeshResource(&LocationGizmoResourceData);
@@ -340,6 +327,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Floor->SetUseColorFlag(true);
     TArray<float> Black = { 0.35f, 0.55f, 0.20f, 0.8f };
     Floor->SetModelColor(Black);
+
+    //하이라이트 용 오브젝트
+    UHighlightComp* HighlightObj = new UHighlightComp();
+    HighlightObj->SetMeshResource(&CubeResourceData);
+    HighlightObj->SetShaderResource(&DefaultShader);
+    HighlightObj->SetBlendMode(BlendMode::Opaque);
+    HighlightObj->SetRasterizerState(RasterizerState::FrontCulling);
+    TArray<float> Orange = { 1.f, 0.5f, 0.f, 1.0f };
+    HighlightObj->SetModelColor(Orange);
+    HighlightObj->SetUseColorFlag(true);
+    
 
     /*GUObjectArray.RemoveObj(Test);
     GUObjectArray.RemoveObj(Test3);
@@ -550,6 +548,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 XGizmo->bIsActive = false;
                                 YGizmo->bIsActive = false;
                                 ZGizmo->bIsActive = false;
+
+                                if (HighlightObj != nullptr)
+                                {
+                                    HighlightObj->bIsActive = false;
+                                }                                
                             }
                             else if (pickedGizmoPtr->IsA(UGizmo::StaticClass())) {
                                 pickedGizmoPtr->bIsSelected = !pickedGizmoPtr->bIsSelected;
@@ -566,6 +569,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                 YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                 ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+
+                                if (HighlightObj != nullptr)
+                                {
+                                    HighlightObj->bIsActive = true;
+                                    HighlightObj->SetMeshResource(pickedObjectPtr->GetMeshResource());
+                                    HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
+                                    HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                                    HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
+                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                                }                                
                             }
                         }
                         else {
@@ -582,6 +595,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                 YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                 ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+
+                                //하이라이트 데이터 수정
+                                if (HighlightObj != nullptr)
+                                {
+                                    HighlightObj->bIsActive = true;
+                                    HighlightObj->SetMeshResource(pickedObjectPtr->GetMeshResource());
+                                    HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
+                                    HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                                    HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
+                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                                }
                             }
                         }
                     }

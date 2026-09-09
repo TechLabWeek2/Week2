@@ -39,4 +39,11 @@ public:
 
     void UpdateArguments(bool bImGuiWantCaptureMouse, POINT* currentMousePos, HWND* hWnd);
     void Update(float deltaTime) override;
+
+    static UClass* StaticClass()
+    {
+        static UClass Class("UCameraComp", USceneComponent::StaticClass());
+
+        return &Class;
+    }
 };
