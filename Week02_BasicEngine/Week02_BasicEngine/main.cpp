@@ -23,7 +23,7 @@
 #include "ImGui/imgui_impl_dx11.h"
 #include "imGui/imgui_impl_win32.h"
 #include "ExampleAppConsole.h"
-#include <FJsonWrapper.h>
+#include "FJsonWrapper.h"
 
 #define SCREEN_WIDTH_INIT 1800
 #define SCREEN_HEIGHT_INIT 1200
@@ -182,8 +182,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     MeshRegistry.Registry(ETypePrimitive::Plane, &PlaneResourceData);
 
     //Shader Resource
-    DefaultShader.SetVertexShaderName(L"ShaderW0.hlsl");
-    DefaultShader.SetPixelShaderName(L"ShaderW0.hlsl");
+    DefaultShader.SetVertexShaderName(L"Shaders/ShaderW0.hlsl");
+    DefaultShader.SetPixelShaderName(L"Shaders/ShaderW0.hlsl");
 
     TArray <D3D11_INPUT_ELEMENT_DESC> DefaultLayout =
     {
@@ -197,8 +197,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     DefaultShader.CreateShaderResource();
 
     //체크무늬 셰이더
-    CheckerShader.SetVertexShaderName(L"ShaderW0.hlsl");
-    CheckerShader.SetPixelShaderName(L"CheckPattern.hlsl");
+    CheckerShader.SetVertexShaderName(L"Shaders/ShaderW0.hlsl");
+    CheckerShader.SetPixelShaderName(L"Shaders/CheckPattern.hlsl");
 
     TArray <D3D11_INPUT_ELEMENT_DESC> CheckerLayout =
     {

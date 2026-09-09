@@ -18,9 +18,13 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
     ImGui::Begin("Jungle Control Panel");
     ImGui::Text("Hello Jungle World!");
     ImGui::Text("FPS %.1f (%.3f ms)", (float)currentFPS, (float)elapsedTime);
+    ImGui::Text("[Spawn]");
     const char* typeNames[] = { "None", "Plane", "Cube", "Sphere", "Floor", "XLine", "YLine", "ZLine", "Max" };
     static ETypePrimitive current = ETypePrimitive::Sphere;
-    if (ImGui::BeginCombo("Primitive", typeNames[(int32)current]))
+    ImGui::Text("Type");
+    ImGui::SameLine(75);
+    ImGui::SetNextItemWidth(150.0f);
+    if (ImGui::BeginCombo("##Primitive", typeNames[(int32)current]))
     {
         for (int32 i = 1; i < (int32)ETypePrimitive::Floor; i++)
         {
@@ -36,6 +40,9 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
         }
         ImGui::EndCombo();
     }
+    /*ImGui::Text("Type");
+    ImGui::SameLine(70);
+    ImGui::SetNextItemWidth(50.0f);*/
 
     bool sceneChanged = false;
 
@@ -47,16 +54,6 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
     static float CLx = 0, CLy = 0, CLz = 0;
     static float CRx = 0, CRy = 0, CRz = 0;
     static int spawnNum = 1;
-    if (ImGui::Button("Spawn", ImVec2(50.0f, 0.0f)))
-    {
-		UPrimitiveComponent* newPrimitive = FPrimitiveFactory::CreatePrimitive(current, &DefaultShader, MeshRegistry);
-        newPrimitive->RelativeLocation = FVector(Lx, Ly, Lz);
-        newPrimitive->RelativeRotation = FVector(DegreeToRadian(Rx), DegreeToRadian(Ry), DegreeToRadian(Rz));
-        newPrimitive->RelativeScale3D = FVector(Sx, Sy, Sz);
-        newPrimitive->RelativeQ = newPrimitive->RelativeQ.FromEuler(newPrimitive->RelativeRotation);
-    }
-    ImGui::SameLine();
-    ImGui::InputInt("Number of spawn", &spawnNum);
     //Draw
     ImGui::BeginGroup();
     //Location
@@ -95,6 +92,17 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
     ImGui::SetNextItemWidth(50.0f);
     ImGui::InputFloat("##Sz_input", &Sz);
 
+    if (ImGui::Button("Spawn", ImVec2(60.0f, 0.0f)))
+    {
+		UPrimitiveComponent* newPrimitive = FPrimitiveFactory::CreatePrimitive(current, &DefaultShader, MeshRegistry);
+        newPrimitive->RelativeLocation = FVector(Lx, Ly, Lz);
+        newPrimitive->RelativeRotation = FVector(DegreeToRadian(Rx), DegreeToRadian(Ry), DegreeToRadian(Rz));
+        newPrimitive->RelativeScale3D = FVector(Sx, Sy, Sz);
+        newPrimitive->RelativeQ = newPrimitive->RelativeQ.FromEuler(newPrimitive->RelativeRotation);
+    }
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(150.0f);
+    ImGui::InputInt("Number of spawn", &spawnNum);
     ImGui::EndGroup();
 
     ImGui::Separator();
@@ -107,53 +115,60 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
             pickedPrimitivePtr = nullptr;
         }
 
-        ImGui::Separator();
+        //ImGui::Separator();
 
-        //카메라
-        ImGui::Checkbox("##Orthogonal", &IsOrthogonal);
-        ImGui::SameLine();
-        ImGui::Text("Orthogonal");
+        ////카메라
+        //ImGui::Checkbox("##Orthogonal", &IsOrthogonal);
+        //ImGui::SameLine();
+        //ImGui::Text("Orthogonal");
 
-        ImGui::Text("FOV");
-        ImGui::SameLine(130);
-        ImGui::SetNextItemWidth(170.0f);
-        ImGui::InputFloat("##FOV", &FOV);
-        //Location
-        ImGui::Text("Camera Location");
-        ImGui::SameLine(130);
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CLx_input", &CLx);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CLy_input", &CLy);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CLz_input", &CLz);
+        //ImGui::Text("FOV");
+        //ImGui::SameLine(130);
+        //ImGui::SetNextItemWidth(170.0f);
+        //ImGui::InputFloat("##FOV", &FOV);
+        ////Location
+        //ImGui::Text("Camera Location");
+        //ImGui::SameLine(130);
+        //ImGui::SetNextItemWidth(50.0f);
+        //ImGui::InputFloat("##CLx_input", &CLx);
+        //ImGui::SameLine();
+        //ImGui::SetNextItemWidth(50.0f);
+        //ImGui::InputFloat("##CLy_input", &CLy);
+        //ImGui::SameLine();
+        //ImGui::SetNextItemWidth(50.0f);
+        //ImGui::InputFloat("##CLz_input", &CLz);
 
-        //Rotation
-        ImGui::Text("Camera Rotation");
-        ImGui::SameLine(130);
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CRx_input", &CRx);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CRy_input", &CRy);
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(50.0f);
-        ImGui::InputFloat("##CRz_input", &CRz);
+        ////Rotation
+        //ImGui::Text("Camera Rotation");
+        //ImGui::SameLine(130);
+        //ImGui::SetNextItemWidth(50.0f);
+        //ImGui::InputFloat("##CRx_input", &CRx);
+        //ImGui::SameLine();
+        //ImGui::SetNextItemWidth(50.0f);
+        //ImGui::InputFloat("##CRy_input", &CRy);
+        //ImGui::SameLine();
+        //ImGui::SetNextItemWidth(50.0f);
+        //ImGui::InputFloat("##CRz_input", &CRz);
     }
 
 
-    ImGui::Separator();
+    //ImGui::Separator();
     ImGui::Separator();
 
+    ImGui::Text("[Scene]");
+    /*ImGui::SameLine(70);
+    ImGui::SetNextItemWidth(50.0f);*/
+
     //Scene 이름을 담는 버퍼
+    ImGui::Text("Scene Name");
+    ImGui::SameLine(90);
+    ImGui::SetNextItemWidth(150.0f);
     static char inputBuffer[256] = "Default";
-    ImGui::InputText("Scene Name", inputBuffer, IM_ARRAYSIZE(inputBuffer));
+    ImGui::InputText("##Scene Name", inputBuffer, IM_ARRAYSIZE(inputBuffer));
     static std::string sceneMessage;
 
     //새로운 Scene 생성
-    if (ImGui::Button("New Scene", ImVec2(100.0f, 0.0f)))
+    if (ImGui::Button("New Scene", ImVec2(90.0f, 0.0f)))
     {
         if (inputBuffer[0] != '\0')
         {
@@ -266,7 +281,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
         initialized = true;
     }
 
-    if (ImGui::Button("Refresh Scenes"))
+    if (ImGui::Button("Refresh Scenes List"))
     {
         RefreshSceneFiles();
     }
@@ -343,8 +358,9 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
 
 
 
-    ImGui::Separator();
+    //ImGui::Separator();
 
+    ImGui::Text("[Camera]");
     //카메라
     ImGui::Checkbox("##Orthogonal", &Camera->IsOrthogonal);
     ImGui::SameLine();
@@ -358,25 +374,32 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
     ImGui::Text("Camera Location");
     ImGui::SameLine(130);
     ImGui::SetNextItemWidth(50.0f);
-    ImGui::InputFloat("##CLx_input", &Camera->RelativeLocation.x);
+    //ImGui::InputFloat("##CLx_input", &Camera->RelativeLocation.x);
+    ImGui::DragFloat("##CLx_input", &Camera->RelativeLocation.x, 0.01f);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(50.0f);
-    ImGui::InputFloat("##CLy_input", &Camera->RelativeLocation.y);
+    //ImGui::InputFloat("##CLy_input", &Camera->RelativeLocation.y);
+    ImGui::DragFloat("##CLy_input", &Camera->RelativeLocation.y, 0.01f);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(50.0f);
-    ImGui::InputFloat("##CLz_input", &Camera->RelativeLocation.z);
+    //ImGui::InputFloat("##CLz_input", &Camera->RelativeLocation.z);
+    ImGui::DragFloat("##CLz_input", &Camera->RelativeLocation.z, 0.01f);
+
 
     //Rotation
     ImGui::Text("Camera Rotation");
     ImGui::SameLine(130);
     ImGui::SetNextItemWidth(50.0f);
-    ImGui::InputFloat("##CRx_input", &Camera->RelativeRotation.x);
+    //ImGui::InputFloat("##CRx_input", &Camera->RelativeRotation.x);
+    ImGui::DragFloat("##CRx_input", &Camera->RelativeRotation.x, 0.01f);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(50.0f);
-    ImGui::InputFloat("##CRy_input", &Camera->RelativeRotation.y);
+    //ImGui::InputFloat("##CRy_input", &Camera->RelativeRotation.y);
+    ImGui::DragFloat("##CRy_input", &Camera->RelativeRotation.y, 0.01f);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(50.0f);
-    ImGui::InputFloat("##CRz_input", &Camera->RelativeRotation.z);
+    //ImGui::InputFloat("##CRz_input", &Camera->RelativeRotation.z);
+    ImGui::DragFloat("##CRz_input", &Camera->RelativeRotation.z, 0.01f);
 
     ImGui::End();
 }

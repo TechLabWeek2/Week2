@@ -123,6 +123,12 @@
     <ClCompile Include="FShaderResource.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
+    <ClCompile Include="FQuat.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="UHighlightComp.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -222,6 +228,24 @@
       <Filter>Header File</Filter>
     </ClInclude>
     <ClInclude Include="FShaderResource.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FMeshResourceRegistry.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FObjectFactory.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FPrimitiveFactory.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="FQuat.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiFunction.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="UHighlightComp.h">
       <Filter>Header File</Filter>
     </ClInclude>
   </ItemGroup>

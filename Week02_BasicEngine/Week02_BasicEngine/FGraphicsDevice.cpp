@@ -43,11 +43,17 @@ void FGraphicsDevice::CreateDeviceAndSwapChain(HWND hWindow)
 	swapchaindesc.Windowed = TRUE; // 창 모드
 	swapchaindesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // 스왑 방식
 
+	UINT createDeviceFlags = 0;
+
+#if defined(_DEBUG)
+	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
 	// Direct3D 장치와 스왑 체인을 생성
 	HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
-								  D3D11_CREATE_DEVICE_BGRA_SUPPORT | D3D11_CREATE_DEVICE_DEBUG,
-								  featurelevels, ARRAYSIZE(featurelevels), D3D11_SDK_VERSION,
-								  &swapchaindesc, &SwapChain, &Device, nullptr, &DeviceContext);
+											   createDeviceFlags,
+											   featurelevels, ARRAYSIZE(featurelevels), D3D11_SDK_VERSION,
+											   &swapchaindesc, &SwapChain, &Device, nullptr, &DeviceContext);
 
 	if (FAILED(hr))
 	{
