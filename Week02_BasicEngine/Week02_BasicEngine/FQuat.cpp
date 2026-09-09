@@ -91,3 +91,22 @@ FQuat FQuat::operator*(const FQuat& Other) const
                  w * Other.z + x * Other.y - y * Other.x + z * Other.w,
                  w * Other.w - x * Other.x - y * Other.y - z * Other.z);
 }
+
+FVector FQuat::RotateVector(const FVector& v) const
+{
+    FQuat qv(v.x, v.y, v.z, 0.0f);
+
+    FQuat result = (*this) * qv * Inverse();
+
+    return FVector(result.x, result.y, result.z);
+}
+
+FQuat FQuat::Inverse() const
+{
+    float SizeSquared = x * x + y * y + z * z + w * w;
+
+    if (SizeSquared == 0.0f)
+        return FQuat(0, 0, 0, 1);
+
+    return FQuat(-x / SizeSquared, -y / SizeSquared, -z / SizeSquared, w / SizeSquared);
+}
