@@ -533,6 +533,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         ZGizmo->Update(pickedObjectPtr, Camera);
 
                         lastMousePos = currentMousePos;
+
+                        if (HighlightObj != nullptr)
+                        {
+                            HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                            HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
+                            HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
+                            HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                        }
                     }
 
                     if (!isDragging) {
@@ -577,6 +585,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
                                     HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                     HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
+                                    HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
                                     HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
                                 }                                
                             }
@@ -604,6 +613,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
                                     HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                     HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
+                                    HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
                                     HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
                                 }
                             }
