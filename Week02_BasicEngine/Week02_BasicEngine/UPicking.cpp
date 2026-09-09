@@ -164,9 +164,12 @@ void UPicking::Hovering(float ndcX, float ndcY, UCameraComp*& Camera, FVector fo
             {
                 prevObjectPtr->bIsSelected = false;
             }
-            else if (prevObjectPtr != pickedGizmoPtr)
+            if (pickedGizmoPtr)
             {
-                prevObjectPtr->bIsSelected = false;
+                if (prevObjectPtr != pickedGizmoPtr)
+                {
+                    prevObjectPtr->bIsSelected = false;
+                }
             }
         }
     }
