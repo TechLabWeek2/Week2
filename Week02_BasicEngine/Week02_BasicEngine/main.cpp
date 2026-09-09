@@ -371,12 +371,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     TArray<float> Black = { 0.f, 0.f, 0.f, 1.f };
     Floor->SetModelColor(Black);
 
-    GUObjectArray.RemoveObj(Test);
+    /*GUObjectArray.RemoveObj(Test);
     GUObjectArray.RemoveObj(Test3);
     GUObjectArray.RemoveObj(Test4);
     GUObjectArray.RemoveObj(Test5);
     GUObjectArray.RemoveObj(Test6);
-    GUObjectArray.RemoveObj(Test7);
+    GUObjectArray.RemoveObj(Test7);*/
 
     // Main Loop (Quit Message가 들어오기 전까지 아래 Loop를 무한히 실행하게 됨)
     while (bIsExit == false && !bStopRender)
@@ -682,7 +682,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                             if (pickedObjectPtr != nullptr)
                             {
-                                //pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                                pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
                                 XGizmo->bIsActive = true;
                                 YGizmo->bIsActive = true;
                                 ZGizmo->bIsActive = true;
