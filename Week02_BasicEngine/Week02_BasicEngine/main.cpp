@@ -418,7 +418,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         float ndcY = 1.f - 2.f * (float)currentMousePos.y / Height;
         UPicking::Hovering(ndcX, ndcY, Camera, CameraForward, CameraRight, CameraUp, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking, hoveringtObjectPtr, prevObjectPtr, pickedObjectPtr, pickedGizmoPtr);
 
-        
+        Camera->UpdateArguments(bFocus, io.WantCaptureMouse, &currentMousePos);
+
         if (bFocus)
         {
             if (GetAsyncKeyState(VK_TAB) & 0x0001) {
@@ -434,7 +435,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 YGizmo->Space = Space;
                 ZGizmo->Space = Space;
             }
-            Camera->UpdateArguments(io.WantCaptureMouse, &currentMousePos ,&hWnd);
 
             if (GetAsyncKeyState(VK_SPACE) & 0x0001 && pickedObjectPtr) {
                 switch (XGizmo->Type) {

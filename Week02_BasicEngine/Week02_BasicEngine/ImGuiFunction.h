@@ -398,6 +398,8 @@ void DrawDetailsWindow(UPrimitiveComponent* selectedObject)
         ETypePrimitive type = selectedObject->primitiveType;
         const char* typeNames[] = { "None", "Plane", "Cube", "Sphere", "Floor", "XLine", "YLine", "ZLine", "Max" };
         ImGui::Text("Primitive Type: %s", typeNames[(int32)type]);
+
+
     }
 
     ImGui::End();
