@@ -478,6 +478,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             {
                 if (!io.WantCaptureMouse)
                 {
+                    //하이라이트 오브젝트 스케일 증가 두께
+                    FVector HighlightThickness = { 0.01f, 0.01f, 0.01f };
+
                     // picking
                     RECT rect;
                     GetClientRect(hWnd, &rect);
@@ -560,7 +563,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
                             HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
                             HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
-                            HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                            HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
                         }
                     }
 
@@ -607,7 +610,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                     HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
                                     HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
-                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
                                 }                                
                             }
                         }
@@ -635,9 +638,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                     HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
                                     HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
-                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
                                 }
-                            }
+                            }                            
                         }
                     }
                 }
@@ -647,6 +650,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 isDragging = false;
                 lastMousePos = currentMousePos;
                 pickedGizmoPtr = nullptr;
+                //조작 없이 가만히 있을 때 imgui 기즈모에서 delete를 눌렀을 때와 같이 pickedObjectPtr이 사라졌을 때 대처
+                if (pickedObjectPtr == nullptr)
+                {
+                    XGizmo->bIsActive = false;
+                    YGizmo->bIsActive = false;
+                    ZGizmo->bIsActive = false;
+                    if(HighlightObj != nullptr)
+                        HighlightObj->bIsActive = false;
+                }
             }
         }
         if (pickedObjectPtr) {
