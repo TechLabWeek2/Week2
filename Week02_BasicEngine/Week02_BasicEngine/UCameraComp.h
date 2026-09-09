@@ -20,10 +20,10 @@ public:
     FVector YAxis;
 
     bool bIsRotating = false;
+    bool bFocus = false;
     bool bImGuiWantCaptureMouse = false;
     POINT lastMousePos = {};
     POINT* currentMousePos = {};
-    HWND* hWnd = nullptr;
 
 public:
     UCameraComp();
@@ -37,7 +37,7 @@ public:
     const FVector GetRightVector_UE()const;
     const FVector GetUpVector_UE()const;*/
 
-    void UpdateArguments(bool bImGuiWantCaptureMouse, POINT* currentMousePos, HWND* hWnd);
+    void UpdateArguments(bool bFocus, bool bImGuiWantCaptureMouse, POINT* currentMousePos);
     void Update(float deltaTime) override;
 
     static UClass* StaticClass()

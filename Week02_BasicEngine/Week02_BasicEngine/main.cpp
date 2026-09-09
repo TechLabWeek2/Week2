@@ -417,11 +417,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         float ndcY = 1.f - 2.f * (float)currentMousePos.y / Height;
         UPicking::Hovering(ndcX, ndcY, Camera, CameraForward, CameraRight, CameraUp, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking, hoveringtObjectPtr, prevObjectPtr, pickedObjectPtr, pickedGizmoPtr);
 
-        
+        Camera->UpdateArguments(bFocus, io.WantCaptureMouse, &currentMousePos);
+
         if (bFocus)
         {
-            Camera->UpdateArguments(io.WantCaptureMouse, &currentMousePos ,&hWnd);
-
             if (GetAsyncKeyState(VK_SPACE) & 0x0001 && pickedObjectPtr) {
                 switch (XGizmo->Type) {
                 case ETypeTransform::Location:
@@ -647,6 +646,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Console.Draw("Console Windows", &is_window_open);
         DrawCreateWindow(Camera, pickedObjectPtr, MeshRegistry, elapsedTime, currentFPS);
         DrawStatWindow();
+        DrawDetailsWindow(pickedObjectPtr);
 
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
