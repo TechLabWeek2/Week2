@@ -11,6 +11,7 @@
 #include "FJsonWrapper.h"
 #include "FShaderResource.h"
 #include "FMeshResourceRegistry.h"
+#include "FPrimitiveFactory.h"
 
 void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitivePtr, const FMeshResourceRegistry& MeshRegistry, double elapsedTime, double currentFPS)
 {
@@ -46,26 +47,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
     static int spawnNum = 1;
     if (ImGui::Button("Spawn", ImVec2(50.0f, 0.0f)))
     {
-        UPrimitiveComponent* newPrimitive = nullptr;
-        FMeshResource* meshResource = MeshRegistry.GetMeshResource(current);
-
-        switch (current)
-        {
-        case ETypePrimitive::Cube:
-            newPrimitive = new UCubeComp();
-            newPrimitive->SetMeshResource(meshResource);
-            newPrimitive->SetShaderResource(&DefaultShader);
-            break;
-        case ETypePrimitive::Sphere:
-            newPrimitive = new USphereComp();
-            newPrimitive->SetMeshResource(meshResource);
-            newPrimitive->SetShaderResource(&DefaultShader);
-            break;
-        case ETypePrimitive::Plane:
-            newPrimitive = new UPlaneComp();
-            newPrimitive->SetMeshResource(meshResource);
-            newPrimitive->SetShaderResource(&DefaultShader);
-        }
+		UPrimitiveComponent* newPrimitive = FPrimitiveFactory::CreatePrimitive(current, &DefaultShader, MeshRegistry);
         newPrimitive->RelativeLocation = FVector(Lx, Ly, Lz);
         newPrimitive->RelativeRotation = FVector(DegreeToRadian(Rx), DegreeToRadian(Ry), DegreeToRadian(Rz));
         newPrimitive->RelativeScale3D = FVector(Sx, Sy, Sz);
