@@ -418,7 +418,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         float ndcY = 1.f - 2.f * (float)currentMousePos.y / Height;
         UPicking::Hovering(ndcX, ndcY, Camera, CameraForward, CameraRight, CameraUp, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking, hoveringtObjectPtr, prevObjectPtr, pickedObjectPtr, pickedGizmoPtr);
 
-        Camera->UpdateArguments(bFocus, io.WantCaptureMouse, &currentMousePos);
+        bool bMouseOut = false;
+        if (!(-0.99f < ndcX && ndcX < 0.99f && -0.99f < ndcY && ndcY < 0.99f))
+        {
+            bMouseOut = true;
+        }
+        Console.UE_LOG("%f %f", ndcX, ndcY);
+
+        Camera->UpdateArguments(bFocus, bMouseOut, io.WantCaptureMouse, &currentMousePos);
 
         if (bFocus)
         {

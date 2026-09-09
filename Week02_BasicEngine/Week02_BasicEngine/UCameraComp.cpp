@@ -49,9 +49,10 @@ FMatrix UCameraComp::GetProjectionMatrix() const
 //	return Up;
 //}
 //
-void UCameraComp::UpdateArguments(bool bFocus, bool bImGuiWantCaptureMouse, POINT* currentMousePos)
+void UCameraComp::UpdateArguments(bool bFocus, bool bMouseOut, bool bImGuiWantCaptureMouse, POINT* currentMousePos)
 {
     this->bFocus = bFocus;
+    this->bMouseOut = bMouseOut;
     this->bImGuiWantCaptureMouse = bImGuiWantCaptureMouse;
     this->currentMousePos = currentMousePos;
 }
@@ -111,6 +112,10 @@ void UCameraComp::Update(float deltaTime)
     }
     if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
         RelativeLocation.z += cameraSpeed;
+    }
+    if (bMouseOut)
+    {
+        return;
     }
     if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) // 마우스 우클릭으로 시점 변경
     {
