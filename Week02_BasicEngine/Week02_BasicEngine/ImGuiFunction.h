@@ -37,6 +37,8 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
         ImGui::EndCombo();
     }
 
+    bool sceneChanged = false;
+
     static float Lx = 0, Ly = 0, Lz = 0;
     static float Rx = 0, Ry = 0, Rz = 0;
     static float Sx = 0.1f, Sy = 0.1f, Sz = 0.1f;
@@ -148,6 +150,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
     //Scene 이름을 담는 버퍼
     static char inputBuffer[256] = "Default";
     ImGui::InputText("Scene Name", inputBuffer, IM_ARRAYSIZE(inputBuffer));
+    static std::string sceneMessage;
 
     //새로운 Scene 생성
     if (ImGui::Button("New Scene", ImVec2(100.0f, 0.0f)))
@@ -164,11 +167,15 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
 
             if (count > 0)
             {
-                FString path(L"..\\");
-                path.Append(FString(sceneName));
-                path.Append(L".Scene");
+                const std::filesystem::path scenePath =
+                    FSceneLoader::MakeScenePath(sceneName);
 
-                FSceneLoader::NewScene(std::filesystem::path(*path));
+                if (!scenePath.empty())
+                {
+					pickedPrimitivePtr = nullptr;
+                    sceneChanged = true;
+                    FSceneLoader::NewScene(scenePath);
+                }
 
             }
         }
@@ -189,11 +196,16 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
 
             if (count > 0)
             {
-                FString path(L"..\\");
-                path.Append(FString(sceneName));
-                path.Append(L".Scene");
+                const std::filesystem::path scenePath =
+                    FSceneLoader::MakeScenePath(sceneName);
 
-                FSceneLoader::SaveScene(std::filesystem::path(*path));
+                if (!scenePath.empty())
+                {
+                    FSceneLoader::SaveScene(scenePath);
+                    pickedPrimitivePtr = nullptr;
+                    sceneChanged = true;
+                }
+               
                
             }
         }
@@ -206,7 +218,6 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
     static std::vector<fs::path> sceneFiles;
     static int selectedScene = -1;
     static bool initialized = false;
-    static std::string sceneMessage;
 
     auto RefreshSceneFiles = [&]()
         {
@@ -216,7 +227,7 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
 
             try
             {
-                sceneDirectory = FSceneLoader::FindDirectory(L".slnx");
+                sceneDirectory = FSceneLoader::GetSceneDirectory();
 
                 if (sceneDirectory.empty())
                 {

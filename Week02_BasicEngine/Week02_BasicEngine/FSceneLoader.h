@@ -27,10 +27,21 @@ class FSceneLoader
 		static bool NewScene(const std::filesystem::path& filename)
 		{
 
+
+			json::JSON root = json::Object();
+			root["Version"] = 1;
+			root["NextUUID"] = UEngineStatics::GetNextUUID();
+			json::JSON primitiveJson = json::Object();
+			root["Primitives"] = primitiveJson;
+			std::ofstream file(filename);
+			if (!file.is_open())
+				return false;
+			file << root.dump();
+
 			for (int i = GUObjectArray.GetNum() - 1; i >= 0; --i)
 			{
 				UObject* object = GUObjectArray.GetAllObjects()[i];
-				
+
 				if (object == nullptr)
 				{
 					continue;
@@ -50,15 +61,7 @@ class FSceneLoader
 
 
 
-			json::JSON root = json::Object();
-			root["Version"] = 1;
-			root["NextUUID"] = UEngineStatics::GetNextUUID();
-			json::JSON primitiveJson = json::Object();
-			root["Primitives"] = primitiveJson;
-			std::ofstream file(filename);
-			if (!file.is_open())
-				return false;
-			file << root.dump();
+
 			return true;
 		}
 
@@ -260,7 +263,85 @@ class FSceneLoader
 			return true;
 		}
 
-		
+		static std::filesystem::path GetExecutableDirectory()
+		{
+			std::wstring buffer(32768, L'\0');
+
+			const DWORD length = GetModuleFileNameW(
+				nullptr,
+				buffer.data(),
+				static_cast<DWORD>(buffer.size()));
+
+			if (length == 0 || length >= buffer.size())
+			{
+				return {};
+			}
+
+			buffer.resize(length);
+
+			return std::filesystem::path(buffer).parent_path();
+		}
+
+		static std::filesystem::path GetSceneDirectory()
+		{
+			namespace fs = std::filesystem;
+
+			const fs::path executableDirectory =
+				GetExecutableDirectory();
+
+			if (executableDirectory.empty())
+			{
+				return {};
+			}
+
+			const fs::path sceneDirectory =
+				executableDirectory / L"Resource" ;
+
+			std::error_code error;
+			fs::create_directories(sceneDirectory, error);
+
+			if (error)
+			{
+				return {};
+			}
+
+			return sceneDirectory;
+		}
+
+
+		static std::filesystem::path MakeScenePath(
+			const wchar_t* sceneName)
+		{
+			namespace fs = std::filesystem;
+
+			if (sceneName == nullptr || sceneName[0] == L'\0')
+			{
+				return {};
+			}
+
+			fs::path fileName(sceneName);
+
+			// 절대경로나 ../ 등을 씬 이름으로 입력하지 못하게 막는다.
+			if (fileName.is_absolute() ||
+				fileName.has_parent_path() ||
+				fileName == L"." ||
+				fileName == L"..")
+			{
+				return {};
+			}
+
+			fileName.replace_extension(L".Scene");
+
+			const fs::path sceneDirectory =
+				GetSceneDirectory();
+
+			if (sceneDirectory.empty())
+			{
+				return {};
+			}
+
+			return sceneDirectory / fileName;
+		}
 
 		static std::filesystem::path FindDirectory(const wchar_t* dir)
 		{
