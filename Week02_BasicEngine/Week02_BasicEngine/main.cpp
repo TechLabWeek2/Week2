@@ -368,7 +368,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     Floor->SetBlendMode(BlendMode::Alpha); 
     Floor->SetUseColorFlag(true);
-    TArray<float> Black = { 0.f, 0.f, 0.f, 1.f };
+    TArray<float> Black = { 0.f, 0.f, 0.f, 0.5f };
     Floor->SetModelColor(Black);
 
     /*GUObjectArray.RemoveObj(Test);
