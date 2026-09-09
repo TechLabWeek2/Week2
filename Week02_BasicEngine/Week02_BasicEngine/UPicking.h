@@ -5,6 +5,7 @@
 #include "FMeshResource.h"
 #include "Shapes.h"
 #include "TArray.h"
+#include "UObjectArray.h"
 
 class UPicking
 {
@@ -29,4 +30,24 @@ public:
 	FVector DragPlaneNormal;
 public:
 	static UPrimitiveComponent* GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, const TArray<UObject*> &PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking);
+
+	static void Hovering(float ndcX, float ndcY, UCameraComp*& Camera, FVector forward, FVector right, FVector up, const TArray<UObject*>& PrimitiveComponentList, int32 PrimitiveComponentCnt, bool* bIsPicking, UPrimitiveComponent*& hoveringtObjectPtr, UPrimitiveComponent*& prevObjectPtr)
+	{
+		if (hoveringtObjectPtr != prevObjectPtr && hoveringtObjectPtr != nullptr)
+		{
+			prevObjectPtr = hoveringtObjectPtr;
+		}
+		hoveringtObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, forward, right, up, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), bIsPicking);
+		if (hoveringtObjectPtr)// 오브젝트 위에 마우스가 있음 (호버)
+		{
+			hoveringtObjectPtr->bIsSelected = true;
+		}
+		else // 빈공간에 마우스가 있음
+		{
+			if (prevObjectPtr)
+			{
+				prevObjectPtr->bIsSelected = false;
+			}
+		}
+	}
 };

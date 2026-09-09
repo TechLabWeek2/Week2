@@ -61,8 +61,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return true;
     }
     RECT rect;
-    long width;
-    long height;
+    GetClientRect(hWnd, &rect);
+    long width = rect.right - rect.left;
+    long height = rect.bottom - rect.top;
     switch (message)
     {
     case WM_DESTROY:
@@ -77,9 +78,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         else if (wParam == SIZE_MAXIMIZED || (wParam == SIZE_RESTORED && !bStopRender))
         {
-            GetClientRect(hWnd, &rect);
-            width = rect.right - rect.left;
-            height = rect.bottom - rect.top;
             screenWidth = width;
             screenHeight = height;
             bResizeWindow = true;
@@ -92,12 +90,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_EXITSIZEMOVE:
         if (bStopRender)
         {
-            bStopRender = false;
-            GetClientRect(hWnd, &rect);
-            width = rect.right - rect.left;
-            height = rect.bottom - rect.top;
             screenWidth = width;
             screenHeight = height;
+            bStopRender = false;
             bResizeWindow = true;
         }
         break;
@@ -272,6 +267,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     //picking
     bool bIsPicking = false;
+    UPrimitiveComponent* prevObjectPtr = nullptr;
+    UPrimitiveComponent* hoveringtObjectPtr = nullptr;
     UPrimitiveComponent* pickedObjectPtr = nullptr;
     UPrimitiveComponent* pickedGizmoPtr = nullptr;
 
@@ -396,6 +393,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         POINT currentMousePos;
         GetCursorPos(&currentMousePos); // 현재 마우스 스크린 좌표 획득
+        ScreenToClient(hWnd, &currentMousePos);
         RECT Rect;
         GetClientRect(hWnd, &Rect);
         float Width = static_cast<float>(Rect.right - Rect.left);
@@ -407,7 +405,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         const bool isLeftMouseDown = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
         const bool isLeftMousePressed = isLeftMouseDown && !wasLeftMouseDown;
         wasLeftMouseDown = isLeftMouseDown;
-
+        
         // camera forward
         FVector ZAxis(cos(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x), sin(Camera->RelativeRotation.x), -sin(Camera->RelativeRotation.y) * cos(Camera->RelativeRotation.x));
         ZAxis.Normalize();
@@ -417,6 +415,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // camera up
         FVector YAxis = ZAxis.Cross(XAxis);
         YAxis.Normalize();
+
+        //Mouse Hovering
+        float ndcX = 2.f * (float)currentMousePos.x / Width - 1.f;  // screen xy to NDC xy
+        float ndcY = 1.f - 2.f * (float)currentMousePos.y / Height;
+        UPicking::Hovering(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking, hoveringtObjectPtr, prevObjectPtr);
 
         const float cameraSpeed = 0.04f;
         if (bFocus)
