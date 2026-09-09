@@ -458,7 +458,8 @@ static FMatrix GetModelMatrixInverse(const FVector& Location, const FVector& Rot
 }
 
 FMatrix FMatrix::GetViewMatrix(const FVector& Location, const FVector& Rotation) {
-	FVector ZAxis(cos(Rotation.y) * cos(Rotation.x), sin(Rotation.x), -sin(Rotation.y) * cos(Rotation.x));
+	return GetViewMatrix_UEToDX(Location, Rotation);
+	/*FVector ZAxis(cos(Rotation.y) * cos(Rotation.x), sin(Rotation.x), -sin(Rotation.y) * cos(Rotation.x));
 	ZAxis.Normalize();
 	FVector XAxis = FVector(0, 1, 0).Cross(ZAxis);
 	XAxis.Normalize();
@@ -480,6 +481,40 @@ FMatrix FMatrix::GetViewMatrix(const FVector& Location, const FVector& Rotation)
 	M.m[3][0] = -Location.x * XAxis.x - Location.y * XAxis.y - Location.z * XAxis.z;
 	M.m[3][1] = -Location.x * YAxis.x - Location.y * YAxis.y - Location.z * YAxis.z;
 	M.m[3][2] = -Location.x * ZAxis.x - Location.y * ZAxis.y - Location.z * ZAxis.z;
+	M.m[3][3] = 1.0f;
+	return M;*/
+}
+
+FMatrix FMatrix::GetViewMatrix_UEToDX(const FVector& Location, const FVector& Rotation)
+{
+	//Forward : X, Right : Y, Up : Z 의 UE 좌표계 기준에서 카메라 3축 벡터를 구합니다.
+	FVector ForwardVector(cos(Rotation.y) * cos(Rotation.z), -cos(Rotation.y) * sin(Rotation.z), sin(Rotation.y));
+	FVector RightVector = FVector(0.f, 0.f, 1.f).Cross(ForwardVector);
+	FVector UpVector = ForwardVector.Cross(RightVector);
+	ForwardVector.Normalize();
+	RightVector.Normalize();
+	UpVector.Normalize();
+
+	//[Right.x			/ Up.x			/ Forward.x			/ 0]
+	//[Right.y			/ Up.y			/ Forward.y			/ 0]
+	//[Right.z			/ Up.z			/ Forward.z			/ 0]
+	//[-Dot(Eye,Right)	/ -Dot(Eye,Up)	/ -Dot(Eye,Forward) / 0]
+	FMatrix M;
+	M.m[0][0] = RightVector.x;
+	M.m[0][1] = UpVector.x;
+	M.m[0][2] = ForwardVector.x;
+	M.m[0][3] = 0.0f;
+	M.m[1][0] = RightVector.y;
+	M.m[1][1] = UpVector.y;
+	M.m[1][2] = ForwardVector.y;
+	M.m[1][3] = 0.0f;
+	M.m[2][0] = RightVector.z;
+	M.m[2][1] = UpVector.z;
+	M.m[2][2] = ForwardVector.z;
+	M.m[2][3] = 0.0f;
+	M.m[3][0] = -Location.Dot(RightVector);
+	M.m[3][1] = -Location.Dot(UpVector);
+	M.m[3][2] = -Location.Dot(ForwardVector);
 	M.m[3][3] = 1.0f;
 	return M;
 }

@@ -22,4 +22,8 @@ public:
     FMatrix GetProjectionMatrix() const;
     FMatrix GetProjectionMatrixOrthogonal() const;
 
+    const FVector GetForwardVector_UE()const;
+    const FVector GetRightVector_UE()const;
+    const FVector GetUpVector_UE()const;
+
 };

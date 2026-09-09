@@ -16,17 +16,25 @@ public:
         return FVector(x + V.x, y + V.y, z + V.z);
     }
 
-    [[nodiscard]] __forceinline FVector operator+=(const FVector& V)
+    __forceinline FVector& operator+=(const FVector& V)
     {
         this->x += V.x;
         this->y += V.y;
         this->z += V.z;
-        return FVector(x + V.x, y + V.y, z + V.z);
+        return *this;
     }
 
     [[nodiscard]] __forceinline FVector operator-(const FVector& V) const
     {
         return FVector(x - V.x, y - V.y, z - V.z);
+    }
+
+    __forceinline FVector& operator-=(const FVector& V)
+    {
+        this->x -= V.x;
+        this->y -= V.y;
+        this->z -= V.z;
+        return *this;
     }
 
     [[nodiscard]] __forceinline FVector operator*(const FVector& V) const
