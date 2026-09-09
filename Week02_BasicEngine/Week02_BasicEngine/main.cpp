@@ -46,6 +46,7 @@ UINT screenWidth = SCREEN_WIDTH_INIT;
 UINT screenHeight = SCREEN_HEIGHT_INIT;
 bool bStopRender = false;
 bool bResizeWindow = false;
+bool bFocus = true;
 
 UCameraComp* Camera = new UCameraComp();
 
@@ -98,6 +99,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             screenHeight = height;
             bResizeWindow = true;
         }
+        break;
+    case WM_SETFOCUS:
+        bFocus = true;
+        break;
+    case WM_KILLFOCUS:
+        bFocus = false;
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -800,243 +807,246 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         YAxis.Normalize();
 
         const float cameraSpeed = 0.04f;
-        if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
-            Camera->RelativeLocation.x -= XAxis.x * cameraSpeed;
-            Camera->RelativeLocation.y -= XAxis.y * cameraSpeed;
-            Camera->RelativeLocation.z -= XAxis.z * cameraSpeed;
-            //Console.UE_LOG("%s %c %f %d %u %o %x","Hello",'A',3.14f,-100,100,100,255);
-        }
-        if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
-            Camera->RelativeLocation.x += XAxis.x * cameraSpeed;
-            Camera->RelativeLocation.y += XAxis.y * cameraSpeed;
-            Camera->RelativeLocation.z += XAxis.z * cameraSpeed;
-        }
-        if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
-            if (Camera->IsOrthogonal)
-            {
-                Camera->ZoomLevel -= 0.5f * cameraSpeed;
-            }
-            else
-            {
-                Camera->RelativeLocation.x += ZAxis.x * cameraSpeed;
-                Camera->RelativeLocation.y += ZAxis.y * cameraSpeed;
-                Camera->RelativeLocation.z += ZAxis.z * cameraSpeed;
-            }
-        }
-        if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
-            if (Camera->IsOrthogonal)
-            {
-                Camera->ZoomLevel += 0.5f * cameraSpeed;
-            }
-            else
-            {
-                Camera->RelativeLocation.x -= ZAxis.x * cameraSpeed;
-                Camera->RelativeLocation.y -= ZAxis.y * cameraSpeed;
-                Camera->RelativeLocation.z -= ZAxis.z * cameraSpeed;
-            }
-        }
-        if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
-            Camera->RelativeLocation.y -= cameraSpeed;
-        }
-        if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
-            Camera->RelativeLocation.y += cameraSpeed;
-        }
-        if (pickedObjectPtr && GetAsyncKeyState(VK_SPACE) & 0x0001) {
-            switch (XGizmo->Type) {
-            case ETypeTransform::Location:
-                XGizmo->SetMeshResource(&RotationGizmoResourceData);
-                YGizmo->SetMeshResource(&RotationGizmoResourceData);
-                ZGizmo->SetMeshResource(&RotationGizmoResourceData);
-                XGizmo->Type = ETypeTransform::Rotation;
-                YGizmo->Type = ETypeTransform::Rotation;
-                ZGizmo->Type = ETypeTransform::Rotation;
-                break;
-            case ETypeTransform::Rotation:
-                XGizmo->SetMeshResource(&ScaleGizmoResourceData);
-                YGizmo->SetMeshResource(&ScaleGizmoResourceData);
-                ZGizmo->SetMeshResource(&ScaleGizmoResourceData);
-                XGizmo->Type = ETypeTransform::Scale;
-                YGizmo->Type = ETypeTransform::Scale;
-                ZGizmo->Type = ETypeTransform::Scale;
-                break;
-            case ETypeTransform::Scale:
-                XGizmo->SetMeshResource(&LocationGizmoResourceData);
-                YGizmo->SetMeshResource(&LocationGizmoResourceData);
-                ZGizmo->SetMeshResource(&LocationGizmoResourceData);
-                XGizmo->Type = ETypeTransform::Location;
-                YGizmo->Type = ETypeTransform::Location;
-                ZGizmo->Type = ETypeTransform::Location;
-                break;
-            }
-            XGizmo->Update(pickedObjectPtr);
-            YGizmo->Update(pickedObjectPtr);
-            ZGizmo->Update(pickedObjectPtr);
-        }
-        if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
+        if (bFocus)
         {
-            if (!isDragging && !io.WantCaptureMouse)
-            {
-                isDragging = true;
-                lastMousePos = currentMousePos;
+            if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
+                Camera->RelativeLocation.x -= XAxis.x * cameraSpeed;
+                Camera->RelativeLocation.y -= XAxis.y * cameraSpeed;
+                Camera->RelativeLocation.z -= XAxis.z * cameraSpeed;
+                //Console.UE_LOG("%s %c %f %d %u %o %x","Hello",'A',3.14f,-100,100,100,255);
             }
-
-            float deltaX = (float)(currentMousePos.x - lastMousePos.x);
-            float deltaY = (float)(currentMousePos.y - lastMousePos.y);
-
-            const float sensitivity = 0.002f;
-
-            float angleX = deltaX * sensitivity;
-            float angleY = -deltaY * sensitivity;
-
-            // 좌우
-            Camera->RelativeRotation.y += angleX;
-            // 상하
-            Camera->RelativeRotation.x += angleY;
-
-            // 상하 각도 제한
-            if (Camera->RelativeRotation.x <= DegreeToRadian(-89.f))
-            {
-                Camera->RelativeRotation.x = DegreeToRadian(-89.f);
+            if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
+                Camera->RelativeLocation.x += XAxis.x * cameraSpeed;
+                Camera->RelativeLocation.y += XAxis.y * cameraSpeed;
+                Camera->RelativeLocation.z += XAxis.z * cameraSpeed;
             }
-            else if (Camera->RelativeRotation.x >= DegreeToRadian(89.f))
-            {
-                Camera->RelativeRotation.x = DegreeToRadian(89.f);
+            if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
+                if (Camera->IsOrthogonal)
+                {
+                    Camera->ZoomLevel -= 0.5f * cameraSpeed;
+                }
+                else
+                {
+                    Camera->RelativeLocation.x += ZAxis.x * cameraSpeed;
+                    Camera->RelativeLocation.y += ZAxis.y * cameraSpeed;
+                    Camera->RelativeLocation.z += ZAxis.z * cameraSpeed;
+                }
             }
-
-            lastMousePos = currentMousePos;
-        }
-        else if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000))
-        {
-            if (!io.WantCaptureMouse)
+            if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
+                if (Camera->IsOrthogonal)
+                {
+                    Camera->ZoomLevel += 0.5f * cameraSpeed;
+                }
+                else
+                {
+                    Camera->RelativeLocation.x -= ZAxis.x * cameraSpeed;
+                    Camera->RelativeLocation.y -= ZAxis.y * cameraSpeed;
+                    Camera->RelativeLocation.z -= ZAxis.z * cameraSpeed;
+                }
+            }
+            if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
+                Camera->RelativeLocation.y -= cameraSpeed;
+            }
+            if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
+                Camera->RelativeLocation.y += cameraSpeed;
+            }
+            if (pickedObjectPtr && GetAsyncKeyState(VK_SPACE) & 0x0001) {
+                switch (XGizmo->Type) {
+                case ETypeTransform::Location:
+                    XGizmo->SetMeshResource(&RotationGizmoResourceData);
+                    YGizmo->SetMeshResource(&RotationGizmoResourceData);
+                    ZGizmo->SetMeshResource(&RotationGizmoResourceData);
+                    XGizmo->Type = ETypeTransform::Rotation;
+                    YGizmo->Type = ETypeTransform::Rotation;
+                    ZGizmo->Type = ETypeTransform::Rotation;
+                    break;
+                case ETypeTransform::Rotation:
+                    XGizmo->SetMeshResource(&ScaleGizmoResourceData);
+                    YGizmo->SetMeshResource(&ScaleGizmoResourceData);
+                    ZGizmo->SetMeshResource(&ScaleGizmoResourceData);
+                    XGizmo->Type = ETypeTransform::Scale;
+                    YGizmo->Type = ETypeTransform::Scale;
+                    ZGizmo->Type = ETypeTransform::Scale;
+                    break;
+                case ETypeTransform::Scale:
+                    XGizmo->SetMeshResource(&LocationGizmoResourceData);
+                    YGizmo->SetMeshResource(&LocationGizmoResourceData);
+                    ZGizmo->SetMeshResource(&LocationGizmoResourceData);
+                    XGizmo->Type = ETypeTransform::Location;
+                    YGizmo->Type = ETypeTransform::Location;
+                    ZGizmo->Type = ETypeTransform::Location;
+                    break;
+                }
+                XGizmo->Update(pickedObjectPtr);
+                YGizmo->Update(pickedObjectPtr);
+                ZGizmo->Update(pickedObjectPtr);
+            }
+            if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
             {
-                // picking
-                RECT rect;
-                GetClientRect(hWnd, &rect);
-                float screenWidth = (float)(rect.right - rect.left);
-                float screenHeight = (float)(rect.bottom - rect.top);
-                 
-                GetCursorPos(&currentMousePos);
-                ScreenToClient(hWnd, &currentMousePos);
-                float ndcX = 2.f * (float)currentMousePos.x / screenWidth - 1.f;  // screen xy to NDC xy
-                float ndcY = 1.f - 2.f * (float)currentMousePos.y / screenHeight;
-
-                if (pickedGizmoPtr) {
-                    if (!isDragging && !io.WantCaptureMouse)
-                    {
-                        isDragging = true;
-                        lastMousePos = currentMousePos;
-                    }
-
-                    float sensitivity = 0.002f;
-                    float deltaX = (float)(currentMousePos.x - lastMousePos.x);
-                    float deltaY = (float)(currentMousePos.y - lastMousePos.y);
-
-                    FVector GizmoAxis;
-
-                    switch (static_cast<UGizmo*>(pickedGizmoPtr)->Axis)
-                    {
-                    case ETypeAxis::XAxis:
-                        GizmoAxis = FVector(1, 0, 0);
-                        break;
-
-                    case ETypeAxis::YAxis:
-                        GizmoAxis = FVector(0, 1, 0);
-                        break;
-
-                    case ETypeAxis::ZAxis:
-                        GizmoAxis = FVector(0, 0, 1);
-                        break;
-                    }
-
-                    float GizmoLength = 1.f; //기즈모를 같은 크기로 했을 때 이 변수를 기즈모 길이로 수정
-
-                    FVector ObjectLocation = pickedObjectPtr->RelativeLocation;
-                    FMatrix VP = Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
-                    FVector StartNDC = VP.WorldToNDC(ObjectLocation, VP);
-                    FVector EndNDC = VP.WorldToNDC(ObjectLocation + GizmoAxis * GizmoLength, VP);
-
-                    FVector GizmoDirection = EndNDC - StartNDC;
-                    GizmoDirection.z = 0;
-
-                    GizmoDirection.Normalize();
-
-                    float AxisScreenLength =
-                        GizmoDirection.Length();
-
-                    if (AxisScreenLength > 0.00001f)
-                    {
-                        GizmoDirection.Normalize();
-
-                        // 마우스 이동량을 NDC로 변환
-                        FVector MouseDeltaNDC( deltaX * 2.0f / Width, -deltaY * 2.0f / Height );
-
-                        // 마우스 이동을 Gizmo 화면 방향으로 투영
-                        float MouseAxisMovement =  MouseDeltaNDC.Dot(GizmoDirection);
-
-                        // NDC 이동량 → 월드 이동량
-                        float WorldMoveAmount = MouseAxisMovement / AxisScreenLength;
-
-                        // 선택된 월드 축으로만 이동
-                        FVector WorldMove = GizmoAxis * WorldMoveAmount;
-
-                        static_cast<UGizmo*>(pickedGizmoPtr)->ObjUpdate(pickedObjectPtr, WorldMove);
-                    }
-                    XGizmo->Update(pickedObjectPtr);
-                    YGizmo->Update(pickedObjectPtr);
-                    ZGizmo->Update(pickedObjectPtr);
-
+                if (!isDragging && !io.WantCaptureMouse)
+                {
+                    isDragging = true;
                     lastMousePos = currentMousePos;
                 }
 
-                if (!isDragging) {
-                    if (pickedObjectPtr != nullptr)
-                    {
-                        pickedGizmoPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
-                        if (pickedGizmoPtr == nullptr) {
-                            pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                            pickedObjectPtr = nullptr;
-                            XGizmo->bIsActive = false;
-                            YGizmo->bIsActive = false;
-                            ZGizmo->bIsActive = false;
-                        }
-                        else if (pickedGizmoPtr->IsA(UGizmo::StaticClass())) {
-                            pickedGizmoPtr->bIsSelected = !pickedGizmoPtr->bIsSelected;
-                        }
-                        else {
-                            pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                float deltaX = (float)(currentMousePos.x - lastMousePos.x);
+                float deltaY = (float)(currentMousePos.y - lastMousePos.y);
 
-                            pickedObjectPtr = pickedGizmoPtr;
-                            pickedGizmoPtr = nullptr;
-                            pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                            XGizmo->bIsActive = true;
-                            YGizmo->bIsActive = true;
-                            ZGizmo->bIsActive = true;
-                            XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                            YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                            ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                const float sensitivity = 0.002f;
+
+                float angleX = deltaX * sensitivity;
+                float angleY = -deltaY * sensitivity;
+
+                // 좌우
+                Camera->RelativeRotation.y += angleX;
+                // 상하
+                Camera->RelativeRotation.x += angleY;
+
+                // 상하 각도 제한
+                if (Camera->RelativeRotation.x <= DegreeToRadian(-89.f))
+                {
+                    Camera->RelativeRotation.x = DegreeToRadian(-89.f);
+                }
+                else if (Camera->RelativeRotation.x >= DegreeToRadian(89.f))
+                {
+                    Camera->RelativeRotation.x = DegreeToRadian(89.f);
+                }
+
+                lastMousePos = currentMousePos;
+            }
+            else if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000))
+            {
+                if (!io.WantCaptureMouse)
+                {
+                    // picking
+                    RECT rect;
+                    GetClientRect(hWnd, &rect);
+                    float screenWidth = (float)(rect.right - rect.left);
+                    float screenHeight = (float)(rect.bottom - rect.top);
+
+                    GetCursorPos(&currentMousePos);
+                    ScreenToClient(hWnd, &currentMousePos);
+                    float ndcX = 2.f * (float)currentMousePos.x / screenWidth - 1.f;  // screen xy to NDC xy
+                    float ndcY = 1.f - 2.f * (float)currentMousePos.y / screenHeight;
+
+                    if (pickedGizmoPtr) {
+                        if (!isDragging && !io.WantCaptureMouse)
+                        {
+                            isDragging = true;
+                            lastMousePos = currentMousePos;
                         }
+
+                        float sensitivity = 0.002f;
+                        float deltaX = (float)(currentMousePos.x - lastMousePos.x);
+                        float deltaY = (float)(currentMousePos.y - lastMousePos.y);
+
+                        FVector GizmoAxis;
+
+                        switch (static_cast<UGizmo*>(pickedGizmoPtr)->Axis)
+                        {
+                        case ETypeAxis::XAxis:
+                            GizmoAxis = FVector(1, 0, 0);
+                            break;
+
+                        case ETypeAxis::YAxis:
+                            GizmoAxis = FVector(0, 1, 0);
+                            break;
+
+                        case ETypeAxis::ZAxis:
+                            GizmoAxis = FVector(0, 0, 1);
+                            break;
+                        }
+
+                        float GizmoLength = 1.f; //기즈모를 같은 크기로 했을 때 이 변수를 기즈모 길이로 수정
+
+                        FVector ObjectLocation = pickedObjectPtr->RelativeLocation;
+                        FMatrix VP = Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
+                        FVector StartNDC = VP.WorldToNDC(ObjectLocation, VP);
+                        FVector EndNDC = VP.WorldToNDC(ObjectLocation + GizmoAxis * GizmoLength, VP);
+
+                        FVector GizmoDirection = EndNDC - StartNDC;
+                        GizmoDirection.z = 0;
+
+                        GizmoDirection.Normalize();
+
+                        float AxisScreenLength =
+                            GizmoDirection.Length();
+
+                        if (AxisScreenLength > 0.00001f)
+                        {
+                            GizmoDirection.Normalize();
+
+                            // 마우스 이동량을 NDC로 변환
+                            FVector MouseDeltaNDC(deltaX * 2.0f / Width, -deltaY * 2.0f / Height);
+
+                            // 마우스 이동을 Gizmo 화면 방향으로 투영
+                            float MouseAxisMovement = MouseDeltaNDC.Dot(GizmoDirection);
+
+                            // NDC 이동량 → 월드 이동량
+                            float WorldMoveAmount = MouseAxisMovement / AxisScreenLength;
+
+                            // 선택된 월드 축으로만 이동
+                            FVector WorldMove = GizmoAxis * WorldMoveAmount;
+
+                            static_cast<UGizmo*>(pickedGizmoPtr)->ObjUpdate(pickedObjectPtr, WorldMove);
+                        }
+                        XGizmo->Update(pickedObjectPtr);
+                        YGizmo->Update(pickedObjectPtr);
+                        ZGizmo->Update(pickedObjectPtr);
+
+                        lastMousePos = currentMousePos;
                     }
-                    else {
-                        pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+
+                    if (!isDragging) {
                         if (pickedObjectPtr != nullptr)
                         {
-                            pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
-                            XGizmo->bIsActive = true;
-                            YGizmo->bIsActive = true;
-                            ZGizmo->bIsActive = true;
-                            XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                            YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                            ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                            pickedGizmoPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                            if (pickedGizmoPtr == nullptr) {
+                                pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                                pickedObjectPtr = nullptr;
+                                XGizmo->bIsActive = false;
+                                YGizmo->bIsActive = false;
+                                ZGizmo->bIsActive = false;
+                            }
+                            else if (pickedGizmoPtr->IsA(UGizmo::StaticClass())) {
+                                pickedGizmoPtr->bIsSelected = !pickedGizmoPtr->bIsSelected;
+                            }
+                            else {
+                                pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+
+                                pickedObjectPtr = pickedGizmoPtr;
+                                pickedGizmoPtr = nullptr;
+                                pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                                XGizmo->bIsActive = true;
+                                YGizmo->bIsActive = true;
+                                ZGizmo->bIsActive = true;
+                                XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                                YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                                ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                            }
+                        }
+                        else {
+                            pickedObjectPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                            if (pickedObjectPtr != nullptr)
+                            {
+                                pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
+                                XGizmo->bIsActive = true;
+                                YGizmo->bIsActive = true;
+                                ZGizmo->bIsActive = true;
+                                XGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                                YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                                ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                            }
                         }
                     }
                 }
             }
-        }
-        else
-        {
-            isDragging = false;
-            lastMousePos = currentMousePos;
-            pickedGizmoPtr = nullptr;
+            else
+            {
+                isDragging = false;
+                lastMousePos = currentMousePos;
+                pickedGizmoPtr = nullptr;
+            }
         }
 
         //오브젝트 순회하면서 Update 호출
