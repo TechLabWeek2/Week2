@@ -14,6 +14,9 @@
 #include "FMeshResource.h"
 #include "UObjectArray.h"
 #include "Core/Core.h"
+#include "UAxisGizmo.h"
+#include "UFloorComp.h"
+#include "UGizmo.h"
 
 
 class FJsonWrapper

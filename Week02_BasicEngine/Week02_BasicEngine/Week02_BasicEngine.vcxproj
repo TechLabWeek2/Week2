@@ -186,6 +186,7 @@
     <ClInclude Include="FMeshResource.h" />
     <ClInclude Include="FShaderResource.h" />
     <ClInclude Include="FVector.h" />
+    <ClInclude Include="ImGuiFunction.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_dx11.h" />
