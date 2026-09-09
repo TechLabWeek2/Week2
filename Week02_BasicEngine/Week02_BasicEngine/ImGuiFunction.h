@@ -10,8 +10,9 @@
 #include "UCameraComp.h"
 #include "FJsonWrapper.h"
 #include "FShaderResource.h"
+#include "FMeshResourceRegistry.h"
 
-void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource, FMeshResource* PlaneResource, UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitivePtr, double elapsedTime, double currentFPS)
+void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitivePtr, const FMeshResourceRegistry& MeshRegistry, double elapsedTime, double currentFPS)
 {
     ImGui::Begin("Jungle Control Panel");
     ImGui::Text("Hello Jungle World!");
@@ -46,21 +47,23 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
     if (ImGui::Button("Spawn", ImVec2(50.0f, 0.0f)))
     {
         UPrimitiveComponent* newPrimitive = nullptr;
+        FMeshResource* meshResource = MeshRegistry.GetMeshResource(current);
+
         switch (current)
         {
         case ETypePrimitive::Cube:
             newPrimitive = new UCubeComp();
-            newPrimitive->SetMeshResource(CubeResource);
+            newPrimitive->SetMeshResource(meshResource);
             newPrimitive->SetShaderResource(&DefaultShader);
             break;
         case ETypePrimitive::Sphere:
             newPrimitive = new USphereComp();
-            newPrimitive->SetMeshResource(SphereResource);
+            newPrimitive->SetMeshResource(meshResource);
             newPrimitive->SetShaderResource(&DefaultShader);
             break;
         case ETypePrimitive::Plane:
             newPrimitive = new UPlaneComp();
-            newPrimitive->SetMeshResource(PlaneResource);
+            newPrimitive->SetMeshResource(meshResource);
             newPrimitive->SetShaderResource(&DefaultShader);
         }
         newPrimitive->RelativeLocation = FVector(Lx, Ly, Lz);
@@ -318,9 +321,8 @@ void DrawCreateWindow(FMeshResource* CubeResource, FMeshResource* SphereResource
         // 경로에 이미 .Scene이 포함되어 있으므로 다시 붙이지 않음
         if (FJsonWrapper::LoadScene(
             sceneFiles[selectedScene],
-            CubeResource,
-            SphereResource,
-            PlaneResource, &DefaultShader))
+            MeshRegistry,
+            &DefaultShader))
         {
             pickedPrimitivePtr = nullptr;
             sceneMessage = "Scene loaded.";

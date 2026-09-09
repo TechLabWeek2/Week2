@@ -199,6 +199,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Floor1ResourceData.Initialize();
     Floor2ResourceData.Initialize();
 
+
+    FMeshResourceRegistry MeshRegistry;
+    MeshRegistry.Registry(ETypePrimitive::Cube, &CubeResourceData);
+    MeshRegistry.Registry(ETypePrimitive::Sphere, &SphereResourceData);
+    MeshRegistry.Registry(ETypePrimitive::Plane, &PlaneResourceData);
+
+
     //Shader Resource
     DefaultShader.SetVertexShaderName(L"ShaderW0.hlsl");
     DefaultShader.SetPixelShaderName(L"ShaderW0.hlsl");
@@ -697,7 +704,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::NewFrame();
         
         Console.Draw("Console Windows", &is_window_open);
-        DrawCreateWindow(&CubeResourceData, &SphereResourceData, &PlaneResourceData, Camera, pickedObjectPtr, elapsedTime, currentFPS);
+        DrawCreateWindow(Camera, pickedObjectPtr, MeshRegistry, elapsedTime, currentFPS);
         DrawStatWindow();
 
         ImGui::Render();

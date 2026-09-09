@@ -17,7 +17,7 @@
 #include "UAxisGizmo.h"
 #include "UFloorComp.h"
 #include "UGizmo.h"
-
+#include "FMeshResourceRegistry.h"
 
 class FJsonWrapper
 {
@@ -135,7 +135,7 @@ public:
 		return data;
 	}
 
-	static UPrimitiveComponent* DeserializePrimitive(const Json& data, FMeshResource* cubeResource, FMeshResource* sphereResource,FMeshResource* PlaneResource,FShaderResource* shaderResource)
+	static UPrimitiveComponent* DeserializePrimitive(const Json& data,FShaderResource* shaderResource, const FMeshResourceRegistry& MeshRegistry)
 	{
 		FVector location = DeserializeVector3(data.at("Location"));
 		FVector rotation = DeserializeVector3(data.at("Rotation"));
@@ -162,25 +162,8 @@ public:
 		const Json& flag = data.at("UseColor");
 		useColor = flag.ToBool();
 
-		FMeshResource* MeshResource = nullptr;
+		FMeshResource* MeshResource = MeshRegistry.GetMeshResource(type);
 
-		switch (type)
-		{
-		case ETypePrimitive::Cube:
-			MeshResource = cubeResource;
-			break;
-
-		case ETypePrimitive::Sphere:
-			MeshResource = sphereResource;
-			//newPrimitive = new USphereComp();
-			break;
-
-		case ETypePrimitive::Plane:
-			MeshResource = PlaneResource;
-			break;
-		default:
-			return nullptr; // 
-		}
 		if (MeshResource == nullptr)
 			return nullptr;
 
@@ -278,7 +261,7 @@ public:
 		return true;
 	}
 
-	static bool LoadScene(const std::filesystem::path& filename, FMeshResource* cubeResource, FMeshResource* sphereResource, FMeshResource* PlaneResource,FShaderResource* shaderResource)
+	static bool LoadScene(const std::filesystem::path& filename, const FMeshResourceRegistry& MeshRegistry,FShaderResource* shaderResource)
 	{
 		std::ifstream file(filename);
 
@@ -330,7 +313,7 @@ public:
 		for (const auto& [uuidString, primitiveData]
 			: primitives.ObjectRange())
 		{
-			DeserializePrimitive(primitiveData, cubeResource, sphereResource, PlaneResource, shaderResource);
+			DeserializePrimitive(primitiveData,shaderResource, MeshRegistry);
 
 		}
 
