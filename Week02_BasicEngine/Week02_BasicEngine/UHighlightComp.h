@@ -3,5 +3,7 @@
 class UHighlightComp :
     public UPrimitiveComponent
 {
+public:
+    UHighlightComp();
 };
 

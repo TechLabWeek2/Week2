@@ -142,4 +142,5 @@ public:
     //반투명 정렬 함수
     void SortTranslucentByDistance(TArray<UPrimitiveComponent*>& AlphaList, const FVector& CameraLoc);
 
+    void RenderList(TArray<UPrimitiveComponent*>& ObjList, const UCameraComp* Camera);
 };

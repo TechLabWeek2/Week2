@@ -322,116 +322,14 @@ void URenderer::RenderScene(const TArray<UObject*> Objects, const UCameraComp* C
 		}
 	}
 
-	//불투명 그리기
-	for (UPrimitiveComponent* Obj : OpaqueList)
-	{
-		if (Obj->bIsActive)
-		{
-			//Shader Set
-			if (FShaderResource* TempShaderResource = Obj->GetShaderResource())
-			{
-				if (ID3D11VertexShader* VSShader = TempShaderResource->GetVertexShader())
-				{
-					GGraphicsDevice.GetDeviceContext()->VSSetShader(VSShader, nullptr, 0);
-				}
-				if (ID3D11PixelShader* PSShader = TempShaderResource->GetPixelShader())
-				{
-					GGraphicsDevice.GetDeviceContext()->PSSetShader(PSShader, nullptr, 0);
-				}
-
-				if (ID3D11InputLayout* InputLO = TempShaderResource->GetInputLayout())
-				{
-					GGraphicsDevice.GetDeviceContext()->IASetInputLayout(InputLO);
-				}
-			}
-
-			/*GGraphicsDevice.GetDeviceContext()->VSSetShader(Obj->GetShaderResource()->GetVertexShader(), nullptr, 0);
-			GGraphicsDevice.GetDeviceContext()->PSSetShader(Obj->GetShaderResource()->GetPixelShader(), nullptr, 0);
-			GGraphicsDevice.GetDeviceContext()->IASetInputLayout(Obj->GetShaderResource()->GetInputLayout()); */ 
-
-			//Constant Buffer Set
-			GGraphicsDevice.GetDeviceContext()->VSSetConstantBuffers(0, 1, &ConstantBuffer);
-			GGraphicsDevice.GetDeviceContext()->PSSetConstantBuffers(0, 1, &ConstantBuffer);
-
-			//Rasterizer State Set
-			GGraphicsDevice.GetDeviceContext()->RSSetState(FindRasterizerState(Obj->GetRasterizerState()));
-			//BlendState Set
-			GGraphicsDevice.GetDeviceContext()->OMSetBlendState(FindBlendState(Obj->GetBlendMode()), nullptr, 0xffffffff);
-
-			//Constant Buffer Update
-			FConstants TempConstantData = {};
-
-			TempConstantData.MVP = Obj->GetQuatModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
-			TempConstantData.HightLightIntensity = Obj->bIsSelected ? 2.0 : 1.0;
-			TempConstantData.Color[0] = Obj->GetModelColor()[0];
-			TempConstantData.Color[1] = Obj->GetModelColor()[1];
-			TempConstantData.Color[2] = Obj->GetModelColor()[2];
-			TempConstantData.Color[3] = Obj->GetModelColor()[3];
-			TempConstantData.UseColor = Obj->GetUseColorFlag();
-			TempConstantData.PatternNum = 2000;
-			UpdateConstant(TempConstantData);
-
-			//Topology Set
-			//메시 리소스
-			if (FMeshResource* TempMeshResource = Obj->GetMeshResource())
-			{
-				if (D3D11_PRIMITIVE_TOPOLOGY TempTopology = TempMeshResource->GetTopology())
-				{
-					GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(TempTopology);
-				}
-				//Render
-				RenderPrimitive(TempMeshResource->GetVertexBuffer(), TempMeshResource->GetNumVertices());
-			}
-
-		}
-	}
+	//불투명 렌더
+	RenderList(OpaqueList, Camera);
 
 	//거리 정렬
 	SortTranslucentByDistance(AlphaList, Camera->GetLocation());
 
 	//반투명 렌더
-	for (UPrimitiveComponent* Obj : AlphaList)
-	{
-		if (Obj->bIsActive)
-		{
-			if (FShaderResource* TempShaderResource = Obj->GetShaderResource())
-			{
-				if (ID3D11VertexShader* VSShader = TempShaderResource->GetVertexShader())
-				{
-					GGraphicsDevice.GetDeviceContext()->VSSetShader(VSShader, nullptr, 0);
-				}
-				if (ID3D11PixelShader* PSShader = TempShaderResource->GetPixelShader())
-				{
-					GGraphicsDevice.GetDeviceContext()->PSSetShader(PSShader, nullptr, 0);
-				}
-
-				if (ID3D11InputLayout* InputLO = TempShaderResource->GetInputLayout())
-				{
-					GGraphicsDevice.GetDeviceContext()->IASetInputLayout(InputLO);
-				}
-			}
-			
-			GGraphicsDevice.GetDeviceContext()->VSSetConstantBuffers(0, 1, &ConstantBuffer);
-			GGraphicsDevice.GetDeviceContext()->PSSetConstantBuffers(0, 1, &ConstantBuffer);
-
-			GGraphicsDevice.GetDeviceContext()->RSSetState(FindRasterizerState(Obj->GetRasterizerState()));
-			GGraphicsDevice.GetDeviceContext()->OMSetBlendState(FindBlendState(Obj->GetBlendMode()), nullptr, 0xffffffff);
-
-			FConstants TempConstantData = {};
-			TempConstantData.MVP = Obj->GetQuatModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
-			TempConstantData.HightLightIntensity = Obj->bIsSelected ? 2.0 : 1.0;
-			TempConstantData.Color[0] = Obj->GetModelColor()[0];
-			TempConstantData.Color[1] = Obj->GetModelColor()[1];
-			TempConstantData.Color[2] = Obj->GetModelColor()[2];
-			TempConstantData.Color[3] = Obj->GetModelColor()[3];
-			TempConstantData.UseColor = Obj->GetUseColorFlag();
-			TempConstantData.PatternNum = 2000;
-			UpdateConstant(TempConstantData);
-
-			GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(Obj->GetMeshResource()->GetTopology());
-			RenderPrimitive(Obj->GetMeshResource()->GetVertexBuffer(), Obj->GetMeshResource()->GetNumVertices());
-		}
-	}	 
+	RenderList(AlphaList, Camera);
 }
 
 void URenderer::Init()
@@ -613,4 +511,68 @@ void URenderer::SortTranslucentByDistance(TArray<UPrimitiveComponent*>& AlphaLis
 				  float DisB = (B->GetLocation() - CameraLoc).SizeSquared();
 				  return DisA > DisB;
 			  });
+}
+
+void URenderer::RenderList(TArray<UPrimitiveComponent*>& ObjList, const UCameraComp* Camera)
+{
+	for (UPrimitiveComponent* Obj : ObjList)
+	{
+		if (Obj->bIsActive)
+		{
+			if (FShaderResource* TempShaderResource = Obj->GetShaderResource())
+			{
+				if (ID3D11VertexShader* VSShader = TempShaderResource->GetVertexShader())
+				{
+					GGraphicsDevice.GetDeviceContext()->VSSetShader(VSShader, nullptr, 0);
+				}
+				else continue;
+				if (ID3D11PixelShader* PSShader = TempShaderResource->GetPixelShader())
+				{
+					GGraphicsDevice.GetDeviceContext()->PSSetShader(PSShader, nullptr, 0);
+				}
+				else continue;
+
+				if (ID3D11InputLayout* InputLO = TempShaderResource->GetInputLayout())
+				{
+					GGraphicsDevice.GetDeviceContext()->IASetInputLayout(InputLO);
+				}
+				else continue;
+			}
+			else continue;
+
+			GGraphicsDevice.GetDeviceContext()->VSSetConstantBuffers(0, 1, &ConstantBuffer);
+			GGraphicsDevice.GetDeviceContext()->PSSetConstantBuffers(0, 1, &ConstantBuffer);
+
+			if (ID3D11RasterizerState* TempRSState = FindRasterizerState(Obj->GetRasterizerState()))
+			{
+				GGraphicsDevice.GetDeviceContext()->RSSetState(TempRSState);
+			}
+			else continue;
+
+			if (ID3D11BlendState* TempBlendState = FindBlendState(Obj->GetBlendMode()))
+			{
+				GGraphicsDevice.GetDeviceContext()->OMSetBlendState(TempBlendState, nullptr, 0xffffffff);
+			}
+			else continue;
+
+			FConstants TempConstantData = {};
+			TempConstantData.MVP = Obj->GetQuatModelMatrix() * Camera->GetViewMatrix() * Camera->GetProjectionMatrix();
+			TempConstantData.HightLightIntensity = Obj->bIsSelected ? 2.0 : 1.0;
+			TempConstantData.Color[0] = Obj->GetModelColor()[0];
+			TempConstantData.Color[1] = Obj->GetModelColor()[1];
+			TempConstantData.Color[2] = Obj->GetModelColor()[2];
+			TempConstantData.Color[3] = Obj->GetModelColor()[3];
+			TempConstantData.UseColor = Obj->GetUseColorFlag();
+			TempConstantData.PatternNum = 2000;
+			UpdateConstant(TempConstantData);
+
+
+			if (FMeshResource* TempMeshResource = Obj->GetMeshResource())
+			{
+				GGraphicsDevice.GetDeviceContext()->IASetPrimitiveTopology(TempMeshResource->GetTopology());
+				RenderPrimitive(Obj->GetMeshResource()->GetVertexBuffer(), TempMeshResource->GetNumVertices());
+			}
+			else continue;
+		}
+	}
 }

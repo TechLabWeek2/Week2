@@ -548,6 +548,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 XGizmo->bIsActive = false;
                                 YGizmo->bIsActive = false;
                                 ZGizmo->bIsActive = false;
+
+                                if (HighlightObj != nullptr)
+                                {
+                                    HighlightObj->bIsActive = false;
+                                }                                
                             }
                             else if (pickedGizmoPtr->IsA(UGizmo::StaticClass())) {
                                 pickedGizmoPtr->bIsSelected = !pickedGizmoPtr->bIsSelected;
@@ -565,11 +570,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 YGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                 ZGizmo->RelativeLocation = pickedObjectPtr->RelativeLocation;
 
-                                HighlightObj->SetMeshResource(pickedObjectPtr->GetMeshResource());
-                                HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
-                                HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
-                                HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
-                                HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                                if (HighlightObj != nullptr)
+                                {
+                                    HighlightObj->bIsActive = true;
+                                    HighlightObj->SetMeshResource(pickedObjectPtr->GetMeshResource());
+                                    HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
+                                    HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
+                                    HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
+                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                                }                                
                             }
                         }
                         else {
@@ -590,6 +599,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 //하이라이트 데이터 수정
                                 if (HighlightObj != nullptr)
                                 {
+                                    HighlightObj->bIsActive = true;
                                     HighlightObj->SetMeshResource(pickedObjectPtr->GetMeshResource());
                                     HighlightObj->SetRasterizerState(pickedObjectPtr->GetHighlightRasterizerState(pickedObjectPtr->GetRasterizerState()));
                                     HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
