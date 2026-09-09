@@ -458,16 +458,22 @@ void DrawDetailsWindow(UPrimitiveComponent* selectedObject)
         ImGui::Text("Location");
         ImGui::SameLine(130);
         ImGui::SetNextItemWidth(100.0f);
-        ImGui::DragFloat("##LocationX_input", &LocationX, 0.01f);
-        selectedObject->RelativeLocation.x = LocationX;
+        if (ImGui::DragFloat("##LocationX_input", &LocationX, 0.01f))
+        {
+            selectedObject->RelativeLocation.x = LocationX;
+        }
         ImGui::SameLine();
         ImGui::SetNextItemWidth(100.0f);
-        ImGui::DragFloat("##LocationY_input", &LocationY, 0.01f);
-        selectedObject->RelativeLocation.y = LocationY;
+        if (ImGui::DragFloat("##LocationY_input", &LocationY, 0.01f))
+        {
+            selectedObject->RelativeLocation.y = LocationY;
+        }
         ImGui::SameLine();
         ImGui::SetNextItemWidth(100.0f);
-        ImGui::DragFloat("##LocationZ_input", &LocationZ, 0.01f);
-        selectedObject->RelativeLocation.z = LocationZ;
+        if (ImGui::DragFloat("##LocationZ_input", &LocationZ, 0.01f))
+        {
+            selectedObject->RelativeLocation.z = LocationZ;
+        }
 
         float RotationX = selectedObject->RelativeRotation.x;
         float RotationY = selectedObject->RelativeRotation.y;
@@ -476,17 +482,22 @@ void DrawDetailsWindow(UPrimitiveComponent* selectedObject)
         ImGui::Text("Rotation");
         ImGui::SameLine(130);
         ImGui::SetNextItemWidth(100.0f);
-        ImGui::DragFloat("##RotationX_input", &RotationX, 0.01f);
-        selectedObject->RelativeRotation.x = RotationX;
+        bool rotationChanged = false;
+        rotationChanged |= ImGui::DragFloat("##RotationX_input", &RotationX, 0.01f);
         ImGui::SameLine();
         ImGui::SetNextItemWidth(100.0f);
-        ImGui::DragFloat("##RotationY_input", &RotationY, 0.01f);
-        selectedObject->RelativeRotation.y = RotationY;
+        rotationChanged |= ImGui::DragFloat("##RotationY_input", &RotationY, 0.01f);
         ImGui::SameLine();
         ImGui::SetNextItemWidth(100.0f);
-        ImGui::DragFloat("##RotationZ_input", &RotationZ, 0.01f);
-        selectedObject->RelativeRotation.z = RotationZ;
-        selectedObject->RelativeQ = selectedObject->RelativeQ.FromEuler(selectedObject->RelativeRotation);
+        rotationChanged |= ImGui::DragFloat("##RotationZ_input", &RotationZ, 0.01f);
+
+        if (rotationChanged)
+        {
+            selectedObject->RelativeRotation.x = RotationX;
+            selectedObject->RelativeRotation.y = RotationY;
+            selectedObject->RelativeRotation.z = RotationZ;
+            selectedObject->RelativeQ = selectedObject->RelativeQ.FromEuler(selectedObject->RelativeRotation);
+        }
 
         float ScaleX = selectedObject->RelativeScale3D.x;
         float ScaleY = selectedObject->RelativeScale3D.y;
@@ -495,16 +506,22 @@ void DrawDetailsWindow(UPrimitiveComponent* selectedObject)
         ImGui::Text("Scale");
         ImGui::SameLine(130);
         ImGui::SetNextItemWidth(100.0f);
-        ImGui::DragFloat("##ScaleX_input", &ScaleX, 0.01f);
-        selectedObject->RelativeScale3D.x = ScaleX;
+        if (ImGui::DragFloat("##ScaleX_input", &ScaleX, 0.01f))
+        {
+            selectedObject->RelativeScale3D.x = ScaleX;
+        }
         ImGui::SameLine();
         ImGui::SetNextItemWidth(100.0f);
-        ImGui::DragFloat("##ScaleY_input", &ScaleY, 0.01f);
-        selectedObject->RelativeScale3D.y = ScaleY;
+        if (ImGui::DragFloat("##ScaleY_input", &ScaleY, 0.01f))
+        {
+            selectedObject->RelativeScale3D.y = ScaleY;
+        }
         ImGui::SameLine();
         ImGui::SetNextItemWidth(100.0f);
-        ImGui::DragFloat("##ScaleZ_input", &ScaleZ, 0.01f);
-        selectedObject->RelativeScale3D.z = ScaleZ;
+        if (ImGui::DragFloat("##ScaleZ_input", &ScaleZ, 0.01f))
+        {
+            selectedObject->RelativeScale3D.z = ScaleZ;
+        }
 
         //ImGui::Separator();
     }
