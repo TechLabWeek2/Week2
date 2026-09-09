@@ -456,6 +456,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             {
                 if (!io.WantCaptureMouse)
                 {
+                    //하이라이트 오브젝트 스케일 증가 두께
+                    FVector HighlightThickness = { 0.01f, 0.01f, 0.01f };
+
                     // picking
                     RECT rect;
                     GetClientRect(hWnd, &rect);
@@ -538,7 +541,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
                             HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
                             HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
-                            HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                            HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
                         }
                     }
 
@@ -585,7 +588,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                     HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
                                     HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
-                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
                                 }                                
                             }
                         }
@@ -613,7 +616,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     HighlightObj->RelativeLocation = pickedObjectPtr->RelativeLocation;
                                     HighlightObj->RelativeRotation = pickedObjectPtr->RelativeRotation;
                                     HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
-                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D * 1.05f;
+                                    HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
                                 }
                             }
                         }
