@@ -49,15 +49,20 @@ FMatrix UCameraComp::GetProjectionMatrix() const
 //	return Up;
 //}
 //
-void UCameraComp::UpdateArguments(bool bImGuiWantCaptureMouse, POINT* currentMousePos, HWND* hWnd)
+void UCameraComp::UpdateArguments(bool bFocus, bool bImGuiWantCaptureMouse, POINT* currentMousePos)
 {
+    this->bFocus = bFocus;
     this->bImGuiWantCaptureMouse = bImGuiWantCaptureMouse;
-    this->hWnd = hWnd;
     this->currentMousePos = currentMousePos;
 }
 
 void UCameraComp::Update(float deltaTime)
 {
+    if (!bFocus)
+    {
+        return;
+    }
+
     FVector CameraForward = GetForwardVector_UE();
     FVector CameraRight = GetRightVector_UE();
     FVector CameraUp = GetUpVector_UE();
