@@ -1,4 +1,5 @@
 #include "UPicking.h"
+#include "UGizmo.h"
 
 UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCameraComp* &Camera, FVector forward, FVector right, FVector up, const TArray<UObject*>& ObjectList, int32 ObjectListCnt, bool* bIsPicking)
 {
@@ -127,16 +128,17 @@ UPrimitiveComponent* UPicking::GetPickedPrimitive(float ndcX, float ndcY, UCamer
                 FVector rayCastedLocation = rayOrigin + rayVector * t;
                 float distanceCamera = (rayOrigin - rayCastedLocation).Size(); // 충돌지점에서 camera까지의 거리
                 distanceCamera = distanceCamera < 0.001f ? 0.001f : distanceCamera;
+                //if (PrimitiveComponent->primitiveType == ETypePrimitive::Gizmo)
+                if (PrimitiveComponent->IsA(UGizmo::StaticClass()))
+                {
+                    return PrimitiveComponent;
+                }
                 if (distanceMin > distanceCamera)
                 {
                     *bIsPicking = true;
                     bIsFound = true;
                     distanceMin = distanceCamera;
                     pickedObject = PrimitiveComponent;
-                    if (PrimitiveComponent->primitiveType == ETypePrimitive::Gizmo)
-                    {
-                        return pickedObject;
-                    }
                 }
             }
         }

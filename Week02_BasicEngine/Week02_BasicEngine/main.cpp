@@ -309,7 +309,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     TArray<float> Red = { 0.8f, 0.f, 0.f, 1.0f };
     TArray<float> Green = { 0.f, 0.8f, 0.f, 1.f };
-    TArray<float> Blue = { 0.f, 0.f, 0.8f, 1.f };
+    TArray<float> Blue = { 0.f, 0.f, 0.6f, 1.f };
     XGizmo->SetModelColor(Red);
     YGizmo->SetModelColor(Green);
     ZGizmo->SetModelColor(Blue);
@@ -581,6 +581,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             //pickedGizmoPtr = UPicking::GetPickedPrimitive(ndcX, ndcY, Camera, ZAxis, XAxis, YAxis, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
                             pickedGizmoPtr = UPicking::GetPickedPrimitive(
                                 ndcX, ndcY, Camera, CameraForward, CameraRight, CameraUp, GUObjectArray.GetAllObjects(), GUObjectArray.GetNum(), &bIsPicking);
+                            
 
                             if (pickedGizmoPtr == nullptr) {
                                 pickedObjectPtr->bIsSelected = !pickedObjectPtr->bIsSelected;
