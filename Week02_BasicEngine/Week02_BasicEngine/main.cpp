@@ -633,7 +633,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     HighlightObj->RelativeQ = pickedObjectPtr->RelativeQ;
                                     HighlightObj->RelativeScale3D = pickedObjectPtr->RelativeScale3D + HighlightThickness;
                                 }
-                            }
+                            }                            
                         }
                     }
                 }
@@ -643,6 +643,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 isDragging = false;
                 lastMousePos = currentMousePos;
                 pickedGizmoPtr = nullptr;
+                //조작 없이 가만히 있을 때 imgui 기즈모에서 delete를 눌렀을 때와 같이 pickedObjectPtr이 사라졌을 때 대처
+                if (pickedObjectPtr == nullptr)
+                {
+                    XGizmo->bIsActive = false;
+                    YGizmo->bIsActive = false;
+                    ZGizmo->bIsActive = false;
+                    if(HighlightObj != nullptr)
+                        HighlightObj->bIsActive = false;
+                }
             }
         }
         if (pickedObjectPtr) {

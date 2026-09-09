@@ -55,10 +55,8 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
     }
     ImGui::SameLine();
     ImGui::InputInt("Number of spawn", &spawnNum);
-
     //Draw
     ImGui::BeginGroup();
-
     //Location
     ImGui::Text("Location");
     ImGui::SameLine(70);
@@ -101,9 +99,10 @@ void DrawCreateWindow(UCameraComp* Camera, UPrimitiveComponent*& pickedPrimitive
 
     if (ImGui::Button("Delete", ImVec2(50.0f, 0.0f)))
     {
-        if (pickedPrimitivePtr)
+        if (pickedPrimitivePtr != nullptr)
         {
             GUObjectArray.RemoveObj(pickedPrimitivePtr);
+            pickedPrimitivePtr = nullptr;
         }
 
         ImGui::Separator();
