@@ -49,11 +49,12 @@ FMatrix UCameraComp::GetProjectionMatrix() const
 //	return Up;
 //}
 //
-void UCameraComp::UpdateArguments(bool bFocus, bool bMouseOut, bool bImGuiWantCaptureMouse, POINT* currentMousePos)
+void UCameraComp::UpdateArguments(bool bFocus, bool bMouseOut, bool bImGuiWantCaptureMouse, bool bImGuiWantCaptureKeyboard,  POINT* currentMousePos)
 {
     this->bFocus = bFocus;
     this->bMouseOut = bMouseOut;
     this->bImGuiWantCaptureMouse = bImGuiWantCaptureMouse;
+    this->bImGuiWantCaptureKeyboard = bImGuiWantCaptureKeyboard;
     this->currentMousePos = currentMousePos;
 }
 
@@ -77,42 +78,46 @@ void UCameraComp::Update(float deltaTime)
     float deltaY = float(lastMousePos.y - currentMousePos->y);
     lastMousePos = *currentMousePos;
 
-    if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
-        RelativeLocation -= (CameraRight * cameraSpeed);
-    }
-    if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
-        RelativeLocation += CameraRight * cameraSpeed;
-    }
-    if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
-        if (IsOrthogonal)
-        {
-            ZoomLevel -= 0.5f * cameraSpeed;
+    if (!bImGuiWantCaptureKeyboard)
+    {
+        if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) { //왼쪽 (A)
+            RelativeLocation -= (CameraRight * cameraSpeed);
         }
-        else
-        {
-            RelativeLocation.x += CameraForward.x * cameraSpeed;
-            RelativeLocation.y += CameraForward.y * cameraSpeed;
-            RelativeLocation.z += CameraForward.z * cameraSpeed;
+        if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) { //오른쪽 (D)
+            RelativeLocation += CameraRight * cameraSpeed;
+        }
+        if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) { //앞 (W)
+            if (IsOrthogonal)
+            {
+                ZoomLevel -= 0.5f * cameraSpeed;
+            }
+            else
+            {
+                RelativeLocation.x += CameraForward.x * cameraSpeed;
+                RelativeLocation.y += CameraForward.y * cameraSpeed;
+                RelativeLocation.z += CameraForward.z * cameraSpeed;
+            }
+        }
+        if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
+            if (IsOrthogonal)
+            {
+                ZoomLevel += 0.5f * cameraSpeed;
+            }
+            else
+            {
+                RelativeLocation.x -= CameraForward.x * cameraSpeed;
+                RelativeLocation.y -= CameraForward.y * cameraSpeed;
+                RelativeLocation.z -= CameraForward.z * cameraSpeed;
+            }
+        }
+        if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
+            RelativeLocation.z -= cameraSpeed;
+        }
+        if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
+            RelativeLocation.z += cameraSpeed;
         }
     }
-    if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) { //뒤 (S)
-        if (IsOrthogonal)
-        {
-            ZoomLevel += 0.5f * cameraSpeed;
-        }
-        else
-        {
-            RelativeLocation.x -= CameraForward.x * cameraSpeed;
-            RelativeLocation.y -= CameraForward.y * cameraSpeed;
-            RelativeLocation.z -= CameraForward.z * cameraSpeed;
-        }
-    }
-    if (GetAsyncKeyState(0x51) & 0x8000) { //위 (Q)
-        RelativeLocation.z -= cameraSpeed;
-    }
-    if (GetAsyncKeyState(0x45) & 0x8000) { //아래 (E)
-        RelativeLocation.z += cameraSpeed;
-    }
+    
     if (bMouseOut)
     {
         return;

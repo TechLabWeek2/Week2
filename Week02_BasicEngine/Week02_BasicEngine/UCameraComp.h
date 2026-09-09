@@ -23,6 +23,7 @@ public:
     bool bFocus = false;
     bool bMouseOut = false;
     bool bImGuiWantCaptureMouse = false;
+    bool bImGuiWantCaptureKeyboard = false;
     POINT lastMousePos = {};
     POINT* currentMousePos = {};
 
@@ -38,7 +39,7 @@ public:
     const FVector GetRightVector_UE()const;
     const FVector GetUpVector_UE()const;*/
 
-    void UpdateArguments(bool bFocus, bool bMouseOut, bool bImGuiWantCaptureMouse, POINT* currentMousePos);
+    void UpdateArguments(bool bFocus, bool bMouseOut, bool bImGuiWantCaptureMouse, bool bImGuiWantCaptureKeyboard, POINT* currentMousePos);
     void Update(float deltaTime) override;
 
     static UClass* StaticClass()
