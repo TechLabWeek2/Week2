@@ -24,4 +24,6 @@ struct FQuat
     void Normalize();
 
     FQuat operator*(const FQuat& Other) const;
+    FVector RotateVector(const FVector& v) const;
+    FQuat Inverse() const;
 };

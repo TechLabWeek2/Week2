@@ -237,6 +237,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     //ExampleAppConsole Console;
     bool is_window_open = true;
+    ETypeSpace Space = ETypeSpace::Local;
 
     //picking
     bool bIsPicking = false;
@@ -420,6 +421,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         
         if (bFocus)
         {
+            if (GetAsyncKeyState(VK_TAB) & 0x0001) {
+                switch (Space) {
+                case ETypeSpace::Local:
+                    Space = ETypeSpace::World;
+                    break;
+                case ETypeSpace::World:
+                    Space = ETypeSpace::Local;
+                    break;
+                }
+                XGizmo->Space = Space;
+                YGizmo->Space = Space;
+                ZGizmo->Space = Space;
+            }
             Camera->UpdateArguments(io.WantCaptureMouse, &currentMousePos ,&hWnd);
 
             if (GetAsyncKeyState(VK_SPACE) & 0x0001 && pickedObjectPtr) {
@@ -526,7 +540,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             // 선택된 월드 축으로만 이동
                             FVector WorldMove = GizmoAxis * WorldMoveAmount;
 
-                            static_cast<UGizmo*>(pickedGizmoPtr)->ObjUpdate(pickedObjectPtr, WorldMove, deltaX* sensitivity, deltaY* sensitivity);
+                            static_cast<UGizmo*>(pickedGizmoPtr)->ObjUpdate(pickedObjectPtr, WorldMove, currentMousePos, lastMousePos, screenWidth, screenHeight, Camera);
                         }
                         XGizmo->Update(pickedObjectPtr, Camera);
                         YGizmo->Update(pickedObjectPtr, Camera);
